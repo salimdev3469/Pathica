@@ -45,6 +45,23 @@ create table if not exists anonymous_sessions (
   created_at timestamptz default now()
 );
 
+
+create table if not exists cv_email_requests (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  token text not null unique,
+  status text not null default 'pending', -- pending | sent | failed
+  cv_state jsonb not null,
+  fingerprint text,
+  expires_at timestamptz not null default (now() + interval '24 hours'),
+  verified_at timestamptz,
+  sent_at timestamptz,
+  error_message text,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_cv_email_requests_token on cv_email_requests(token);
+create index if not exists idx_cv_email_requests_email on cv_email_requests(email);
 create table if not exists job_applications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,

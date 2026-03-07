@@ -4,11 +4,14 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useCV, CVState } from '@/context/CVContext';
 import { CVTemplate } from '@/components/pdf/CVTemplate';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Download, Loader2, Sparkles, UserPlus, Save, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAnonymousLimit } from '@/hooks/useAnonymousLimit';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import Link from 'next/link';
+import { createBrowserClient } from '@/lib/supabase';
 
 import {
     DndContext,
@@ -81,7 +84,7 @@ const DraggableSectionWrapper = ({ id, children, state, showTutorial, onDismiss,
                     <div className="absolute left-[15px] top-1 w-[220px] bg-blue-600 text-white p-4 rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in duration-500 font-sans cursor-default pointer-events-none">
                         <div className="flex justify-between items-center mb-1.5 pointer-events-auto">
                             <span className="font-bold text-sm flex items-center gap-1.5">
-                                💡 Tip
+                                Tip
                             </span>
                             <button onClick={(e) => { e.stopPropagation(); onDismiss?.(); }} className="text-blue-200 hover:text-white transition-colors bg-blue-700/50 hover:bg-blue-700 p-1 rounded-full">
                                 <X size={14} />
@@ -156,7 +159,16 @@ export function CVPreview() {
     const { fingerprint, hasReachedLimit, isLoading, setHasReachedLimit } = useAnonymousLimit();
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showTutorial, setShowTutorial] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showEmailDialog, setShowEmailDialog] = useState(false);
+    const [downloadEmail, setDownloadEmail] = useState('');
+    const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
 
+
+    const getErrorMessage = (error: unknown) => {
+        if (error instanceof Error) return error.message;
+        return 'Unexpected error';
+    };
     // Auto-scale the A4 preview to fit its container
     useEffect(() => {
         const handleResize = () => {
@@ -173,15 +185,36 @@ export function CVPreview() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+
+    useEffect(() => {
+        let isMounted = true;
+
+        async function loadAuthState() {
+            try {
+                const supabase = createBrowserClient();
+                const { data: { user } } = await supabase.auth.getUser();
+                if (isMounted) {
+                    setIsAuthenticated(Boolean(user));
+                }
+            } catch {
+                if (isMounted) setIsAuthenticated(false);
+            }
+        }
+
+        loadAuthState();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
     useEffect(() => {
         // Show tutorial if not seen before and there are sections
         const seen = localStorage.getItem('cv-builder-dnd-tutorial-v2');
         if (!seen && state.sections.length > 0 && !showTutorial) {
             setShowTutorial(true);
-
-            // Ekranın sağ alt/üst köşesinden net bir şekilde çıkacak bildirim
+            // Show the drag-and-drop onboarding toast shortly after the tutorial appears
             setTimeout(() => {
-                toast('💡 New Feature: Drag & Drop', {
+                toast('New Feature: Drag & Drop', {
                     description: 'You can instantly reorder your CV by grabbing the drag handles on the left side of the sections on the PDF preview!',
                     duration: 10000,
                     action: {
@@ -219,18 +252,13 @@ export function CVPreview() {
         }
     };
 
-    const handleDownload = async () => {
-        if (hasReachedLimit) {
-            setShowUpgradeModal(true);
-            return;
-        }
-
+    const downloadPdfDirectly = async () => {
         setIsDownloading(true);
         try {
             const response = await fetch('/api/cv/generate-pdf', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...state, fingerprint }),
+                body: JSON.stringify({ ...state, fingerprint: isAuthenticated ? undefined : fingerprint }),
             });
 
             if (!response.ok) {
@@ -251,14 +279,74 @@ export function CVPreview() {
             a.remove();
             window.URL.revokeObjectURL(url);
 
-            toast.success('CV Downloaded successfully!');
-            setHasReachedLimit(true);
+            toast.success('CV downloaded successfully!');
+            if (!isAuthenticated) {
+                setHasReachedLimit(true);
+            }
         } catch (error) {
             console.error('Download error:', error);
             toast.error('Failed to download CV');
         } finally {
             setIsDownloading(false);
         }
+    };
+
+    const handleEmailRequest = async () => {
+        const trimmedEmail = downloadEmail.trim();
+        if (!trimmedEmail) {
+            toast.error('Please enter an email address.');
+            return;
+        }
+
+        if (!fingerprint) {
+            toast.error('Could not verify your device. Please refresh and try again.');
+            return;
+        }
+
+        setIsSubmittingEmail(true);
+        try {
+            const response = await fetch('/api/cv/email/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: trimmedEmail,
+                    cvState: state,
+                    fingerprint,
+                }),
+            });
+
+            const data = await response.json().catch(() => null);
+            if (!response.ok) {
+                throw new Error(data?.error || 'Failed to send verification email');
+            }
+
+            setShowEmailDialog(false);
+            setDownloadEmail('');
+            toast.success('Verification email sent. After confirmation, your CV will be sent to your inbox.');
+        } catch (error) {
+            toast.error(getErrorMessage(error));
+        } finally {
+            setIsSubmittingEmail(false);
+        }
+    };
+
+    const handleDownload = async () => {
+        if (isAuthenticated) {
+            await downloadPdfDirectly();
+            return;
+        }
+
+        if (!fingerprint) {
+            toast.error('Could not verify your device. Please refresh and try again.');
+            return;
+        }
+
+        if (hasReachedLimit) {
+            setShowUpgradeModal(true);
+            return;
+        }
+
+        setShowEmailDialog(true);
     };
 
     // DND Handlers
@@ -337,13 +425,15 @@ export function CVPreview() {
             <div className="flex items-center justify-between p-4 bg-white border-b shadow-sm z-10">
                 <h2 className="font-semibold text-lg text-slate-800">Preview</h2>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleSave} disabled={isSaving} className="gap-2">
-                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        Save
-                    </Button>
-                    <Button onClick={handleDownload} disabled={isDownloading || isLoading} className="gap-2">
+                    {isAuthenticated && (
+                        <Button variant="outline" onClick={handleSave} disabled={isSaving} className="gap-2">
+                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            Save
+                        </Button>
+                    )}
+                    <Button onClick={handleDownload} disabled={isDownloading || isLoading || isSubmittingEmail} className="gap-2">
                         {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                        Download PDF
+                        {isAuthenticated ? 'Download PDF' : 'Send PDF to Email'}
                     </Button>
                 </div>
             </div>
@@ -376,6 +466,35 @@ export function CVPreview() {
                 </div>
             </div>
 
+            <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl text-center pb-2">Where should we send your CV?</DialogTitle>
+                        <DialogDescription className="text-center text-base">
+                            Enter your email to verify it. After confirmation, your CV will be sent to your inbox.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2 py-2">
+                        <Label htmlFor="download-email">Email address</Label>
+                        <Input
+                            id="download-email"
+                            type="email"
+                            placeholder="you@example.com"
+                            value={downloadEmail}
+                            onChange={(e) => setDownloadEmail(e.target.value)}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowEmailDialog(false)} disabled={isSubmittingEmail}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleEmailRequest} disabled={isSubmittingEmail} className="gap-2">
+                            {isSubmittingEmail && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Send verification email
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
@@ -394,7 +513,7 @@ export function CVPreview() {
                         <Button asChild className="w-full text-lg h-12 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-md">
                             <Link href="/api/stripe/checkout">
                                 <Sparkles className="mr-2 h-5 w-5" />
-                                Go Pro — $9.99/mo
+                                Go Pro - $9.99/mo
                             </Link>
                         </Button>
                     </div>
@@ -403,3 +522,5 @@ export function CVPreview() {
         </div>
     );
 }
+
+

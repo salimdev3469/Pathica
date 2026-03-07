@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
     const protectedPaths = ['/dashboard', '/jobs', '/applications'];
     const isProtectedPath =
         protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path)) ||
-        request.nextUrl.pathname.startsWith('/cv/');
+        (request.nextUrl.pathname.startsWith('/cv/') && request.nextUrl.pathname !== '/cv/new');
 
     if (isProtectedPath && !user) {
         const url = request.nextUrl.clone();

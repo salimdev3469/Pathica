@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase-server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -6,6 +7,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Plus, FileText, Calendar, Edit2, Download } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import LogoutButton from '@/components/LogoutButton';
+import fs from 'node:fs';
+import path from 'node:path';
 
 export default async function DashboardPage() {
     const supabase = createClient();
@@ -30,16 +33,17 @@ export default async function DashboardPage() {
         .single();
 
     const plan = subscription?.plan || 'free';
+    const logoSrc = getLogoSrc();
 
     return (
         <div className="flex flex-col h-screen overflow-y-auto bg-slate-50">
-            <header className="flex h-16 items-center border-b bg-white px-6 w-full justify-between sticky top-0 z-10">
+            <header className="flex h-28 items-center border-b bg-white px-6 w-full justify-between sticky top-0 z-10">
                 <div className="flex items-center gap-2 font-semibold text-lg text-primary">
-                    <FileText className="h-6 w-6" />
-                    <span>CV Builder Pro</span>
+                    <Image src={logoSrc} alt="Pathica logo" width={144} height={144} className="h-36 w-36 object-contain" />
+                    
                 </div>
                 <div className="flex items-center gap-4">
-                    <span className="text-sm text-slate-500 uppercase font-semibold tracking-wider mr-2">
+                    <span className="text-sm text-slate-500 uppercase font-semibold tracking-wider mr-2 whitespace-nowrap">
                         {plan} PLAN
                     </span>
                     <Button variant="outline" asChild>
@@ -103,4 +107,13 @@ export default async function DashboardPage() {
             </main>
         </div>
     );
+}
+
+function getLogoSrc() {
+    try {
+        const mtime = fs.statSync(path.join(process.cwd(), 'public', 'logo_pathica.png')).mtimeMs;
+        return `/logo_pathica.png?v=${Math.floor(mtime)}`;
+    } catch {
+        return '/logo_pathica.png';
+    }
 }

@@ -1,0 +1,17 @@
+﻿node.exe : npm error code MODULE_NOT_FOUND
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\SalimSerhatAKA\AppDat
+a ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo          : NotSpecified: (npm error code MODULE_NO 
+   T_FOUND:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm error path C:\Users\SalimSerhatAKA\AppData\Roaming\npm\node_module
+s\npm\node_modules\path-scurry
+npm error Cannot find module 'C:\Users\SalimSerhatAKA\AppData\Roaming\
+npm\node_modules\npm\node_modules\path-scurry\dist\commonjs\index.js'
+npm error A complete log of this run can be found in: C:\Users\SalimSe
+rhatAKA\AppData\Local\npm-cache\_logs\2026-03-07T06_42_07_606Z-debug-0
+.log

@@ -1,6 +1,12 @@
+@import url('https://fonts.cdnfonts.com/css/codec-pro');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+* {
+  font-family: 'Codec Pro', sans-serif;
+}
 
 @layer utilities {
   .text-balance {
