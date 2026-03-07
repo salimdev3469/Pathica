@@ -5,21 +5,6 @@ import { createClient } from '@/lib/supabase-server';
 import { redirect } from 'next/navigation';
 import { CVState, Section, Item, PersonalInfo } from '@/context/CVContext';
 
-type CvFieldRow = {
-    id: string;
-    label: string;
-    value: string;
-    field_type: string;
-    position: number;
-};
-
-type CvSectionRow = {
-    id: string;
-    title: string;
-    position: number;
-    cv_fields: CvFieldRow[];
-};
-
 export default async function CVBuilderPage({ params }: { params: { id: string } }) {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -50,45 +35,40 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
     }
 
     // Transform to front-end State
-    const allSections = (cvData.cv_sections as CvSectionRow[]).sort((a, b) => a.position - b.position);
+    const allSections = (cvData.cv_sections as any[]).sort((a, b) => a.position - b.position);
 
     // Extract virtual sections
-    const personalInfoSection = allSections.find((s) => s.title === '_personal_info');
-    const summarySection = allSections.find((s) => s.title === '_summary');
+    const personalInfoSection = allSections.find(s => s.title === '_personal_info');
+    const summarySection = allSections.find(s => s.title === '_summary');
 
     // Parse personal info
-    let personalInfo: PersonalInfo | undefined;
-    const personalInfoField = personalInfoSection?.cv_fields?.find((f) => f.label === 'personal_info');
-    if (personalInfoField?.value) {
+    let personalInfo = undefined;
+    if (personalInfoSection && personalInfoSection.cv_fields[0]) {
         try {
-            personalInfo = JSON.parse(personalInfoField.value);
-        } catch { }
+            personalInfo = JSON.parse(personalInfoSection.cv_fields[0].value);
+        } catch (e) { }
     }
-
-    const personalSectionTitleField = personalInfoSection?.cv_fields?.find((f) => f.label === 'personal_section_title');
-    const personalSectionTitle = personalSectionTitleField?.value || 'Personal Information & Summary';
 
     // Parse summary
     let summary = '';
-    const summaryField = summarySection?.cv_fields?.find((f) => f.label === 'summary') || summarySection?.cv_fields?.[0];
-    if (summaryField?.value) {
-        summary = summaryField.value;
+    if (summarySection && summarySection.cv_fields[0]) {
+        summary = summarySection.cv_fields[0].value;
     }
 
     // Filter normal sections
-    const normalSections = allSections.filter((s) => s.title !== '_personal_info' && s.title !== '_summary');
+    const normalSections = allSections.filter(s => s.title !== '_personal_info' && s.title !== '_summary');
 
     const sections: Section[] = normalSections.map((s) => ({
         id: s.id,
         title: s.title,
         position: s.position,
-        items: s.cv_fields
+        items: (s.cv_fields as any[])
             .sort((a, b) => a.position - b.position)
             .map((f) => {
                 if (f.field_type === 'item') {
                     try {
                         return JSON.parse(f.value) as Item;
-                    } catch {
+                    } catch (e) {
                         return null;
                     }
                 }
@@ -100,8 +80,7 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
     const initialState: CVState = {
         id: cvData.id,
         title: cvData.title,
-        personalSectionTitle,
-        ...(personalInfo && { personalInfo }),
+        ...(personalInfo && { personalInfo: personalInfo as PersonalInfo }),
         ...(summary && { summary }),
         sections,
     };

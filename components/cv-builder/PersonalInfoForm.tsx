@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 export function PersonalInfoForm() {
     const { state, dispatch } = useCV();
-    const { personalInfo, summary, personalSectionTitle } = state;
+    const { personalInfo, summary } = state;
 
     const handleInfoChange = (field: keyof typeof personalInfo, value: string) => {
         dispatch({ type: 'UPDATE_PERSONAL_INFO', payload: { [field]: value } });
@@ -18,14 +18,7 @@ export function PersonalInfoForm() {
         <Card className="mb-6 border-primary/20 bg-primary/5 shadow-sm">
             <CardHeader className="pb-3 border-b border-primary/10 mb-3">
                 <CardTitle className="text-lg flex justify-between text-primary">
-                    <Input
-                        value={personalSectionTitle || ''}
-                        onChange={(e) =>
-                            dispatch({ type: 'UPDATE_PERSONAL_SECTION_TITLE', payload: e.target.value })
-                        }
-                        className="text-lg font-bold bg-transparent border-transparent hover:border-slate-200 focus-visible:ring-1 p-1 h-9 w-full text-primary"
-                        placeholder="Section Title"
-                    />
+                    Personal Information & Summary
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">

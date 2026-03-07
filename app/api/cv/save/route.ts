@@ -43,30 +43,14 @@ export async function POST(req: Request) {
             .insert({ cv_id: cvState.id, title: '_personal_info', position: -2 })
             .select().single();
 
-        if (piSection) {
-            const personalFieldsToInsert = [];
-
-            if (cvState.personalInfo) {
-                personalFieldsToInsert.push({
-                    section_id: piSection.id,
-                    label: 'personal_info',
-                    value: JSON.stringify(cvState.personalInfo),
-                    field_type: 'json',
-                    position: 0,
-                });
-            }
-
-            personalFieldsToInsert.push({
+        if (piSection && cvState.personalInfo) {
+            await supabase.from('cv_fields').insert({
                 section_id: piSection.id,
-                label: 'personal_section_title',
-                value: cvState.personalSectionTitle || 'Personal Information & Summary',
-                field_type: 'text',
-                position: 1,
+                label: 'personal_info',
+                value: JSON.stringify(cvState.personalInfo),
+                field_type: 'json',
+                position: 0
             });
-
-            if (personalFieldsToInsert.length > 0) {
-                await supabase.from('cv_fields').insert(personalFieldsToInsert);
-            }
         }
 
         // 2. Insert _summary section
@@ -81,7 +65,7 @@ export async function POST(req: Request) {
                 label: 'summary',
                 value: cvState.summary,
                 field_type: 'text',
-                position: 0,
+                position: 0
             });
         }
 
@@ -101,7 +85,7 @@ export async function POST(req: Request) {
             if (sectionError) throw sectionError;
 
             if (section.items && section.items.length > 0) {
-                const fieldsToInsert = section.items.map((item: { title?: string; position: number }) => ({
+                const fieldsToInsert = section.items.map((item: any) => ({
                     section_id: sectionData.id,
                     label: item.title || 'item',
                     value: JSON.stringify(item),
@@ -120,4 +104,3 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Failed to save CV' }, { status: 500 });
     }
 }
-
