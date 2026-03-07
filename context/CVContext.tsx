@@ -33,6 +33,7 @@ export interface CVState {
     title: string;
     personalInfo: PersonalInfo;
     summary: string;
+    personalSectionTitle: string;
     sections: Section[];
 }
 
@@ -41,6 +42,7 @@ type CVAction =
     | { type: 'UPDATE_TITLE'; payload: string }
     | { type: 'UPDATE_PERSONAL_INFO'; payload: Partial<PersonalInfo> }
     | { type: 'UPDATE_SUMMARY'; payload: string }
+    | { type: 'UPDATE_PERSONAL_SECTION_TITLE'; payload: string }
     | { type: 'ADD_SECTION'; payload: { title: string } }
     | { type: 'UPDATE_SECTION'; payload: { id: string; title: string } }
     | { type: 'REMOVE_SECTION'; payload: string }
@@ -63,6 +65,7 @@ const defaultCVState: CVState = {
         github: '',
     },
     summary: '• Proven ability in analyzing large datasets, debugging SQL queries, and transforming data to drive business decisions.\n• Proficient in creating compelling, interactive dashboards using Power BI, enhancing data accessibility and understanding.\n• Strong command over Excel, SQL, Power BI, enabling efficient data manipulation and analysis.\n• Proficient in market research, requirement gathering, qualitative and quantitative analysis.',
+    personalSectionTitle: 'Personal Information & Summary',
     sections: [
         {
             id: crypto.randomUUID(),
@@ -93,6 +96,8 @@ const cvReducer = (state: CVState, action: CVAction): CVState => {
             return { ...state, personalInfo: { ...state.personalInfo, ...action.payload } };
         case 'UPDATE_SUMMARY':
             return { ...state, summary: action.payload };
+        case 'UPDATE_PERSONAL_SECTION_TITLE':
+            return { ...state, personalSectionTitle: action.payload };
         case 'ADD_SECTION': {
             const newSection: Section = {
                 id: crypto.randomUUID(),
@@ -184,6 +189,7 @@ export const CVProvider = ({ children, initialState }: { children: ReactNode; in
         ...initialState,
         personalInfo: initialState.personalInfo || defaultCVState.personalInfo,
         summary: initialState.summary || '',
+        personalSectionTitle: initialState.personalSectionTitle || defaultCVState.personalSectionTitle,
         sections: initialState.sections || []
     } : defaultCVState;
 
