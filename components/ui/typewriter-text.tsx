@@ -11,6 +11,8 @@ export interface TypewriterProps {
     deleteSpeed?: number;
     delay?: number;
     className?: string;
+    onComplete?: () => void;
+    hideCursorOnComplete?: boolean;
 }
 
 export function Typewriter({
@@ -21,11 +23,14 @@ export function Typewriter({
     deleteSpeed = 50,
     delay = 1500,
     className,
+    onComplete,
+    hideCursorOnComplete = false,
 }: TypewriterProps) {
     const [displayText, setDisplayText] = useState("");
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isDeleting, setIsDeleting] = useState(false);
     const [textArrayIndex, setTextArrayIndex] = useState(0);
+    const [isCompleted, setIsCompleted] = useState(false);
 
     // Validate and process input text
     const textArray = Array.isArray(text) ? text : [text];
@@ -42,6 +47,9 @@ export function Typewriter({
                         setCurrentIndex((prev) => prev + 1);
                     } else if (loop) {
                         setTimeout(() => setIsDeleting(true), delay);
+                    } else if (!isCompleted) {
+                        setIsCompleted(true);
+                        onComplete?.();
                     }
                 } else {
                     if (displayText.length > 0) {
@@ -67,12 +75,16 @@ export function Typewriter({
         delay,
         displayText,
         text,
+        isCompleted,
+        onComplete,
     ]);
 
     return (
         <span className={className}>
             {displayText}
-            <span className="animate-pulse">{cursor}</span>
+            {(!hideCursorOnComplete || !isCompleted) && (
+                <span className="animate-pulse">{cursor}</span>
+            )}
         </span>
     );
 }

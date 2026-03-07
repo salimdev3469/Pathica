@@ -5,7 +5,7 @@ import { Sparkles, FileText, Target, CheckCircle2, Zap, ArrowRight, ShieldCheck 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { createClient } from '@/lib/supabase-server';
 import { MouseEffect } from '@/components/mouse-effect';
-import { Typewriter } from '@/components/ui/typewriter-text';
+import { HeroIntro } from '@/components/home/HeroIntro';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -65,16 +65,7 @@ export default async function Home() {
             <Badge className="mb-6 mx-auto rounded-full px-4 py-1.5 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors cursor-default">
               Powered by Google Gemini AI
             </Badge>
-            <h1 className="text-5xl lg:text-7xl tracking-[-0.04em] text-[#1a1a1a] mb-8 leading-tight min-h-[110px] sm:min-h-[150px]">
-              <Typewriter
-                text="Land Your Dream Job with an AI-Optimized CV"
-                speed={50}
-                loop={false}
-              />
-            </h1>
-            <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Create ATS-friendly resumes that get past the bots. Tailor your applications to specific roles and track your success all in one powerful platform.
-            </p>
+            <HeroIntro />
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-lg font-semibold rounded-full shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-[#1a1a1a] text-white hover:bg-black border-0" asChild>
                 <Link href={heroPrimaryHref}>
@@ -422,3 +413,7 @@ function getFooterLogoSrc() {
     return '/logo_pathica_footer.png';
   }
 }
+
+
+
+
