@@ -1,10 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Plus, Briefcase, GraduationCap, Code, FolderGit2, Save, Loader2, FileText, ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
+import type { Locale } from '@/lib/locale';
 import { useCV, Section } from '@/context/CVContext';
 import { SectionCard } from './SectionCard';
 import { PersonalInfoForm } from './PersonalInfoForm';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Dialog,
@@ -14,61 +19,95 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Briefcase, GraduationCap, Code, FolderGit2, Save, Loader2, FileText, ArrowLeft } from 'lucide-react';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase';
+import { CV_FONT_OPTIONS } from '@/lib/cv-fonts';
 
-const PREBUILT_SECTIONS = [
-  {
-    title: 'Experience',
-    icon: <Briefcase size={16} />,
-    items: [
-      { title: 'Company Name', subtitle: 'Job Title', date: 'Jan 2020 - Present', location: 'City, Country', bullets: '- Achieved X by doing Y\n- Led a team of Z' }
-    ]
-  },
-  {
-    title: 'Education',
-    icon: <GraduationCap size={16} />,
-    items: [
-      { title: 'University Name', subtitle: 'Degree Name', date: 'Aug 2016 - May 2020', location: 'City, Country', bullets: '- GPA: 3.8/4.0' }
-    ]
-  },
-  {
-    title: 'Projects',
-    icon: <FolderGit2 size={16} />,
-    items: [
-      { title: 'Project Name', subtitle: 'Tech Stack (React, Node.js)', date: 'Jan 2023', location: '', bullets: '- Built application using X, improving Y by Z%' }
-    ]
-  },
-  {
-    title: 'Technical Skills',
-    icon: <Code size={16} />,
-    items: [
-      { title: 'Languages', subtitle: '', date: '', location: '', bullets: 'Python, SQL, JavaScript' },
-      { title: 'Frameworks', subtitle: '', date: '', location: '', bullets: 'React, Next.js, Django' }
-    ]
-  }
-];
+type CVBuilderProps = {
+  locale?: Locale;
+};
 
-export function CVBuilder() {
+export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
+  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
+
+  const PREBUILT_SECTIONS = [
+      {
+        title: t('Experience', 'Deneyim'),
+        icon: <Briefcase size={16} />,
+        items: [
+          {
+            title: t('Company Name', 'Ã…Âirket AdÃ„Â±'),
+            subtitle: t('Job Title', 'Pozisyon'),
+            date: 'Jan 2020 - Present',
+            location: t('City, Country', 'Ã…Âehir, ÃƒÅ“lke'),
+            bullets: t('- Achieved X by doing Y\n- Led a team of Z', '- X hedefine Y ile ulasildi\n- Z kisilik ekip yonetildi'),
+          },
+        ],
+      },
+      {
+        title: t('Education', 'EÃ„Å¸itim'),
+        icon: <GraduationCap size={16} />,
+        items: [
+          {
+            title: t('University Name', 'ÃƒÅ“niversite AdÃ„Â±'),
+            subtitle: t('Degree Name', 'BÃƒÂ¶lÃƒÂ¼m / Derece'),
+            date: 'Aug 2016 - May 2020',
+            location: t('City, Country', 'Ã…Âehir, ÃƒÅ“lke'),
+            bullets: '- GPA: 3.8/4.0',
+          },
+        ],
+      },
+      {
+        title: t('Projects', 'Projeler'),
+        icon: <FolderGit2 size={16} />,
+        items: [
+          {
+            title: t('Project Name', 'Proje AdÃ„Â±'),
+            subtitle: t('Tech Stack (React, Node.js)', 'Teknoloji (React, Node.js)'),
+            date: 'Jan 2023',
+            location: '',
+            bullets: t('- Built application using X, improving Y by Z%', '- X ile uygulama geliÃ…Å¸tirildi, Y metriÃ„Å¸inde Z% iyileÃ…Å¸me saÃ„Å¸landÃ„Â±'),
+          },
+        ],
+      },
+      {
+        title: t('Technical Skills', 'Teknik Beceriler'),
+        icon: <Code size={16} />,
+        items: [
+          { title: t('Languages', 'Diller'), subtitle: '', date: '', location: '', bullets: 'Python, SQL, JavaScript' },
+          { title: t('Frameworks', 'Frameworkler'), subtitle: '', date: '', location: '', bullets: 'React, Next.js, Django' },
+        ],
+      },
+    ];
+
   const { state, dispatch } = useCV();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [backHref, setBackHref] = useState('/');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const initialSnapshotRef = useRef<string>(JSON.stringify(state));
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isAiDraft = searchParams.get('aiDraft') === '1';
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!hasUnsavedChanges) {
+        return;
+      }
       e.preventDefault();
       e.returnValue = '';
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, []);
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    const currentSnapshot = JSON.stringify(state);
+    setHasUnsavedChanges(currentSnapshot !== initialSnapshotRef.current);
+  }, [state]);
 
   useEffect(() => {
     let isMounted = true;
@@ -76,7 +115,9 @@ export function CVBuilder() {
     async function loadAuthState() {
       try {
         const supabase = createBrowserClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
         if (isMounted) {
           const loggedIn = Boolean(user);
@@ -99,10 +140,24 @@ export function CVBuilder() {
   }, []);
 
   const handleBack = () => {
+    if (!hasUnsavedChanges) {
+      router.push(backHref);
+      return;
+    }
+
     setIsLeaveDialogOpen(true);
   };
 
   const handleConfirmLeave = () => {
+    if (hasUnsavedChanges) {
+      try {
+        const restoredState = JSON.parse(initialSnapshotRef.current);
+        dispatch({ type: 'SET_CV', payload: restoredState });
+      } catch {
+        // no-op
+      }
+    }
+
     setIsLeaveDialogOpen(false);
     router.push(backHref);
   };
@@ -116,20 +171,23 @@ export function CVBuilder() {
         body: JSON.stringify(state),
       });
       if (!res.ok) throw new Error('Failed to save');
-      toast.success('CV saved successfully!');
+
+      initialSnapshotRef.current = JSON.stringify(state);
+      setHasUnsavedChanges(false);
+      toast.success(t('CV saved successfully!', 'CV basariyla kaydedildi!'));
     } catch {
-      toast.error('Could not save CV. Please try again.');
+      toast.error(t('Could not save CV. Please try again.', 'CV kaydedilemedi. LÃƒÂ¼tfen tekrar deneyin.'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const addCustomSection = () => {
-    dispatch({ type: 'ADD_SECTION', payload: { title: 'New Section' } });
+    dispatch({ type: 'ADD_SECTION', payload: { title: t('New Section', 'Yeni BÃƒÂ¶lÃƒÂ¼m') } });
     setIsPopoverOpen(false);
   };
 
-  const addPrebuiltSection = (template: typeof PREBUILT_SECTIONS[0]) => {
+  const addPrebuiltSection = (template: (typeof PREBUILT_SECTIONS)[0]) => {
     const newSection: Section = {
       id: crypto.randomUUID(),
       title: template.title,
@@ -141,91 +199,121 @@ export function CVBuilder() {
         date: it.date,
         location: it.location,
         bullets: it.bullets,
-        position: i
-      }))
+        position: i,
+      })),
     };
 
     dispatch({
       type: 'SET_CV',
       payload: {
         ...state,
-        sections: [...state.sections, newSection]
-      }
+        sections: [...state.sections, newSection],
+      },
     });
 
     setIsPopoverOpen(false);
   };
 
   return (
-    <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-2xl mx-auto custom-scrollbar">
+    <div className="custom-scrollbar mx-auto w-full max-w-2xl flex-1 overflow-y-auto p-4 md:p-8">
       <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Leave without saving?</DialogTitle>
+            <DialogTitle>{t('Leave without saving?', 'Kaydetmeden ÃƒÂ§Ã„Â±kÃ„Â±lsÃ„Â±n mÃ„Â±?')}</DialogTitle>
             <DialogDescription>
-              If you leave now, your unsaved changes may be lost.
+              {t('If you leave now, your unsaved changes will be discarded.', 'Ã…Âimdi ÃƒÂ§Ã„Â±karsan kaydedilmemiÃ…Å¸ deÃ„Å¸iÃ…Å¸iklikler silinecek.')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsLeaveDialogOpen(false)}>
-              Stay
+              {t('Stay', 'Kal')}
             </Button>
             <Button variant="destructive" onClick={handleConfirmLeave}>
-              Leave
+              {t('Leave', 'Ãƒâ€¡Ã„Â±k')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <div className="mb-6">
-        <Button variant="ghost" onClick={handleBack} className="text-slate-500 hover:text-slate-800 hover:bg-slate-100/50 px-3 -ml-3">
-          <ArrowLeft className="w-4 h-4 mr-2" /> {isAuthenticated ? 'Back to Dashboard' : 'Back to Landing'}
+        <Button variant="ghost" onClick={handleBack} className="-ml-3 px-3 text-slate-500 hover:bg-slate-100/50 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">
+          <ArrowLeft className="mr-2 h-4 w-4" /> {isAuthenticated ? t('Back to Dashboard', 'Panoya DÃƒÂ¶n') : t('Back to Landing', 'Anasayfaya DÃƒÂ¶n')}
         </Button>
       </div>
 
-      <div className="mb-8 flex justify-between items-start gap-4">
+      {isAiDraft && (
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-semibold">{t('AI Draft Loaded', 'AI TaslaÃ„Å¸Ã„Â± YÃƒÂ¼klendi')}</p>
+          <p className="mt-1 leading-relaxed">
+            {t(
+              'This draft was generated in English from your input and may include mock suggestions. Review every section and replace all placeholders and "Recommendation:" lines with your real details before applying.',
+              'Bu taslak girdinizden Ã„Â°ngilizce olarak ÃƒÂ¼retildi ve ÃƒÂ¶rnek ÃƒÂ¶neriler iÃƒÂ§erebilir. BaÃ…Å¸vurmadan ÃƒÂ¶nce tÃƒÂ¼m bÃƒÂ¶lÃƒÂ¼mleri kontrol edin, tÃƒÂ¼m placeholder ve "Recommendation:" satÃ„Â±rlarÃ„Â±nÃ„Â± gerÃƒÂ§ek bilgilerinizle deÃ„Å¸iÃ…Å¸tirin.',
+            )}
+          </p>
+        </div>
+      )}
+
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div className="flex-1">
           <input
             value={state.title}
             onChange={(e) => dispatch({ type: 'UPDATE_TITLE', payload: e.target.value })}
-            className="text-4xl font-bold bg-transparent outline-none border-b-2 border-transparent hover:border-slate-200 focus:border-primary transition-colors pb-1 w-full"
-            placeholder="CV Title"
+            className="w-full border-b-2 border-transparent bg-transparent pb-1 text-4xl font-bold outline-none transition-colors hover:border-slate-200 focus:border-primary"
+            placeholder={t('CV Title', 'CV BaÃ…Å¸lÃ„Â±Ã„Å¸Ã„Â±')}
           />
-          <p className="text-slate-500 mt-2">Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!</p>
+          <p className="mt-2 text-slate-500">{t('Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!', 'Bilgileri doldurup alt bÃƒÂ¶lÃƒÂ¼mler ekleyerek ATS uyumlu CV oluÃ…Å¸tur. Ãƒâ€“nizlemede sÃƒÂ¼rÃƒÂ¼kle-bÃ„Â±rak ile sÃ„Â±ralamayÃ„Â± deÃ„Å¸iÃ…Å¸tirebilirsin!')}</p>
+          <div className="mt-4 max-w-xs">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              {t('CV Font', 'CV YazÄ± Tipi')}
+            </label>
+            <Select
+              value={state.fontFamily}
+              onValueChange={(value) => dispatch({ type: 'UPDATE_FONT_FAMILY', payload: value })}
+            >
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder={t('Choose font', 'YazÄ± tipi seÃ§')} />
+              </SelectTrigger>
+              <SelectContent>
+                {CV_FONT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         {isAuthenticated && (
           <Button onClick={handleSave} disabled={isSaving} className="shrink-0 gap-2">
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save CV
+            {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {t('Save CV', 'CV Kaydet')}
           </Button>
         )}
       </div>
 
-      <PersonalInfoForm />
+      <PersonalInfoForm locale={locale} />
 
       <div className="flex flex-col gap-4">
         {(state.sections || []).map((section) => (
-          <SectionCard key={section.id} section={section} />
+          <SectionCard key={section.id} section={section} locale={locale} />
         ))}
       </div>
 
       <div className="mt-8 flex justify-center pb-20">
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button size="lg" className="rounded-full shadow-lg hover:shadow-xl transition-all">
-              <Plus className="mr-2" /> Add Section
+            <Button size="lg" className="rounded-full shadow-lg transition-all hover:shadow-xl">
+              <Plus className="mr-2" /> {t('Add Section', 'BÃƒÂ¶lÃƒÂ¼m Ekle')}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-2" side="top" align="center">
             <div className="flex flex-col gap-1">
-              <div className="px-2 py-1.5 text-xs text-slate-500 font-semibold uppercase tracking-wider">
-                Pre-built Sections
-              </div>
+              <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">{t('Pre-built Sections', 'HazÃ„Â±r BÃƒÂ¶lÃƒÂ¼mler')}</div>
               {PREBUILT_SECTIONS.map((template) => (
                 <Button
                   key={template.title}
                   variant="ghost"
-                  className="justify-start font-normal h-9"
+                  className="h-9 justify-start font-normal"
                   onClick={() => addPrebuiltSection(template)}
                 >
                   <span className="mr-2 text-slate-400">{template.icon}</span>
@@ -237,11 +325,11 @@ export function CVBuilder() {
 
               <Button
                 variant="ghost"
-                className="justify-start font-normal h-9 text-primary hover:text-primary hover:bg-primary/10"
+                className="h-9 justify-start font-normal text-primary hover:bg-primary/10 hover:text-primary"
                 onClick={addCustomSection}
               >
                 <FileText className="mr-2 h-4 w-4" />
-                Custom Section
+                {t('Custom Section', 'Ãƒâ€“zel BÃƒÂ¶lÃƒÂ¼m')}
               </Button>
             </div>
           </PopoverContent>

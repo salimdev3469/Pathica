@@ -3,14 +3,19 @@
 import { useState } from 'react';
 import { Typewriter } from '@/components/ui/typewriter-text';
 
-export function HeroIntro() {
+type HeroIntroProps = {
+  headline: string;
+  subtitle: string;
+};
+
+export function HeroIntro({ headline, subtitle }: HeroIntroProps) {
   const [showSubtitle, setShowSubtitle] = useState(false);
 
   return (
     <>
-      <h1 className="text-5xl lg:text-7xl tracking-[-0.04em] text-[#1a1a1a] mb-8 leading-tight min-h-[110px] sm:min-h-[150px]">
+      <h1 className="mb-8 min-h-[110px] text-5xl leading-tight tracking-[-0.04em] text-slate-900 dark:text-slate-100 sm:min-h-[150px] lg:text-7xl">
         <Typewriter
-          text="Land Your Dream Job with an AI-Optimized CV"
+          text={headline}
           speed={50}
           loop={false}
           hideCursorOnComplete
@@ -20,12 +25,12 @@ export function HeroIntro() {
 
       <p
         className={[
-          'text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed',
+          'mb-10 mx-auto max-w-2xl text-xl leading-relaxed text-slate-600',
           'transition-all duration-700 ease-out',
-          showSubtitle ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none',
+          showSubtitle ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0',
         ].join(' ')}
       >
-        Create ATS-friendly resumes that get past the bots. Tailor your applications to specific roles and track your success all in one powerful platform.
+        {subtitle}
       </p>
     </>
   );

@@ -8,7 +8,7 @@ export async function GET(req: Request) {
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
-            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login?next=/jobs`);
+            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login?next=/dashboard`);
         }
 
         const url = new URL(req.url);
@@ -47,3 +47,4 @@ export async function GET(req: Request) {
         return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=checkout_failed`);
     }
 }
+

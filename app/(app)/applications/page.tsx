@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase-server';
 import { redirect } from 'next/navigation';
-import { ApplicationList } from '@/components/jobs/ApplicationList';
+import { ApplicationList } from '@/components/applications/ApplicationList';
 import { Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -31,9 +31,6 @@ export default async function ApplicationsPage() {
                     <span>Application Tracker</span>
                 </div>
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" asChild>
-                        <Link href="/jobs">Find Jobs</Link>
-                    </Button>
                     <Button variant="ghost" asChild>
                         <Link href="/dashboard">Dashboard</Link>
                     </Button>
@@ -53,3 +50,5 @@ export default async function ApplicationsPage() {
         </div>
     );
 }
+
+

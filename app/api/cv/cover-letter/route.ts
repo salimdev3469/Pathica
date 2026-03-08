@@ -18,7 +18,7 @@ export async function POST(req: Request) {
             .single();
 
         if (!subscription || subscription.plan === 'free') {
-            return NextResponse.json({ error: 'Upgrade to Pro to use AI features.' }, { status: 403 });
+            return NextResponse.json({ error: 'This feature is currently unavailable.' }, { status: 403 });
         }
 
         const { cvState, jobDescription, company } = await req.json();
@@ -52,3 +52,4 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+

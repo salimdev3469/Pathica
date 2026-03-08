@@ -1,5 +1,6 @@
 'use client';
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { DEFAULT_CV_FONT, normalizeCvFont, type CvFontKey } from '@/lib/cv-fonts';
 
 export interface PersonalInfo {
     fullName: string;
@@ -9,6 +10,10 @@ export interface PersonalInfo {
     linkedin: string;
     portfolio: string;
     github: string;
+    photoDataUrl?: string;
+    photoX?: number;
+    photoY?: number;
+    photoSize?: number;
 }
 
 export interface Item {
@@ -31,7 +36,9 @@ export interface Section {
 export interface CVState {
     id: string;
     title: string;
+    fontFamily: CvFontKey;
     personalInfo: PersonalInfo;
+    summaryTitle: string;
     summary: string;
     sections: Section[];
 }
@@ -39,7 +46,9 @@ export interface CVState {
 type CVAction =
     | { type: 'SET_CV'; payload: CVState }
     | { type: 'UPDATE_TITLE'; payload: string }
+    | { type: 'UPDATE_FONT_FAMILY'; payload: string }
     | { type: 'UPDATE_PERSONAL_INFO'; payload: Partial<PersonalInfo> }
+    | { type: 'UPDATE_SUMMARY_TITLE'; payload: string }
     | { type: 'UPDATE_SUMMARY'; payload: string }
     | { type: 'ADD_SECTION'; payload: { title: string } }
     | { type: 'UPDATE_SECTION'; payload: { id: string; title: string } }
@@ -53,6 +62,7 @@ type CVAction =
 const defaultCVState: CVState = {
     id: crypto.randomUUID(),
     title: 'My CV',
+    fontFamily: DEFAULT_CV_FONT,
     personalInfo: {
         fullName: 'PRADEEP M',
         email: 'pradeepm.analyst@gmail.com',
@@ -61,8 +71,13 @@ const defaultCVState: CVState = {
         linkedin: 'linkedin.com/in/pradeepanalyst',
         portfolio: 'Portfolio Linked',
         github: '',
+        photoDataUrl: '',
+        photoX: 628,
+        photoY: 54,
+        photoSize: 112,
     },
-    summary: '• Proven ability in analyzing large datasets, debugging SQL queries, and transforming data to drive business decisions.\n• Proficient in creating compelling, interactive dashboards using Power BI, enhancing data accessibility and understanding.\n• Strong command over Excel, SQL, Power BI, enabling efficient data manipulation and analysis.\n• Proficient in market research, requirement gathering, qualitative and quantitative analysis.',
+    summaryTitle: 'Profile Summary',
+    summary: 'Ã¢â‚¬Â¢ Proven ability in analyzing large datasets, debugging SQL queries, and transforming data to drive business decisions.\nÃ¢â‚¬Â¢ Proficient in creating compelling, interactive dashboards using Power BI, enhancing data accessibility and understanding.\nÃ¢â‚¬Â¢ Strong command over Excel, SQL, Power BI, enabling efficient data manipulation and analysis.\nÃ¢â‚¬Â¢ Proficient in market research, requirement gathering, qualitative and quantitative analysis.',
     sections: [
         {
             id: crypto.randomUUID(),
@@ -73,9 +88,9 @@ const defaultCVState: CVState = {
                     id: crypto.randomUUID(),
                     title: 'Deloitte',
                     subtitle: 'Data Integrity & Reporting Analyst',
-                    date: 'June 2024 – Present',
+                    date: 'June 2024 Ã¢â‚¬â€œ Present',
                     location: '',
-                    bullets: '• Manage and enhance client data across multiple CRM tools, ensuring up-to-date and accurate information.\n• Perform lead verification by researching on LinkedIn and other sources to identify and correct data inconsistencies.\n• Oversee data accuracy and consistency within Deloitte\'s databases through ongoing validation, audits, and updates, leveraging strong analytical skills and attention to detail.',
+                    bullets: 'Ã¢â‚¬Â¢ Manage and enhance client data across multiple CRM tools, ensuring up-to-date and accurate information.\nÃ¢â‚¬Â¢ Perform lead verification by researching on LinkedIn and other sources to identify and correct data inconsistencies.\nÃ¢â‚¬Â¢ Oversee data accuracy and consistency within Deloitte\'s databases through ongoing validation, audits, and updates, leveraging strong analytical skills and attention to detail.',
                     position: 0,
                 }
             ],
@@ -86,11 +101,21 @@ const defaultCVState: CVState = {
 const cvReducer = (state: CVState, action: CVAction): CVState => {
     switch (action.type) {
         case 'SET_CV':
-            return action.payload;
+            return {
+                ...defaultCVState,
+                ...action.payload,
+                personalInfo: action.payload.personalInfo || defaultCVState.personalInfo,
+                sections: action.payload.sections || [],
+                fontFamily: normalizeCvFont(action.payload.fontFamily),
+            };
         case 'UPDATE_TITLE':
             return { ...state, title: action.payload };
+        case 'UPDATE_FONT_FAMILY':
+            return { ...state, fontFamily: normalizeCvFont(action.payload) };
         case 'UPDATE_PERSONAL_INFO':
             return { ...state, personalInfo: { ...state.personalInfo, ...action.payload } };
+        case 'UPDATE_SUMMARY_TITLE':
+            return { ...state, summaryTitle: action.payload };
         case 'UPDATE_SUMMARY':
             return { ...state, summary: action.payload };
         case 'ADD_SECTION': {
@@ -182,7 +207,9 @@ export const CVProvider = ({ children, initialState }: { children: ReactNode; in
     // Merge initial state properties safely in case DB load has missing new properties
     const safeInitialState = initialState ? {
         ...initialState,
+        fontFamily: normalizeCvFont(initialState.fontFamily),
         personalInfo: initialState.personalInfo || defaultCVState.personalInfo,
+        summaryTitle: initialState.summaryTitle || defaultCVState.summaryTitle,
         summary: initialState.summary || '',
         sections: initialState.sections || []
     } : defaultCVState;
@@ -199,3 +226,4 @@ export const useCV = () => {
     }
     return context;
 };
+

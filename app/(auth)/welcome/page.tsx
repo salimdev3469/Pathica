@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,7 +32,8 @@ export default function WelcomeTransitionPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center overflow-visible bg-white px-6">
-      <div className="flex flex-col items-center gap-6 overflow-visible text-center">`r`n        <TextShimmer
+      <div className="flex flex-col items-center gap-6 overflow-visible text-center">
+        <TextShimmer
           key={LINES[currentIndex]}
           as="p"
           duration={1.1}

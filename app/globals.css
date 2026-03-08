@@ -14,10 +14,9 @@
   }
 }
 
-
-
 @layer base {
   :root {
+    color-scheme: light;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -44,7 +43,9 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
+    color-scheme: dark;
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
@@ -69,5 +70,59 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+  }
+}
+
+@keyframes nav-load {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(420%);
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  .dark .bg-white,
+  .dark .bg-slate-50 {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .dark .bg-slate-100 {
+    background-color: rgb(30 41 59) !important;
+  }
+
+  .dark .border-slate-100,
+  .dark .border-slate-200 {
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .dark .text-slate-900,
+  .dark .text-slate-800 {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .dark .text-slate-700,
+  .dark .text-slate-600,
+  .dark .text-slate-500,
+  .dark .text-slate-400 {
+    color: rgb(148 163 184) !important;
+  }
+
+  .dark [class*='bg-white/'] {
+    background-color: rgb(15 23 42 / 0.85) !important;
+  }
+
+  .dark [class*='border-white/'] {
+    border-color: rgb(51 65 85 / 0.6) !important;
+  }
+
+  .dark [class*='text-[#1a1a1a]'] {
+    color: hsl(var(--foreground)) !important;
   }
 }

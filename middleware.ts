@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser();
 
-    const protectedPaths = ['/dashboard', '/jobs', '/applications'];
+    const protectedPaths = ['/dashboard', '/applications'];
     const isProtectedPath =
         protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path)) ||
         (request.nextUrl.pathname.startsWith('/cv/') && request.nextUrl.pathname !== '/cv/new');
@@ -83,3 +83,4 @@ export const config = {
         '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 };
+

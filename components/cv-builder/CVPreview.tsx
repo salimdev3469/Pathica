@@ -6,7 +6,7 @@ import { CVTemplate } from '@/components/pdf/CVTemplate';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Download, Loader2, Sparkles, UserPlus, Save, GripVertical } from 'lucide-react';
+import { Download, Loader2, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAnonymousLimit } from '@/hooks/useAnonymousLimit';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -32,6 +32,17 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 import { X } from 'lucide-react';
+
+const PAGE_WIDTH = 794;
+const PAGE_HEIGHT = 1123;
+const PAGE_MARGIN = 54;
+const DEFAULT_PHOTO_SIZE = 112;
+const MIN_PHOTO_SIZE = 72;
+const MAX_PHOTO_SIZE = 200;
+
+function clamp(value: number, min: number, max: number) {
+    return Math.min(max, Math.max(min, value));
+}
 
 // Drag Wrapper for Sections
 const DraggableSectionWrapper = ({ id, children, state, showTutorial, onDismiss, isFirst, scale }: { id: string, children: React.ReactNode, state: CVState, showTutorial?: boolean, onDismiss?: () => void, isFirst?: boolean, scale: number }) => {
@@ -133,7 +144,7 @@ const DraggableItemWrapper = ({ id, sectionId, children, scale }: { id: string, 
     };
 
     return (
-        <div ref={setNodeRef} style={style} className="group/item hover:bg-slate-50 transition-colors rounded p-1 -mx-1 -mt-1 touch-none">
+        <div ref={setNodeRef} style={style} className="group/item rounded p-1 -mx-1 -mt-1 touch-none transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/50">
             {/* Drag Handle for Item - Top Aligned */}
             <div
                 {...attributes}
@@ -155,7 +166,6 @@ export function CVPreview() {
     const [scale, setScale] = useState(1);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
     const { fingerprint, hasReachedLimit, isLoading, setHasReachedLimit } = useAnonymousLimit();
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showTutorial, setShowTutorial] = useState(false);
@@ -163,12 +173,138 @@ export function CVPreview() {
     const [showEmailDialog, setShowEmailDialog] = useState(false);
     const [downloadEmail, setDownloadEmail] = useState('');
     const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
+    const [isPhotoDragging, setIsPhotoDragging] = useState(false);
+    const [photoDragPosition, setPhotoDragPosition] = useState<{ x: number; y: number } | null>(null);
+    const photoDragRef = useRef<{ startClientX: number; startClientY: number; baseX: number; baseY: number } | null>(null);
+    const photoDragPositionRef = useRef<{ x: number; y: number } | null>(null);
 
 
     const getErrorMessage = (error: unknown) => {
         if (error instanceof Error) return error.message;
         return 'Unexpected error';
     };
+
+    const getCurrentPhotoSize = () => {
+        return clamp(state.personalInfo?.photoSize ?? DEFAULT_PHOTO_SIZE, MIN_PHOTO_SIZE, MAX_PHOTO_SIZE);
+    };
+
+    const getPhotoBounds = (photoSize: number) => ({
+        minX: 0,
+        maxX: PAGE_WIDTH - photoSize,
+        minY: 0,
+        maxY: PAGE_HEIGHT - photoSize,
+    });
+
+    const clampPhotoPosition = (x: number, y: number, photoSize: number) => {
+        const bounds = getPhotoBounds(photoSize);
+        return {
+            x: clamp(x, bounds.minX, bounds.maxX),
+            y: clamp(y, bounds.minY, bounds.maxY),
+        };
+    };
+
+    const getCurrentPhotoPosition = () => {
+        const size = getCurrentPhotoSize();
+        const defaultX = PAGE_WIDTH - size;
+        const defaultY = 0;
+
+        return clampPhotoPosition(
+            state.personalInfo?.photoX ?? defaultX,
+            state.personalInfo?.photoY ?? defaultY,
+            size,
+        );
+    };
+
+    const handlePhotoPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!state.personalInfo?.photoDataUrl) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const current = photoDragPosition ?? getCurrentPhotoPosition();
+
+        photoDragRef.current = {
+            startClientX: event.clientX,
+            startClientY: event.clientY,
+            baseX: current.x,
+            baseY: current.y,
+        };
+        photoDragPositionRef.current = current;
+        setPhotoDragPosition(current);
+        setIsPhotoDragging(true);
+    };
+
+    useEffect(() => {
+        if (!isPhotoDragging) {
+            return;
+        }
+
+        const handlePointerMove = (event: PointerEvent) => {
+            const drag = photoDragRef.current;
+            if (!drag) return;
+
+            const photoSize = getCurrentPhotoSize();
+            const scaleSafe = scale > 0 ? scale : 1;
+            const deltaX = (event.clientX - drag.startClientX) / scaleSafe;
+            const deltaY = (event.clientY - drag.startClientY) / scaleSafe;
+            const next = clampPhotoPosition(drag.baseX + deltaX, drag.baseY + deltaY, photoSize);
+            const rounded = { x: Math.round(next.x), y: Math.round(next.y) };
+
+            photoDragPositionRef.current = rounded;
+            setPhotoDragPosition(rounded);
+        };
+
+        const finishDragging = () => {
+            const finalPosition = photoDragPositionRef.current;
+            if (finalPosition && state.personalInfo?.photoDataUrl) {
+                dispatch({
+                    type: 'UPDATE_PERSONAL_INFO',
+                    payload: { photoX: finalPosition.x, photoY: finalPosition.y },
+                });
+            }
+
+            setIsPhotoDragging(false);
+            setPhotoDragPosition(null);
+            photoDragRef.current = null;
+            photoDragPositionRef.current = null;
+        };
+
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', finishDragging);
+        window.addEventListener('pointercancel', finishDragging);
+
+        return () => {
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', finishDragging);
+            window.removeEventListener('pointercancel', finishDragging);
+        };
+    }, [dispatch, isPhotoDragging, scale, state.personalInfo?.photoDataUrl, state.personalInfo?.photoSize]);
+
+    useEffect(() => {
+        if (!state.personalInfo?.photoDataUrl) {
+            setIsPhotoDragging(false);
+            setPhotoDragPosition(null);
+            photoDragRef.current = null;
+            photoDragPositionRef.current = null;
+            return;
+        }
+
+        const size = getCurrentPhotoSize();
+        const clamped = clampPhotoPosition(
+            state.personalInfo?.photoX ?? (PAGE_WIDTH - size),
+            state.personalInfo?.photoY ?? 0,
+            size,
+        );
+
+        if (clamped.x !== state.personalInfo?.photoX || clamped.y !== state.personalInfo?.photoY) {
+            dispatch({
+                type: 'UPDATE_PERSONAL_INFO',
+                payload: { photoX: clamped.x, photoY: clamped.y },
+            });
+        }
+    }, [dispatch, state.personalInfo?.photoDataUrl, state.personalInfo?.photoSize]);
     // Auto-scale the A4 preview to fit its container
     useEffect(() => {
         const handleResize = () => {
@@ -229,27 +365,6 @@ export function CVPreview() {
     const dismissTutorial = () => {
         setShowTutorial(false);
         localStorage.setItem('cv-builder-dnd-tutorial-v2', 'true');
-    };
-
-    const handleSave = async () => {
-        setIsSaving(true);
-        try {
-            const response = await fetch('/api/cv/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(state),
-            });
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.error || 'Failed to save');
-            }
-            toast.success('CV saved successfully!');
-        } catch (error: any) {
-            console.error('Save error:', error);
-            toast.error(error.message || 'Failed to save CV. Please ensure you are logged in.');
-        } finally {
-            setIsSaving(false);
-        }
     };
 
     const downloadPdfDirectly = async () => {
@@ -425,12 +540,7 @@ export function CVPreview() {
             <div className="flex items-center justify-between p-4 bg-white border-b shadow-sm z-10">
                 <h2 className="font-semibold text-lg text-slate-800">Preview</h2>
                 <div className="flex gap-2">
-                    {isAuthenticated && (
-                        <Button variant="outline" onClick={handleSave} disabled={isSaving} className="gap-2">
-                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            Save
-                        </Button>
-                    )}
+                    
                     <Button onClick={handleDownload} disabled={isDownloading || isLoading || isSubmittingEmail} className="gap-2">
                         {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                         {isAuthenticated ? 'Download PDF' : 'Send PDF to Email'}
@@ -456,9 +566,16 @@ export function CVPreview() {
                         <SortableContext items={state.sections.map(s => `section-${s.id}`)} strategy={verticalListSortingStrategy}>
                             <div className="shadow-2xl relative">
                                 <CVTemplate
+                                    previewMode
                                     cv={state}
                                     SectionWrapper={SectionWrapperComponent}
                                     ItemWrapper={ItemWrapperComponent}
+                                    photoPositionOverride={photoDragPosition || undefined}
+                                    photoInteractive={
+                                        state.personalInfo?.photoDataUrl
+                                            ? { onPointerDown: handlePhotoPointerDown, isDragging: isPhotoDragging }
+                                            : undefined
+                                    }
                                 />
                             </div>
                         </SortableContext>
@@ -500,20 +617,13 @@ export function CVPreview() {
                     <DialogHeader>
                         <DialogTitle className="text-2xl text-center pb-2">You've used your free CV</DialogTitle>
                         <DialogDescription className="text-center text-base">
-                            Sign up free to save your CV, or go Pro to unlock AI optimization and job matching.
+                            You have used your free export for now. You can continue from the landing page.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="flex flex-col gap-3 py-4">
                         <Button asChild variant="outline" className="w-full text-lg h-12">
-                            <Link href="/register">
-                                <UserPlus className="mr-2 h-5 w-5" />
-                                Create Free Account
-                            </Link>
-                        </Button>
-                        <Button asChild className="w-full text-lg h-12 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-md">
-                            <Link href="/api/stripe/checkout">
-                                <Sparkles className="mr-2 h-5 w-5" />
-                                Go Pro - $9.99/mo
+                            <Link href="/">
+                                Back to Landing
                             </Link>
                         </Button>
                     </div>
@@ -522,5 +632,7 @@ export function CVPreview() {
         </div>
     );
 }
+
+
 
 

@@ -9,6 +9,9 @@ create table if not exists cvs (
   updated_at timestamptz default now()
 );
 
+alter table if exists cvs add column if not exists ats_score integer;
+alter table if exists cvs add column if not exists ats_score_updated_at timestamptz;
+
 create table if not exists cv_sections (
   id uuid primary key default gen_random_uuid(),
   cv_id uuid references cvs(id) on delete cascade,
@@ -80,3 +83,4 @@ alter table cv_fields enable row level security;
 alter table subscriptions enable row level security;
 alter table job_applications enable row level security;
 -- anonymous_sessions is accessed only via service role in the backend
+
