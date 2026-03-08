@@ -107,8 +107,8 @@ export default function LoginPage() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-16 left-16 right-16 z-20">
           <h2 className="mb-4 text-4xl font-normal leading-tight tracking-[-0.04em] text-white">
-            {t("Don't let bad formatting", 'K�t� formatlama')} <br />
-            {t('ruin your chances.', '�ans�n� d���rmesin.')}
+            {t("Don't let bad formatting", 'Kötü formatlama')} <br />
+            {t('ruin your chances.', 'şansını düşürmesin.')}
           </h2>
           <p className="text-lg text-slate-300">
             {t('Pathica helps you build ATS-compliant resumes that actually reach human recruiters.', 'Pathica, ATS uyumlu özgeçmişler hazırlayarak başvurularının gerçek insanlara ulaşmasına yardım eder.')}
@@ -167,27 +167,12 @@ export default function LoginPage() {
               <form onSubmit={handleEmailLogin} className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="h-11 rounded-full px-4"
-                  />
+                  <Input id="email" type="email" placeholder="m@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-full px-4" />
                 </div>
 
                 <div className="grid gap-2">
                   <Label htmlFor="password">{t('Password', 'Şifre')}</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="h-11 rounded-full px-4"
-                  />
+                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="h-11 rounded-full px-4" />
                 </div>
 
                 <Button className="h-11 w-full rounded-full bg-[#1a1a1a] text-md font-semibold text-white shadow-md hover:bg-black" type="submit" disabled={isBusy}>

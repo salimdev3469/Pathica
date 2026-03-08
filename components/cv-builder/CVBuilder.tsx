@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -30,54 +30,54 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
 
   const PREBUILT_SECTIONS = [
-      {
-        title: t('Experience', 'Deneyim'),
-        icon: <Briefcase size={16} />,
-        items: [
-          {
-            title: t('Company Name', 'Ã…Âirket AdÃ„Â±'),
-            subtitle: t('Job Title', 'Pozisyon'),
-            date: 'Jan 2020 - Present',
-            location: t('City, Country', 'Ã…Âehir, ÃƒÅ“lke'),
-            bullets: t('- Achieved X by doing Y\n- Led a team of Z', '- X hedefine Y ile ulasildi\n- Z kisilik ekip yonetildi'),
-          },
-        ],
-      },
-      {
-        title: t('Education', 'EÃ„Å¸itim'),
-        icon: <GraduationCap size={16} />,
-        items: [
-          {
-            title: t('University Name', 'ÃƒÅ“niversite AdÃ„Â±'),
-            subtitle: t('Degree Name', 'BÃƒÂ¶lÃƒÂ¼m / Derece'),
-            date: 'Aug 2016 - May 2020',
-            location: t('City, Country', 'Ã…Âehir, ÃƒÅ“lke'),
-            bullets: '- GPA: 3.8/4.0',
-          },
-        ],
-      },
-      {
-        title: t('Projects', 'Projeler'),
-        icon: <FolderGit2 size={16} />,
-        items: [
-          {
-            title: t('Project Name', 'Proje AdÃ„Â±'),
-            subtitle: t('Tech Stack (React, Node.js)', 'Teknoloji (React, Node.js)'),
-            date: 'Jan 2023',
-            location: '',
-            bullets: t('- Built application using X, improving Y by Z%', '- X ile uygulama geliÃ…Å¸tirildi, Y metriÃ„Å¸inde Z% iyileÃ…Å¸me saÃ„Å¸landÃ„Â±'),
-          },
-        ],
-      },
-      {
-        title: t('Technical Skills', 'Teknik Beceriler'),
-        icon: <Code size={16} />,
-        items: [
-          { title: t('Languages', 'Diller'), subtitle: '', date: '', location: '', bullets: 'Python, SQL, JavaScript' },
-          { title: t('Frameworks', 'Frameworkler'), subtitle: '', date: '', location: '', bullets: 'React, Next.js, Django' },
-        ],
-      },
-    ];
+    {
+      title: t('Experience', 'Deneyim'),
+      icon: <Briefcase size={16} />,
+      items: [
+        {
+          title: t('Company Name', 'Şirket Adı'),
+          subtitle: t('Job Title', 'Pozisyon'),
+          date: 'Jan 2020 - Present',
+          location: t('City, Country', 'Şehir, Ülke'),
+          bullets: t('- Achieved X by doing Y\n- Led a team of Z', '- X hedefine Y ile ulaşıldı\n- Z kişilik ekip yönetildi'),
+        },
+      ],
+    },
+    {
+      title: t('Education', 'Eğitim'),
+      icon: <GraduationCap size={16} />,
+      items: [
+        {
+          title: t('University Name', 'Üniversite Adı'),
+          subtitle: t('Degree Name', 'Bölüm / Derece'),
+          date: 'Aug 2016 - May 2020',
+          location: t('City, Country', 'Şehir, Ülke'),
+          bullets: '- GPA: 3.8/4.0',
+        },
+      ],
+    },
+    {
+      title: t('Projects', 'Projeler'),
+      icon: <FolderGit2 size={16} />,
+      items: [
+        {
+          title: t('Project Name', 'Proje Adı'),
+          subtitle: t('Tech Stack (React, Node.js)', 'Teknoloji (React, Node.js)'),
+          date: 'Jan 2023',
+          location: '',
+          bullets: t('- Built application using X, improving Y by Z%', '- X ile uygulama geliştirildi, Y metriğinde Z% iyileşme sağlandı'),
+        },
+      ],
+    },
+    {
+      title: t('Technical Skills', 'Teknik Beceriler'),
+      icon: <Code size={16} />,
+      items: [
+        { title: t('Languages', 'Diller'), subtitle: '', date: '', location: '', bullets: 'Python, SQL, JavaScript' },
+        { title: t('Frameworks', 'Frameworkler'), subtitle: '', date: '', location: '', bullets: 'React, Next.js, Django' },
+      ],
+    },
+  ];
 
   const { state, dispatch } = useCV();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -174,16 +174,16 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
 
       initialSnapshotRef.current = JSON.stringify(state);
       setHasUnsavedChanges(false);
-      toast.success(t('CV saved successfully!', 'CV basariyla kaydedildi!'));
+      toast.success(t('CV saved successfully!', 'CV başarıyla kaydedildi!'));
     } catch {
-      toast.error(t('Could not save CV. Please try again.', 'CV kaydedilemedi. LÃƒÂ¼tfen tekrar deneyin.'));
+      toast.error(t('Could not save CV. Please try again.', 'CV kaydedilemedi. Lütfen tekrar deneyin.'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const addCustomSection = () => {
-    dispatch({ type: 'ADD_SECTION', payload: { title: t('New Section', 'Yeni BÃƒÂ¶lÃƒÂ¼m') } });
+    dispatch({ type: 'ADD_SECTION', payload: { title: t('New Section', 'Yeni Bölüm') } });
     setIsPopoverOpen(false);
   };
 
@@ -219,9 +219,9 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
       <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('Leave without saving?', 'Kaydetmeden ÃƒÂ§Ã„Â±kÃ„Â±lsÃ„Â±n mÃ„Â±?')}</DialogTitle>
+            <DialogTitle>{t('Leave without saving?', 'Kaydetmeden çıkılsın mı?')}</DialogTitle>
             <DialogDescription>
-              {t('If you leave now, your unsaved changes will be discarded.', 'Ã…Âimdi ÃƒÂ§Ã„Â±karsan kaydedilmemiÃ…Å¸ deÃ„Å¸iÃ…Å¸iklikler silinecek.')}
+              {t('If you leave now, your unsaved changes will be discarded.', 'Şimdi çıkarsan kaydedilmemiş değişiklikler silinecek.')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -229,7 +229,7 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
               {t('Stay', 'Kal')}
             </Button>
             <Button variant="destructive" onClick={handleConfirmLeave}>
-              {t('Leave', 'Ãƒâ€¡Ã„Â±k')}
+              {t('Leave', 'Çık')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -237,17 +237,17 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
 
       <div className="mb-6">
         <Button variant="ghost" onClick={handleBack} className="-ml-3 px-3 text-slate-500 hover:bg-slate-100/50 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">
-          <ArrowLeft className="mr-2 h-4 w-4" /> {isAuthenticated ? t('Back to Dashboard', 'Panoya DÃƒÂ¶n') : t('Back to Landing', 'Anasayfaya DÃƒÂ¶n')}
+          <ArrowLeft className="mr-2 h-4 w-4" /> {isAuthenticated ? t('Back to Dashboard', 'Panoya Dön') : t('Back to Landing', 'Anasayfaya Dön')}
         </Button>
       </div>
 
       {isAiDraft && (
         <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p className="font-semibold">{t('AI Draft Loaded', 'AI TaslaÃ„Å¸Ã„Â± YÃƒÂ¼klendi')}</p>
+          <p className="font-semibold">{t('AI Draft Loaded', 'AI Taslağı Yüklendi')}</p>
           <p className="mt-1 leading-relaxed">
             {t(
               'This draft was generated in English from your input and may include mock suggestions. Review every section and replace all placeholders and "Recommendation:" lines with your real details before applying.',
-              'Bu taslak girdinizden Ã„Â°ngilizce olarak ÃƒÂ¼retildi ve ÃƒÂ¶rnek ÃƒÂ¶neriler iÃƒÂ§erebilir. BaÃ…Å¸vurmadan ÃƒÂ¶nce tÃƒÂ¼m bÃƒÂ¶lÃƒÂ¼mleri kontrol edin, tÃƒÂ¼m placeholder ve "Recommendation:" satÃ„Â±rlarÃ„Â±nÃ„Â± gerÃƒÂ§ek bilgilerinizle deÃ„Å¸iÃ…Å¸tirin.',
+              'Bu taslak girdinizden İngilizce olarak üretildi ve örnek öneriler içerebilir. Başvurmadan önce tüm bölümleri kontrol edin, tüm placeholder ve "Recommendation:" satırlarını gerçek bilgilerinizle değiştirin.',
             )}
           </p>
         </div>
@@ -259,19 +259,19 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
             value={state.title}
             onChange={(e) => dispatch({ type: 'UPDATE_TITLE', payload: e.target.value })}
             className="w-full border-b-2 border-transparent bg-transparent pb-1 text-4xl font-bold outline-none transition-colors hover:border-slate-200 focus:border-primary"
-            placeholder={t('CV Title', 'CV BaÃ…Å¸lÃ„Â±Ã„Å¸Ã„Â±')}
+            placeholder={t('CV Title', 'CV Başlığı')}
           />
-          <p className="mt-2 text-slate-500">{t('Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!', 'Bilgileri doldurup alt bÃƒÂ¶lÃƒÂ¼mler ekleyerek ATS uyumlu CV oluÃ…Å¸tur. Ãƒâ€“nizlemede sÃƒÂ¼rÃƒÂ¼kle-bÃ„Â±rak ile sÃ„Â±ralamayÃ„Â± deÃ„Å¸iÃ…Å¸tirebilirsin!')}</p>
+          <p className="mt-2 text-slate-500">{t('Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!', 'Bilgileri doldurup alt bölümler ekleyerek ATS uyumlu CV oluştur. Önizlemede sürükle-bırak ile sıralamayı değiştirebilirsin!')}</p>
           <div className="mt-4 max-w-xs">
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              {t('CV Font', 'CV YazÄ± Tipi')}
+              {t('CV Font', 'CV Yazı Tipi')}
             </label>
             <Select
               value={state.fontFamily}
               onValueChange={(value) => dispatch({ type: 'UPDATE_FONT_FAMILY', payload: value })}
             >
               <SelectTrigger className="bg-white">
-                <SelectValue placeholder={t('Choose font', 'YazÄ± tipi seÃ§')} />
+                <SelectValue placeholder={t('Choose font', 'Yazı tipi seç')} />
               </SelectTrigger>
               <SelectContent>
                 {CV_FONT_OPTIONS.map((option) => (
@@ -303,12 +303,12 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger asChild>
             <Button size="lg" className="rounded-full shadow-lg transition-all hover:shadow-xl">
-              <Plus className="mr-2" /> {t('Add Section', 'BÃƒÂ¶lÃƒÂ¼m Ekle')}
+              <Plus className="mr-2" /> {t('Add Section', 'Bölüm Ekle')}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-2" side="top" align="center">
             <div className="flex flex-col gap-1">
-              <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">{t('Pre-built Sections', 'HazÃ„Â±r BÃƒÂ¶lÃƒÂ¼mler')}</div>
+              <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">{t('Pre-built Sections', 'Hazır Bölümler')}</div>
               {PREBUILT_SECTIONS.map((template) => (
                 <Button
                   key={template.title}
@@ -329,7 +329,7 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
                 onClick={addCustomSection}
               >
                 <FileText className="mr-2 h-4 w-4" />
-                {t('Custom Section', 'Ãƒâ€“zel BÃƒÂ¶lÃƒÂ¼m')}
+                {t('Custom Section', 'Özel Bölüm')}
               </Button>
             </div>
           </PopoverContent>

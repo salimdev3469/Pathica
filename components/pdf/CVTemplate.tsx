@@ -281,7 +281,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               </div>
             )}
 
-            {page.includeSummary && hasSummary && (
+                        {page.includeSummary && hasSummary && (
               <div style={{ marginBottom: '14px' }}>
                 <div style={{ marginTop: '6px', marginBottom: '6px' }}>
                   <h2
@@ -314,12 +314,11 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                     >
                       {line}
                     </li>
-                                  ))}
+                  ))}
                 </ul>
-                </div>
+              </div>
             )}
-
-            {page.sections.map((section) => {
+{page.sections.map((section) => {
               const standardTitle = mapSectionTitle(section.title);
 
               return (
