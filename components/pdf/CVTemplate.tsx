@@ -92,7 +92,7 @@ function mapSectionTitle(title: string): string {
 }
 
 function normalizeBulletLine(line: string): string {
-  return line.replace(/^[\s*-\u2022]+/, '').trim();
+  return line.replace(/^[\s*\-\u2022]+/, '').trim();
 }
 
 function paginateSectionsByPage(
@@ -281,7 +281,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               </div>
             )}
 
-                        {page.includeSummary && hasSummary && (
+            {page.includeSummary && hasSummary && (
               <div style={{ marginBottom: '14px' }}>
                 <div style={{ marginTop: '6px', marginBottom: '6px' }}>
                   <h2
@@ -318,7 +318,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                 </ul>
               </div>
             )}
-{page.sections.map((section) => {
+            {page.sections.map((section) => {
               const standardTitle = mapSectionTitle(section.title);
 
               return (
