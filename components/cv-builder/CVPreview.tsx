@@ -4,14 +4,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useCV, CVState } from '@/context/CVContext';
 import { CVTemplate } from '@/components/pdf/CVTemplate';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Download, Loader2, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAnonymousLimit } from '@/hooks/useAnonymousLimit';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import Link from 'next/link';
-import { createBrowserClient } from '@/lib/supabase';
 
 import {
     DndContext,
@@ -165,23 +159,13 @@ export function CVPreview() {
     const [scale, setScale] = useState(1);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
-    const { fingerprint, hasReachedLimit, isLoading, setHasReachedLimit } = useAnonymousLimit();
-    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showTutorial, setShowTutorial] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [showEmailDialog, setShowEmailDialog] = useState(false);
-    const [downloadEmail, setDownloadEmail] = useState('');
-    const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
     const [isPhotoDragging, setIsPhotoDragging] = useState(false);
     const [photoDragPosition, setPhotoDragPosition] = useState<{ x: number; y: number } | null>(null);
     const photoDragRef = useRef<{ startClientX: number; startClientY: number; baseX: number; baseY: number } | null>(null);
     const photoDragPositionRef = useRef<{ x: number; y: number } | null>(null);
 
 
-    const getErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message;
-        return 'Unexpected error';
-    };
 
     const getCurrentPhotoSize = () => {
         return clamp(state.personalInfo?.photoSize ?? DEFAULT_PHOTO_SIZE, MIN_PHOTO_SIZE, MAX_PHOTO_SIZE);
@@ -321,27 +305,7 @@ export function CVPreview() {
     }, []);
 
 
-    useEffect(() => {
-        let isMounted = true;
 
-        async function loadAuthState() {
-            try {
-                const supabase = createBrowserClient();
-                const { data: { user } } = await supabase.auth.getUser();
-                if (isMounted) {
-                    setIsAuthenticated(Boolean(user));
-                }
-            } catch {
-                if (isMounted) setIsAuthenticated(false);
-            }
-        }
-
-        loadAuthState();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
     useEffect(() => {
         // Show tutorial if not seen before and there are sections
         const seen = localStorage.getItem('cv-builder-dnd-tutorial-v2');
@@ -372,7 +336,7 @@ export function CVPreview() {
             const response = await fetch('/api/cv/generate-pdf', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...state, fingerprint: isAuthenticated ? undefined : fingerprint }),
+                body: JSON.stringify(state),
             });
 
             if (!response.ok) {
@@ -394,9 +358,6 @@ export function CVPreview() {
             window.URL.revokeObjectURL(url);
 
             toast.success('CV downloaded successfully!');
-            if (!isAuthenticated) {
-                setHasReachedLimit(true);
-            }
         } catch (error) {
             console.error('Download error:', error);
             toast.error('Failed to download CV');
@@ -405,62 +366,8 @@ export function CVPreview() {
         }
     };
 
-    const handleEmailRequest = async () => {
-        const trimmedEmail = downloadEmail.trim();
-        if (!trimmedEmail) {
-            toast.error('Please enter an email address.');
-            return;
-        }
-
-        if (!fingerprint) {
-            toast.error('Could not verify your device. Please refresh and try again.');
-            return;
-        }
-
-        setIsSubmittingEmail(true);
-        try {
-            const response = await fetch('/api/cv/email/request', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: trimmedEmail,
-                    cvState: state,
-                    fingerprint,
-                }),
-            });
-
-            const data = await response.json().catch(() => null);
-            if (!response.ok) {
-                throw new Error(data?.error || 'Failed to send verification email');
-            }
-
-            setShowEmailDialog(false);
-            setDownloadEmail('');
-            toast.success('Verification email sent. After confirmation, your CV will be sent to your inbox.');
-        } catch (error) {
-            toast.error(getErrorMessage(error));
-        } finally {
-            setIsSubmittingEmail(false);
-        }
-    };
-
     const handleDownload = async () => {
-        if (isAuthenticated) {
-            await downloadPdfDirectly();
-            return;
-        }
-
-        if (!fingerprint) {
-            toast.error('Could not verify your device. Please refresh and try again.');
-            return;
-        }
-
-        if (hasReachedLimit) {
-            setShowUpgradeModal(true);
-            return;
-        }
-
-        setShowEmailDialog(true);
+        await downloadPdfDirectly();
     };
 
     // DND Handlers
@@ -540,9 +447,9 @@ export function CVPreview() {
                 <h2 className="font-semibold text-lg text-slate-800">Preview</h2>
                 <div className="flex gap-2">
 
-                    <Button onClick={handleDownload} disabled={isDownloading || isLoading || isSubmittingEmail} className="gap-2">
+                    <Button onClick={handleDownload} disabled={isDownloading} className="gap-2">
                         {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                        {isAuthenticated ? 'Download PDF' : 'Send PDF to Email'}
+                        Download PDF
                     </Button>
                 </div>
             </div>
@@ -582,52 +489,6 @@ export function CVPreview() {
                 </div>
             </div>
 
-            <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl text-center pb-2">Where should we send your CV?</DialogTitle>
-                        <DialogDescription className="text-center text-base">
-                            Enter your email to verify it. After confirmation, your CV will be sent to your inbox.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-2 py-2">
-                        <Label htmlFor="download-email">Email address</Label>
-                        <Input
-                            id="download-email"
-                            type="email"
-                            placeholder="you@example.com"
-                            value={downloadEmail}
-                            onChange={(e) => setDownloadEmail(e.target.value)}
-                        />
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowEmailDialog(false)} disabled={isSubmittingEmail}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleEmailRequest} disabled={isSubmittingEmail} className="gap-2">
-                            {isSubmittingEmail && <Loader2 className="w-4 h-4 animate-spin" />}
-                            Send verification email
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-            <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl text-center pb-2">You&apos;ve used your free CV</DialogTitle>
-                        <DialogDescription className="text-center text-base">
-                            You have used your free export for now. You can continue from the landing page.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-3 py-4">
-                        <Button asChild variant="outline" className="w-full text-lg h-12">
-                            <Link href="/">
-                                Back to Landing
-                            </Link>
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }

@@ -48,52 +48,63 @@ function ptToPx(pt: number): number {
   return pt * 1.333;
 }
 
-function countWrappedLines(text: string, fontSize: number, isBullet = true): number {
+// Chars per line based on font size, using ~0.52 em-width ratio (for monospace-like average)
+function countWrappedLines(text: string, fontSizePt: number, isBullet = true): number {
   if (!text) return 0;
-  // Available width: 686px. Bullets use 18px left padding (668px).
+  // Available content width in px: page 794 - 2*margin 54 = 686px
+  // Bullets add 18px left padding → 668px
   const availWidth = isBullet ? 668 : 686;
-  const charsPerLine = Math.floor(availWidth / (ptToPx(fontSize) * 0.55));
-  const lines = text.split('\n').map((line) => line.trim()).filter(Boolean);
+  // 0.42 = conservative char width ratio — prevents overestimating line wraps
+  const charWidthPx = ptToPx(fontSizePt) * 0.42;
+  const charsPerLine = Math.max(10, Math.floor(availWidth / charWidthPx));
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
   if (lines.length === 0) return 0;
   return lines.reduce((acc, line) => acc + Math.ceil(Math.max(1, line.length) / charsPerLine), 0);
 }
 
 function estimateSummaryHeight(summary?: string, fontSize = 11, titleFontSize = 12): number {
   if (!summary?.trim()) return 0;
-  const titleHeight = 16 + 6 + 3 + 3 + 1.5 + (ptToPx(titleFontSize) * 1.4); // exact margin/padding inside heading + wrapper padding
+  // h2: lineHeight 1.4, marginTop 6, marginBottom 3, paddingBottom 3, parent-div marginTop 6, marginBottom 6
+  const h2Px = ptToPx(titleFontSize) * 1.4;
+  const headingBlock = h2Px + 6 + 3 + 3 + 6 + 6; // wrapper margins + h2 margins
+  // Each bullet li: lineHeight 1.4, marginBottom 3
   const lines = Math.max(1, countWrappedLines(summary, fontSize, true));
-  const textHeight = lines * (ptToPx(fontSize) * 1.4 + 3); // li marginBottom is 3px
-  return titleHeight + textHeight + 14; // wrapper marginBottom 14px
+  const bulletsBlock = 4 + lines * (ptToPx(fontSize) * 1.4 + 3); // ul marginTop + lis
+  const wrapperMargin = 14; // div marginBottom
+  return headingBlock + bulletsBlock + wrapperMargin;
 }
 
 function estimateItemHeight(item: Item): number {
-  const titlePx = ptToPx(item.titleFontSize ?? 11);
-  const subtitlePx = ptToPx(item.subtitleFontSize ?? 11);
-  const bulletsPx = ptToPx(item.bulletsFontSize ?? 11);
+  const titlePt = item.titleFontSize ?? 11;
+  const subtitlePt = item.subtitleFontSize ?? 11;
+  const bulletsPt = item.bulletsFontSize ?? 11;
 
-  let height = 12; // div wrapper marginBottom
+  // Row 1: title + date (same line, baseline-aligned)
+  let h = ptToPx(titlePt) * 1.4;
 
-  height += titlePx * 1.4;
-
+  // Row 2: subtitle + location (only if present)
   if (item.subtitle || item.location) {
-    height += subtitlePx * 1.4;
+    h += ptToPx(subtitlePt) * 1.4;
   }
 
-  if (item.bullets) {
-    const totalLines = countWrappedLines(item.bullets, item.bulletsFontSize ?? 11, true);
-    if (totalLines > 0) {
-      height += 4; // ul marginTop
-      height += totalLines * (bulletsPx * 1.4 + 3);
-    }
+  // Bullet rows
+  if (item.bullets?.trim()) {
+    const lines = countWrappedLines(item.bullets, bulletsPt, true);
+    h += 4 + lines * (ptToPx(bulletsPt) * 1.4 + 3); // ul marginTop + each line
   }
-  return height;
+
+  h += 12; // div marginBottom inside the item group
+  return h;
 }
 
 function estimateSectionHeight(section: Section): number {
-  const headingPx = ptToPx(section.titleFontSize ?? 12);
-  const heading = 43.5 + (headingPx * 1.4); // heading margin/padding + section wrapper marginBottom (14px)
+  const titlePt = section.titleFontSize ?? 12;
+  // h2 block: h2 itself + margins + parent-div margins + sectionWrapper marginBottom
+  const h2Px = ptToPx(titlePt) * 1.4;
+  const headingBlock = h2Px + 16 + 6 + 3 + 6; // marginTop 16, marginBottom 6, paddingBottom 3, parent div marginBottom 6
+  const sectionWrapperMargin = 14;
   const itemsHeight = (section.items || []).reduce((total, item) => total + estimateItemHeight(item), 0);
-  return heading + itemsHeight;
+  return headingBlock + itemsHeight + sectionWrapperMargin;
 }
 
 function mapSectionTitle(title: string): string {
@@ -144,9 +155,11 @@ function paginateSectionsByPage(
   };
 
   for (const section of sections) {
-    const headingPx = ptToPx(section.titleFontSize ?? 12);
-    const headingHeight = 43.5 + (headingPx * 1.4);
+    const titlePt = section.titleFontSize ?? 12;
+    const h2Px = ptToPx(titlePt) * 1.4;
+    const headingHeight = h2Px + 16 + 6 + 3 + 6 + 14;
 
+    // If section heading alone doesn't fit on the current page, start a new page
     if (remaining < headingHeight + 20 && currentPageSections.length > 0) {
       pushNewPage();
     }
@@ -235,12 +248,12 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   const photoX = clamp(requestedX, 0, PAGE_WIDTH - photoSize);
   const photoY = clamp(requestedY, 0, PAGE_HEIGHT - photoSize);
 
+  // Header height: h1 (fontPx * 1.4 + margin-bottom 6) + contact-div (contactPx * 1.3) + wrapper marginBottom 14
   const fullNamePx = ptToPx(personalInfo?.fullNameFontSize ?? 18);
   const contactPx = ptToPx(personalInfo?.contactFontSize ?? 10);
-  const dynamicHeaderHeight = (fullNamePx * 1.2 + 6) + (contactPx * 1.3) + 14;
-  const actualHeaderHeight = Math.max(HEADER_HEIGHT, dynamicHeaderHeight);
+  const actualHeaderHeight = (fullNamePx * 1.4 + 6) + (contactPx * 1.3) + 14;
 
-  const summaryBlockHeight = hasSummary ? estimateSummaryHeight(summary, cv.summaryFontSize, cv.summaryTitleFontSize) : 0;
+  const summaryBlockHeight = hasSummary ? estimateSummaryHeight(summary, cv.summaryFontSize ?? 11, cv.summaryTitleFontSize ?? 12) : 0;
   const firstPageAvailable = CONTENT_HEIGHT - actualHeaderHeight - summaryBlockHeight;
   const sectionPages = paginateSectionsByPage(sections || [], firstPageAvailable, CONTENT_HEIGHT);
 
