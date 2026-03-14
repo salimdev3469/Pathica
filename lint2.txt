@@ -1,0 +1,195 @@
+
+> photonic-observatory@0.1.0 lint
+> next lint
+
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Users\SalimSerh
+atAKA\AppData ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+./app/api/applications/route.
+ts
+28:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+54:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+
+./app/api/cv/cover-letter/rou
+te.ts
+50:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+
+./app/api/cv/optimize/route.t
+s
+40:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+
+./app/api/cv/tailor/route.ts
+55:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+
+./app/api/stripe/checkout/rou
+te.ts
+45:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+
+./app/api/stripe/webhook/rout
+e.ts
+18:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+73:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+
+./app/page.tsx
+218:19  Warning: Using `<img>
+` could result in slower LCP 
+and higher bandwidth. Conside
+r using `<Image />` from `nex
+t/image` to automatically opt
+imize images. This may incur 
+additional usage or cost from
+ your provider. See: https://
+nextjs.org/docs/messages/no-i
+mg-element  @next/next/no-img
+-element
+
+./components/applications/App
+licationList.tsx
+7:10  Error: 'Briefcase' is d
+efined but never used.  @type
+script-eslint/no-unused-vars
+7:32  Error: 'MapPin' is defi
+ned but never used.  @typescr
+ipt-eslint/no-unused-vars
+11:18  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+14:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+21:20  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+31:11  Error: 'supabase' is a
+ssigned a value but never use
+d.  @typescript-eslint/no-unu
+sed-vars
+44:21  Error: Unexpected any.
+ Specify a different type.  @
+typescript-eslint/no-explicit
+-any
+
+./components/cv-builder/CVPre
+view.tsx
+38:7  Error: 'PAGE_MARGIN' is
+ assigned a value but never u
+sed.  @typescript-eslint/no-u
+nused-vars
+283:8  Warning: React Hook us
+eEffect has missing dependenc
+ies: 'clampPhotoPosition' and
+ 'getCurrentPhotoSize'. Eithe
+r include them or remove the 
+dependency array.  react-hook
+s/exhaustive-deps
+307:8  Warning: React Hook us
+eEffect has missing dependenc
+ies: 'clampPhotoPosition', 'g
+etCurrentPhotoSize', 'state.p
+ersonalInfo?.photoX', and 'st
+ate.personalInfo?.photoY'. Ei
+ther include them or remove t
+he dependency array.  react-h
+ooks/exhaustive-deps
+618:79  Error: `'` can be esc
+aped with `&apos;`, `&lsquo;`
+, `&#39;`, `&rsquo;`.  react/
+no-unescaped-entities
+
+./components/cv-builder/Field
+Item.tsx
+6:10  Error: 'Label' is defin
+ed but never used.  @typescri
+pt-eslint/no-unused-vars
+46:18  Error: 'error' is defi
+ned but never used.  @typescr
+ipt-eslint/no-unused-vars
+108:82  Error: Unexpected any
+. Specify a different type.  
+@typescript-eslint/no-explici
+t-any
+
+./components/pdf/CVTemplate.t
+sx
+276:17  Warning: Using `<img>
+` could result in slower LCP 
+and higher bandwidth. Conside
+r using `<Image />` from `nex
+t/image` to automatically opt
+imize images. This may incur 
+additional usage or cost from
+ your provider. See: https://
+nextjs.org/docs/messages/no-i
+mg-element  @next/next/no-img
+-element
+
+./components/ui/typewriter-te
+xt.tsx
+68:8  Warning: React Hook use
+Effect has a missing dependen
+cy: 'textArray.length'. Eithe
+r include it or remove the de
+pendency array.  react-hooks/
+exhaustive-deps
+
+./lib/cv-pdf.ts
+5:52  Error: Unexpected any. 
+Specify a different type.  @t
+ypescript-eslint/no-explicit-
+any
+
+./lib/stripe.ts
+4:40  Error: Unexpected any. 
+Specify a different type.  @t
+ypescript-eslint/no-explicit-
+any
+
+./lib/supabase-server.ts
+1:35  Error: 'CookieOptions' 
+is defined but never used.  @
+typescript-eslint/no-unused-v
+ars
+
+info  - Need to disable some 
+ESLint rules? Learn more here
+: https://nextjs.org/docs/bas
+ic-features/eslint#disabling-
+rules

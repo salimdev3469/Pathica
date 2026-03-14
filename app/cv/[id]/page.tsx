@@ -79,6 +79,8 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
     // Parse summary
     let summary = '';
     let summaryTitle = locale === 'tr' ? 'Profil Özeti' : 'Profile Summary';
+    let summaryTitleFontSize: number | undefined;
+    let summaryFontSize: number | undefined;
     let fontFamily = normalizeCvFont(undefined);
     if (summarySection) {
         const summaryField = summarySection.cv_fields.find((field) => field.label === 'summary') || summarySection.cv_fields[0];
@@ -95,38 +97,61 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
         if (fontFamilyField?.value) {
             fontFamily = normalizeCvFont(fontFamilyField.value);
         }
+
+        const summaryTitleFontSizeField = summarySection.cv_fields.find((field) => field.label === 'summary_title_font_size');
+        if (summaryTitleFontSizeField?.value) {
+            const parsed = parseInt(summaryTitleFontSizeField.value, 10);
+            if (!isNaN(parsed)) summaryTitleFontSize = parsed;
+        }
+
+        const summaryFontSizeField = summarySection.cv_fields.find((field) => field.label === 'summary_font_size');
+        if (summaryFontSizeField?.value) {
+            const parsed = parseInt(summaryFontSizeField.value, 10);
+            if (!isNaN(parsed)) summaryFontSize = parsed;
+        }
     }
     // Filter normal sections
     const normalSections = allSections.filter(
         (s) => s.title !== '_personal_info' && s.title !== '_summary' && s.title !== '_ats_meta',
     );
 
-    const sections: Section[] = normalSections.map((sectionRow) => ({
-        id: sectionRow.id,
-        title: sectionRow.title,
-        position: sectionRow.position,
-        items: (sectionRow.cv_fields || [])
-            .sort((a, b) => a.position - b.position)
-            .map((fieldRow) => {
-                if (fieldRow.field_type === 'item') {
-                    try {
-                        return JSON.parse(fieldRow.value) as Item;
-                    } catch {
-                        return null;
+    const sections: Section[] = normalSections.map((sectionRow) => {
+        let titleFontSize: number | undefined;
+        const metaField = (sectionRow.cv_fields || []).find((f) => f.label === 'section_meta');
+        if (metaField) {
+            try { titleFontSize = JSON.parse(metaField.value).titleFontSize; } catch { }
+        }
+
+        return {
+            id: sectionRow.id,
+            title: sectionRow.title,
+            position: sectionRow.position,
+            ...(titleFontSize !== undefined && { titleFontSize }),
+            items: (sectionRow.cv_fields || [])
+                .sort((a, b) => a.position - b.position)
+                .map((fieldRow) => {
+                    if (fieldRow.field_type === 'item') {
+                        try {
+                            return JSON.parse(fieldRow.value) as Item;
+                        } catch {
+                            return null;
+                        }
                     }
-                }
-                return null;
-            })
-            .filter(Boolean) as Item[],
-    }));
+                    return null;
+                })
+                .filter(Boolean) as Item[],
+        };
+    });
 
     const initialState: CVState = {
         id: cvData.id,
         title: cvData.title,
         ...(personalInfo && { personalInfo }),
         summaryTitle,
+        ...(summaryTitleFontSize !== undefined && { summaryTitleFontSize }),
         fontFamily,
         ...(summary && { summary }),
+        ...(summaryFontSize !== undefined && { summaryFontSize }),
         sections,
     };
 

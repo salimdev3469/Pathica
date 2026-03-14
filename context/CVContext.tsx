@@ -14,6 +14,8 @@ export interface PersonalInfo {
     photoX?: number;
     photoY?: number;
     photoSize?: number;
+    fullNameFontSize?: number;
+    contactFontSize?: number;
 }
 
 export interface Item {
@@ -24,6 +26,11 @@ export interface Item {
     location: string;
     bullets: string;
     position: number;
+    titleFontSize?: number;
+    subtitleFontSize?: number;
+    dateFontSize?: number;
+    locationFontSize?: number;
+    bulletsFontSize?: number;
 }
 
 export interface Section {
@@ -31,6 +38,7 @@ export interface Section {
     title: string;
     position: number;
     items: Item[];
+    titleFontSize?: number;
 }
 
 export interface CVState {
@@ -41,6 +49,8 @@ export interface CVState {
     summaryTitle: string;
     summary: string;
     sections: Section[];
+    summaryTitleFontSize?: number;
+    summaryFontSize?: number;
 }
 
 type CVAction =
@@ -51,7 +61,7 @@ type CVAction =
     | { type: 'UPDATE_SUMMARY_TITLE'; payload: string }
     | { type: 'UPDATE_SUMMARY'; payload: string }
     | { type: 'ADD_SECTION'; payload: { title: string } }
-    | { type: 'UPDATE_SECTION'; payload: { id: string; title: string } }
+    | { type: 'UPDATE_SECTION'; payload: { id: string; title?: string; titleFontSize?: number } }
     | { type: 'REMOVE_SECTION'; payload: string }
     | { type: 'REORDER_SECTIONS'; payload: Section[] }
     | { type: 'ADD_ITEM'; payload: { sectionId: string; item: Omit<Item, 'id' | 'position'> } }
@@ -75,6 +85,8 @@ const defaultCVState: CVState = {
         photoX: 628,
         photoY: 54,
         photoSize: 112,
+        fullNameFontSize: 18,
+        contactFontSize: 10,
     },
     summaryTitle: 'Profile Summary',
     summary: 'Ã¢â‚¬Â¢ Proven ability in analyzing large datasets, debugging SQL queries, and transforming data to drive business decisions.\nÃ¢â‚¬Â¢ Proficient in creating compelling, interactive dashboards using Power BI, enhancing data accessibility and understanding.\nÃ¢â‚¬Â¢ Strong command over Excel, SQL, Power BI, enabling efficient data manipulation and analysis.\nÃ¢â‚¬Â¢ Proficient in market research, requirement gathering, qualitative and quantitative analysis.',
@@ -82,15 +94,21 @@ const defaultCVState: CVState = {
         {
             id: crypto.randomUUID(),
             title: 'Experience',
+            titleFontSize: 12,
             position: 0,
             items: [
                 {
                     id: crypto.randomUUID(),
                     title: 'Deloitte',
+                    titleFontSize: 11,
                     subtitle: 'Data Integrity & Reporting Analyst',
+                    subtitleFontSize: 11,
                     date: 'June 2024 Ã¢â‚¬â€œ Present',
+                    dateFontSize: 11,
                     location: '',
+                    locationFontSize: 11,
                     bullets: 'Ã¢â‚¬Â¢ Manage and enhance client data across multiple CRM tools, ensuring up-to-date and accurate information.\nÃ¢â‚¬Â¢ Perform lead verification by researching on LinkedIn and other sources to identify and correct data inconsistencies.\nÃ¢â‚¬Â¢ Oversee data accuracy and consistency within Deloitte\'s databases through ongoing validation, audits, and updates, leveraging strong analytical skills and attention to detail.',
+                    bulletsFontSize: 11,
                     position: 0,
                 }
             ],
@@ -131,7 +149,7 @@ const cvReducer = (state: CVState, action: CVAction): CVState => {
             return {
                 ...state,
                 sections: state.sections.map((s) =>
-                    s.id === action.payload.id ? { ...s, title: action.payload.title } : s
+                    s.id === action.payload.id ? { ...s, ...action.payload } : s
                 ),
             };
         case 'REMOVE_SECTION':
@@ -210,7 +228,9 @@ export const CVProvider = ({ children, initialState }: { children: ReactNode; in
         fontFamily: normalizeCvFont(initialState.fontFamily),
         personalInfo: initialState.personalInfo || defaultCVState.personalInfo,
         summaryTitle: initialState.summaryTitle || defaultCVState.summaryTitle,
+        summaryTitleFontSize: initialState.summaryTitleFontSize ?? defaultCVState.summaryTitleFontSize,
         summary: initialState.summary || '',
+        summaryFontSize: initialState.summaryFontSize ?? defaultCVState.summaryFontSize,
         sections: initialState.sections || []
     } : defaultCVState;
 

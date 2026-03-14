@@ -100,11 +100,17 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div className="flex flex-col gap-1">
             <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Full Name', 'Ad Soyad')}</label>
-            <Input value={personalInfo?.fullName || ''} onChange={(e) => handleInfoChange('fullName', e.target.value)} className="bg-white" />
+            <div className="flex gap-2">
+              <Input value={personalInfo?.fullName || ''} onChange={(e) => handleInfoChange('fullName', e.target.value)} className="bg-white flex-1" />
+              <Input type="number" min={8} max={48} value={personalInfo?.fullNameFontSize ?? 18} onChange={(e) => handleInfoChange('fullNameFontSize', Number(e.target.value))} className="bg-white w-16 px-2" title={t('Font Size', 'Yazı Büyüklüğü')} />
+            </div>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Email</label>
-            <Input value={personalInfo?.email || ''} onChange={(e) => handleInfoChange('email', e.target.value)} className="bg-white" />
+            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Email & {t('Contact Font Size', 'İletişim Font Büyüklüğü')}</label>
+            <div className="flex gap-2">
+              <Input value={personalInfo?.email || ''} onChange={(e) => handleInfoChange('email', e.target.value)} className="bg-white flex-1" />
+              <Input type="number" min={6} max={24} value={personalInfo?.contactFontSize ?? 10} onChange={(e) => handleInfoChange('contactFontSize', Number(e.target.value))} className="bg-white w-16 px-2" title={t('Contact Info Font Size', 'İletişim Font Büyüklüğü')} />
+            </div>
           </div>
           <div className="flex flex-col gap-1">
             <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Phone', 'Telefon')}</label>
@@ -166,19 +172,27 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
 
         <div className="mt-2 flex flex-col gap-1 border-t border-primary/10 pt-2">
           <label className="mt-1 pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Summary Title', 'Ozet Basligi')}</label>
-          <Input
-            value={summaryTitle || ''}
-            onChange={(e) => dispatch({ type: 'UPDATE_SUMMARY_TITLE', payload: e.target.value })}
-            className="bg-white"
-            placeholder={t('e.g. Profile Summary', 'Orn. Profil Ozeti')}
-          />
+          <div className="flex gap-2">
+            <Input
+              value={summaryTitle || ''}
+              onChange={(e) => dispatch({ type: 'UPDATE_SUMMARY_TITLE', payload: e.target.value })}
+              className="bg-white flex-1"
+              placeholder={t('e.g. Profile Summary', 'Orn. Profil Ozeti')}
+            />
+            <Input type="number" min={8} max={36} value={state.summaryTitleFontSize ?? 12} onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, summaryTitleFontSize: Number(e.target.value) } })} className="bg-white w-16 px-2" title={t('Font Size', 'Yazı Büyüklüğü')} />
+          </div>
           <label className="mt-2 pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Summary Content', 'Ozet Icerigi')}</label>
-          <Textarea
-            value={summary || ''}
-            onChange={(e) => dispatch({ type: 'UPDATE_SUMMARY', payload: e.target.value })}
-            className="min-h-[100px] bg-white"
-            placeholder={t('Enter a brief summary...', 'Kisa bir ozet girin...')}
-          />
+          <div className="relative">
+            <Textarea
+              value={summary || ''}
+              onChange={(e) => dispatch({ type: 'UPDATE_SUMMARY', payload: e.target.value })}
+              className="min-h-[100px] bg-white pr-20"
+              placeholder={t('Enter a brief summary...', 'Kisa bir ozet girin...')}
+            />
+            <div className="absolute right-2 top-2 w-16">
+              <Input type="number" min={6} max={24} value={state.summaryFontSize ?? 11} onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, summaryFontSize: Number(e.target.value) } })} className="bg-white px-2 h-8 text-xs" title={t('Font Size', 'Yazı Büyüklüğü')} />
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

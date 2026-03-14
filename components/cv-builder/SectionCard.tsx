@@ -43,12 +43,23 @@ export function SectionCard({ section, locale = 'en' }: SectionCardProps) {
             <div className="group flex min-w-0">
                 <div className="min-w-0 flex-1 p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
-                        <Input
-                            value={section.title}
-                            onChange={(e) => handleUpdateTitle(e.target.value)}
-                            className="h-9 w-full max-w-[78%] border-transparent bg-transparent p-1 text-lg font-bold uppercase text-primary hover:border-slate-200 focus-visible:ring-1 dark:hover:border-slate-600"
-                            placeholder={t('Section Title', 'Bölüm Başlığı')}
-                        />
+                        <div className="flex w-full max-w-[78%] gap-2 items-center">
+                            <Input
+                                value={section.title}
+                                onChange={(e) => handleUpdateTitle(e.target.value)}
+                                className="h-9 flex-1 border-transparent bg-transparent p-1 text-lg font-bold uppercase text-primary hover:border-slate-200 focus-visible:ring-1 dark:hover:border-slate-600"
+                                placeholder={t('Section Title', 'Bölüm Başlığı')}
+                            />
+                            <Input
+                                type="number"
+                                min={8}
+                                max={36}
+                                value={section.titleFontSize ?? 12}
+                                onChange={(e) => dispatch({ type: 'UPDATE_SECTION', payload: { id: section.id, titleFontSize: Number(e.target.value) } })}
+                                className="h-9 w-16 px-2 text-sm"
+                                title={t('Font Size', 'Yazı Büyüklüğü')}
+                            />
+                        </div>
                         <Button
                             variant="ghost"
                             size="icon"

@@ -16,6 +16,7 @@ type SaveItem = {
 type SaveSection = {
     title?: string;
     position?: number;
+    titleFontSize?: number;
     items?: SaveItem[];
 };
 
@@ -35,9 +36,13 @@ type SaveCvState = {
         photoX?: number;
         photoY?: number;
         photoSize?: number;
+        fullNameFontSize?: number;
+        contactFontSize?: number;
     };
     summaryTitle?: string;
+    summaryTitleFontSize?: number;
     summary?: string;
+    summaryFontSize?: number;
     sections?: SaveSection[];
 };
 
@@ -193,6 +198,26 @@ export async function POST(req: Request) {
                 position: 2,
             });
 
+            if (typeof cvState.summaryTitleFontSize === 'number') {
+                summaryFields.push({
+                    section_id: summarySection.id,
+                    label: 'summary_title_font_size',
+                    value: String(cvState.summaryTitleFontSize),
+                    field_type: 'number',
+                    position: 3,
+                });
+            }
+
+            if (typeof cvState.summaryFontSize === 'number') {
+                summaryFields.push({
+                    section_id: summarySection.id,
+                    label: 'summary_font_size',
+                    value: String(cvState.summaryFontSize),
+                    field_type: 'number',
+                    position: 4,
+                });
+            }
+
             if (summaryFields.length > 0) {
                 await supabase.from('cv_fields').insert(summaryFields);
             }
@@ -225,6 +250,16 @@ export async function POST(req: Request) {
 
                 const { error: fieldsError } = await supabase.from('cv_fields').insert(fieldsToInsert);
                 if (fieldsError) throw fieldsError;
+            }
+
+            if (typeof section.titleFontSize === 'number') {
+                await supabase.from('cv_fields').insert({
+                    section_id: sectionData.id,
+                    label: 'section_meta',
+                    value: JSON.stringify({ titleFontSize: section.titleFontSize }),
+                    field_type: 'json',
+                    position: -1,
+                });
             }
         }
 

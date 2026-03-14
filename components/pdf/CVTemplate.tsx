@@ -226,7 +226,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                 <h1
                   style={{
                     fontFamily,
-                    fontSize: '18pt',
+                    fontSize: `${personalInfo?.fullNameFontSize ?? 18}pt`,
                     fontWeight: 'bold',
                     margin: '0 0 6px 0',
                     color: '#000000',
@@ -240,7 +240,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                 <div
                   style={{
                     fontFamily,
-                    fontSize: '10pt',
+                    fontSize: `${personalInfo?.contactFontSize ?? 10}pt`,
                     color: '#000000',
                     lineHeight: '1.3',
                     textAlign: 'center',
@@ -287,7 +287,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                   <h2
                     style={{
                       fontFamily,
-                      fontSize: '12pt',
+                      fontSize: `${cv.summaryTitleFontSize ?? 12}pt`,
                       fontWeight: 'bold',
                       margin: '0 0 3px 0',
                       borderBottom: '1.5px solid #000000',
@@ -308,7 +308,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                       style={{
                         marginBottom: '3px',
                         fontFamily,
-                        fontSize: '11pt',
+                        fontSize: `${cv.summaryFontSize ?? 11}pt`,
                         listStyleType: 'disc',
                       }}
                     >
@@ -327,7 +327,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                     <h2
                       style={{
                         fontFamily,
-                        fontSize: '12pt',
+                        fontSize: `${section.titleFontSize ?? 12}pt`,
                         fontWeight: 'bold',
                         margin: '0 0 3px 0',
                         borderBottom: '1.5px solid #000000',
@@ -346,14 +346,14 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                       <ItemWrapper key={item.id} id={item.id} sectionId={section.id}>
                         <div style={{ marginBottom: '12px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                            <span style={{ fontFamily, fontSize: '11pt', fontWeight: 'bold' }}>{item.title}</span>
-                            {item.date && <span style={{ fontFamily, fontSize: '11pt' }}>{item.date}</span>}
+                            <span style={{ fontFamily, fontSize: `${item.titleFontSize ?? 11}pt`, fontWeight: 'bold' }}>{item.title}</span>
+                            {item.date && <span style={{ fontFamily, fontSize: `${item.dateFontSize ?? 11}pt` }}>{item.date}</span>}
                           </div>
 
                           {(item.subtitle || item.location) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                              <span style={{ fontFamily, fontSize: '11pt', fontStyle: 'italic' }}>{item.subtitle}</span>
-                              {item.location && <span style={{ fontFamily, fontSize: '11pt' }}>{item.location}</span>}
+                              <span style={{ fontFamily, fontSize: `${item.subtitleFontSize ?? 11}pt`, fontStyle: 'italic' }}>{item.subtitle}</span>
+                              {item.location && <span style={{ fontFamily, fontSize: `${item.locationFontSize ?? 11}pt` }}>{item.location}</span>}
                             </div>
                           )}
 
@@ -368,7 +368,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                                     key={`${item.id}-${i}`}
                                     style={{
                                       fontFamily,
-                                      fontSize: '11pt',
+                                      fontSize: `${item.bulletsFontSize ?? 11}pt`,
                                       marginBottom: '3px',
                                       listStyleType: 'disc',
                                     }}

@@ -50,31 +50,48 @@ export function ItemCard({ sectionId, item, locale = 'en' }: ItemCardProps) {
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                         <div className="flex min-w-0 flex-col gap-1">
                             <label className="text-xs font-medium text-slate-500">{t('Title / Company / School', 'Başlık / Şirket / Okul')}</label>
-                            <Input value={item.title || ''} onChange={(e) => handleUpdate({ title: e.target.value })} placeholder={t('e.g. Deloitte', 'Örn. Deloitte')} className="h-10 min-w-0 text-sm" />
+                            <div className="flex gap-2">
+                                <Input value={item.title || ''} onChange={(e) => handleUpdate({ title: e.target.value })} placeholder={t('e.g. Deloitte', 'Örn. Deloitte')} className="h-10 min-w-0 text-sm flex-1" />
+                                <Input type="number" min={8} max={36} value={item.titleFontSize ?? 11} onChange={(e) => handleUpdate({ titleFontSize: Number(e.target.value) })} className="h-10 w-16 px-2 text-sm" title={t('Font Size', 'Yazı Büyüklüğü')} />
+                            </div>
                         </div>
                         <div className="flex min-w-0 flex-col gap-1">
                             <label className="text-xs font-medium text-slate-500">{t('Subtitle / Role / Degree', 'Alt Başlık / Rol / Derece')}</label>
-                            <Input value={item.subtitle || ''} onChange={(e) => handleUpdate({ subtitle: e.target.value })} placeholder={t('e.g. Data Analyst', 'Örn. Veri Analisti')} className="h-10 min-w-0 text-sm" />
+                            <div className="flex gap-2">
+                                <Input value={item.subtitle || ''} onChange={(e) => handleUpdate({ subtitle: e.target.value })} placeholder={t('e.g. Data Analyst', 'Örn. Veri Analisti')} className="h-10 min-w-0 text-sm flex-1" />
+                                <Input type="number" min={8} max={36} value={item.subtitleFontSize ?? 11} onChange={(e) => handleUpdate({ subtitleFontSize: Number(e.target.value) })} className="h-10 w-16 px-2 text-sm" title={t('Font Size', 'Yazı Büyüklüğü')} />
+                            </div>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                         <div className="flex min-w-0 flex-col gap-1">
                             <label className="text-xs font-medium text-slate-500">{t('Date Range', 'Tarih Aralığı')}</label>
-                            <Input value={item.date || ''} onChange={(e) => handleUpdate({ date: e.target.value })} placeholder={t('e.g. June 2024 - Present', 'Örn. Haziran 2024 - Devam ediyor')} className="h-10 min-w-0 text-sm" />
+                            <div className="flex gap-2">
+                                <Input value={item.date || ''} onChange={(e) => handleUpdate({ date: e.target.value })} placeholder={t('e.g. June 2024 - Present', 'Örn. Haziran 2024 - Devam ediyor')} className="h-10 min-w-0 text-sm flex-1" />
+                                <Input type="number" min={6} max={24} value={item.dateFontSize ?? 11} onChange={(e) => handleUpdate({ dateFontSize: Number(e.target.value) })} className="h-10 w-16 px-2 text-sm" title={t('Font Size', 'Yazı Büyüklüğü')} />
+                            </div>
                         </div>
                         <div className="flex min-w-0 flex-col gap-1">
                             <label className="text-xs font-medium text-slate-500">{t('Location', 'Konum')}</label>
-                            <Input value={item.location || ''} onChange={(e) => handleUpdate({ location: e.target.value })} placeholder={t('e.g. Istanbul', 'Örn. İstanbul')} className="h-10 min-w-0 text-sm" />
+                            <div className="flex gap-2">
+                                <Input value={item.location || ''} onChange={(e) => handleUpdate({ location: e.target.value })} placeholder={t('e.g. Istanbul', 'Örn. İstanbul')} className="h-10 min-w-0 text-sm flex-1" />
+                                <Input type="number" min={6} max={24} value={item.locationFontSize ?? 11} onChange={(e) => handleUpdate({ locationFontSize: Number(e.target.value) })} className="h-10 w-16 px-2 text-sm" title={t('Font Size', 'Yazı Büyüklüğü')} />
+                            </div>
                         </div>
                     </div>
                     <div className="mt-1 flex min-w-0 flex-col gap-1">
                         <label className="text-xs font-medium text-slate-500">{t('Bullets / Description', 'Maddeler / Açıklama')}</label>
-                        <Textarea
-                            value={item.bullets || ''}
-                            onChange={(e) => handleUpdate({ bullets: e.target.value })}
-                            placeholder="- Bullet 1&#10;- Bullet 2"
-                            className="min-h-[100px] min-w-0 text-sm"
-                        />
+                        <div className="relative">
+                            <Textarea
+                                value={item.bullets || ''}
+                                onChange={(e) => handleUpdate({ bullets: e.target.value })}
+                                placeholder="- Bullet 1&#10;- Bullet 2"
+                                className="min-h-[100px] min-w-0 text-sm pr-20"
+                            />
+                            <div className="absolute right-2 top-2 w-16">
+                                <Input type="number" min={6} max={24} value={item.bulletsFontSize ?? 11} onChange={(e) => handleUpdate({ bulletsFontSize: Number(e.target.value) })} className="bg-white px-2 h-8 text-xs" title={t('Font Size', 'Yazı Büyüklüğü')} />
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

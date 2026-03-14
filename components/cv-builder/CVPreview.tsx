@@ -35,7 +35,6 @@ import { X } from 'lucide-react';
 
 const PAGE_WIDTH = 794;
 const PAGE_HEIGHT = 1123;
-const PAGE_MARGIN = 54;
 const DEFAULT_PHOTO_SIZE = 112;
 const MIN_PHOTO_SIZE = 72;
 const MAX_PHOTO_SIZE = 200;
@@ -540,7 +539,7 @@ export function CVPreview() {
             <div className="flex items-center justify-between p-4 bg-white border-b shadow-sm z-10">
                 <h2 className="font-semibold text-lg text-slate-800">Preview</h2>
                 <div className="flex gap-2">
-                    
+
                     <Button onClick={handleDownload} disabled={isDownloading || isLoading || isSubmittingEmail} className="gap-2">
                         {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                         {isAuthenticated ? 'Download PDF' : 'Send PDF to Email'}
@@ -615,7 +614,7 @@ export function CVPreview() {
             <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle className="text-2xl text-center pb-2">You've used your free CV</DialogTitle>
+                        <DialogTitle className="text-2xl text-center pb-2">You&apos;ve used your free CV</DialogTitle>
                         <DialogDescription className="text-center text-base">
                             You have used your free export for now. You can continue from the landing page.
                         </DialogDescription>
