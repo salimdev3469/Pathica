@@ -45,35 +45,44 @@ function clamp(value: number, min: number, max: number): number {
 
 function countWrappedLines(text: string, fontSize: number): number {
   if (!text) return 0;
-  // Approximates how many lines the text takes after wrapping
-  // At 11pt, roughly 95-100 chars fit in the 686px container
-  const charsPerLine = 100 * (11 / fontSize);
+  // Approx 85 chars fit per line at 11pt, in a 686px container
+  const charsPerLine = 85 * (11 / fontSize);
   const lines = text.split('\n').map((line) => line.trim()).filter(Boolean);
   if (lines.length === 0) return 0;
   return lines.reduce((acc, line) => acc + Math.ceil(Math.max(1, line.length) / charsPerLine), 0);
 }
 
+function ptToPx(pt: number): number {
+  return pt * 1.333;
+}
+
 function estimateSummaryHeight(summary?: string, fontSize = 11, titleFontSize = 12): number {
   if (!summary?.trim()) return 0;
   const lines = Math.max(1, countWrappedLines(summary, fontSize));
-  return (titleFontSize * 1.5 + 20) + (lines * fontSize * 1.5) + 14;
+  const titlePx = ptToPx(titleFontSize);
+  const fontPx = ptToPx(fontSize);
+  return (titlePx * 1.5 + 20) + (lines * fontPx * 1.5) + 14;
 }
 
 function estimateItemHeight(item: Item): number {
-  const titleSize = item.titleFontSize ?? 11;
-  const subtitleSize = item.subtitleFontSize ?? 11;
-  const bulletsSize = item.bulletsFontSize ?? 11;
+  const titlePx = ptToPx(item.titleFontSize ?? 11);
+  const subtitlePx = ptToPx(item.subtitleFontSize ?? 11);
+  const bulletsPx = ptToPx(item.bulletsFontSize ?? 11);
 
-  const totalWrappedBulletLines = countWrappedLines(item.bullets || '', bulletsSize);
+  const totalWrappedBulletLines = countWrappedLines(item.bullets || '', item.bulletsFontSize ?? 11);
 
-  const titleRow = titleSize * 1.5;
-  const subtitleRow = item.subtitle || item.location ? (subtitleSize * 1.5) : 0;
+  const titleRow = titlePx * 1.5;
+  const subtitleRow = item.subtitle || item.location ? (subtitlePx * 1.5) : 0;
 
-  return titleRow + subtitleRow + (totalWrappedBulletLines * bulletsSize * 1.6) + 16;
+  // each bullet has line-height 1.4 plus 3px margin-bottom plus general padding 4px
+  const bulletHeight = totalWrappedBulletLines > 0 ? totalWrappedBulletLines * (bulletsPx * 1.4 + 5) + 4 : 0;
+
+  return titleRow + subtitleRow + bulletHeight + 20; // 20px extra buffer for item bottom margin & gap
 }
 
 function estimateSectionHeight(section: Section): number {
-  const heading = (section.titleFontSize ?? 12) * 1.5 + 20;
+  const headingPx = ptToPx(section.titleFontSize ?? 12);
+  const heading = headingPx * 1.5 + 20;
   const itemsHeight = (section.items || []).reduce((total, item) => total + estimateItemHeight(item), 0);
   return heading + itemsHeight;
 }
@@ -126,7 +135,8 @@ function paginateSectionsByPage(
   };
 
   for (const section of sections) {
-    const headingHeight = (section.titleFontSize ?? 12) * 1.5 + 20;
+    const headingPx = ptToPx(section.titleFontSize ?? 12);
+    const headingHeight = headingPx * 1.5 + 20;
 
     if (remaining < headingHeight + 40 && currentPageSections.length > 0) {
       pushNewPage();
@@ -141,11 +151,17 @@ function paginateSectionsByPage(
       const itemHeight = estimateItemHeight(item);
 
       if (itemHeight > remaining) {
-        if (currentPageSections.length === 1 && currentSectionPart.items.length === 0 && remaining >= otherPageAvailable - headingHeight - 20) {
+        if (currentPageSections.length === 1 && currentSectionPart.items.length === 0 && remaining >= otherPageAvailable - headingHeight - 40) {
           // Extremely large single item on a fresh page. Let it stay to not loop infinitely.
           currentSectionPart.items.push(item);
           remaining -= itemHeight;
         } else {
+          // If empty title part was already pushed on this overflowing page
+          if (currentSectionPart.items.length === 0) {
+            currentPageSections.pop();
+            remaining += headingHeight;
+          }
+
           pushNewPage();
           currentSectionPart = { ...section, items: [] };
           remaining -= headingHeight;
@@ -210,8 +226,13 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   const photoX = clamp(requestedX, 0, PAGE_WIDTH - photoSize);
   const photoY = clamp(requestedY, 0, PAGE_HEIGHT - photoSize);
 
+  const fullNamePx = ptToPx(personalInfo?.fullNameFontSize ?? 18);
+  const contactPx = ptToPx(personalInfo?.contactFontSize ?? 10);
+  const dynamicHeaderHeight = (fullNamePx * 1.2 + 6) + (contactPx * 1.3) + 14;
+  const actualHeaderHeight = Math.max(HEADER_HEIGHT, dynamicHeaderHeight);
+
   const summaryBlockHeight = hasSummary ? estimateSummaryHeight(summary, cv.summaryFontSize, cv.summaryTitleFontSize) : 0;
-  const firstPageAvailable = CONTENT_HEIGHT - HEADER_HEIGHT - summaryBlockHeight;
+  const firstPageAvailable = CONTENT_HEIGHT - actualHeaderHeight - summaryBlockHeight;
   const sectionPages = paginateSectionsByPage(sections || [], firstPageAvailable, CONTENT_HEIGHT);
 
   const paginatedPages: PaginatedPage[] = sectionPages.map((pageSections, index) => ({
@@ -251,7 +272,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
           >
             <div style={{ height: '100%', overflow: 'hidden' }}>
               {page.includeHeader && (
-                <div style={{ marginBottom: '14px', minHeight: `${HEADER_HEIGHT}px`, textAlign: 'center' }}>
+                <div style={{ marginBottom: '14px', minHeight: `${actualHeaderHeight}px`, textAlign: 'center' }}>
                   <h1
                     style={{
                       fontFamily,
