@@ -43,30 +43,39 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function countLines(text?: string): number {
+function countWrappedLines(text: string, fontSize: number): number {
   if (!text) return 0;
-  return text
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean).length;
+  // Approximates how many lines the text takes after wrapping
+  // At 11pt, roughly 95-100 chars fit in the 686px container
+  const charsPerLine = 100 * (11 / fontSize);
+  const lines = text.split('\n').map((line) => line.trim()).filter(Boolean);
+  if (lines.length === 0) return 0;
+  return lines.reduce((acc, line) => acc + Math.ceil(Math.max(1, line.length) / charsPerLine), 0);
 }
 
-function estimateSummaryHeight(summary?: string): number {
+function estimateSummaryHeight(summary?: string, fontSize = 11, titleFontSize = 12): number {
   if (!summary?.trim()) return 0;
-  const lines = Math.max(1, countLines(summary));
-  return 32 + lines * 16 + 8;
+  const lines = Math.max(1, countWrappedLines(summary, fontSize));
+  return (titleFontSize * 1.5 + 20) + (lines * fontSize * 1.5) + 14;
 }
 
 function estimateItemHeight(item: Item): number {
-  const bulletLines = Math.max(1, countLines(item.bullets));
-  const subtitleRow = item.subtitle || item.location ? 18 : 0;
-  return 30 + subtitleRow + bulletLines * 15 + 10;
+  const titleSize = item.titleFontSize ?? 11;
+  const subtitleSize = item.subtitleFontSize ?? 11;
+  const bulletsSize = item.bulletsFontSize ?? 11;
+
+  const totalWrappedBulletLines = countWrappedLines(item.bullets || '', bulletsSize);
+
+  const titleRow = titleSize * 1.5;
+  const subtitleRow = item.subtitle || item.location ? (subtitleSize * 1.5) : 0;
+
+  return titleRow + subtitleRow + (totalWrappedBulletLines * bulletsSize * 1.6) + 16;
 }
 
 function estimateSectionHeight(section: Section): number {
-  const heading = 30;
+  const heading = (section.titleFontSize ?? 12) * 1.5 + 20;
   const itemsHeight = (section.items || []).reduce((total, item) => total + estimateItemHeight(item), 0);
-  return heading + itemsHeight + 8;
+  return heading + itemsHeight;
 }
 
 function mapSectionTitle(title: string): string {
@@ -105,41 +114,60 @@ function paginateSectionsByPage(
   }
 
   const pages: Section[][] = [];
-  let sectionIndex = 0;
+  let currentPageSections: Section[] = [];
+  let remaining = firstPageAvailable;
   let isFirstPage = true;
 
-  while (sectionIndex < sections.length) {
-    let remaining = isFirstPage ? firstPageAvailable : otherPageAvailable;
-    const pageSections: Section[] = [];
-
-    if (isFirstPage && remaining <= 120) {
-      pages.push([]);
-      isFirstPage = false;
-      continue;
-    }
-
-    while (sectionIndex < sections.length) {
-      const section = sections[sectionIndex];
-      const sectionHeight = estimateSectionHeight(section);
-
-      if (pageSections.length > 0 && sectionHeight > remaining) {
-        break;
-      }
-
-      if (pageSections.length === 0 && sectionHeight > remaining) {
-        pageSections.push(section);
-        sectionIndex += 1;
-        remaining = 0;
-        break;
-      }
-
-      pageSections.push(section);
-      sectionIndex += 1;
-      remaining -= sectionHeight;
-    }
-
-    pages.push(pageSections);
+  const pushNewPage = () => {
+    pages.push(currentPageSections);
+    currentPageSections = [];
     isFirstPage = false;
+    remaining = otherPageAvailable;
+  };
+
+  for (const section of sections) {
+    const headingHeight = (section.titleFontSize ?? 12) * 1.5 + 20;
+
+    if (remaining < headingHeight + 40 && currentPageSections.length > 0) {
+      pushNewPage();
+    }
+
+    let currentSectionPart: Section = { ...section, items: [] };
+    remaining -= headingHeight;
+    currentPageSections.push(currentSectionPart);
+
+    const items = section.items || [];
+    for (const item of items) {
+      const itemHeight = estimateItemHeight(item);
+
+      if (itemHeight > remaining) {
+        if (currentPageSections.length === 1 && currentSectionPart.items.length === 0 && remaining >= otherPageAvailable - headingHeight - 20) {
+          // Extremely large single item on a fresh page. Let it stay to not loop infinitely.
+          currentSectionPart.items.push(item);
+          remaining -= itemHeight;
+        } else {
+          pushNewPage();
+          currentSectionPart = { ...section, items: [] };
+          remaining -= headingHeight;
+          currentPageSections.push(currentSectionPart);
+
+          currentSectionPart.items.push(item);
+          remaining -= itemHeight;
+        }
+      } else {
+        currentSectionPart.items.push(item);
+        remaining -= itemHeight;
+      }
+    }
+
+    if (currentSectionPart.items.length === 0) {
+      currentPageSections.pop();
+      remaining += headingHeight;
+    }
+  }
+
+  if (currentPageSections.length > 0) {
+    pages.push(currentPageSections);
   }
 
   return pages;
@@ -182,7 +210,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   const photoX = clamp(requestedX, 0, PAGE_WIDTH - photoSize);
   const photoY = clamp(requestedY, 0, PAGE_HEIGHT - photoSize);
 
-  const summaryBlockHeight = hasSummary ? estimateSummaryHeight(summary) : 0;
+  const summaryBlockHeight = hasSummary ? estimateSummaryHeight(summary, cv.summaryFontSize, cv.summaryTitleFontSize) : 0;
   const firstPageAvailable = CONTENT_HEIGHT - HEADER_HEIGHT - summaryBlockHeight;
   const sectionPages = paginateSectionsByPage(sections || [], firstPageAvailable, CONTENT_HEIGHT);
 
@@ -221,113 +249,74 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               pageBreakAfter: !previewMode && !isLastPage ? 'always' : 'auto',
             }}
           >
-            {page.includeHeader && (
-              <div style={{ marginBottom: '14px', minHeight: `${HEADER_HEIGHT}px`, textAlign: 'center' }}>
-                <h1
-                  style={{
-                    fontFamily,
-                    fontSize: `${personalInfo?.fullNameFontSize ?? 18}pt`,
-                    fontWeight: 'bold',
-                    margin: '0 0 6px 0',
-                    color: '#000000',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.2px',
-                  }}
-                >
-                  {fullName || 'YOUR NAME'}
-                </h1>
-
-                <div
-                  style={{
-                    fontFamily,
-                    fontSize: `${personalInfo?.contactFontSize ?? 10}pt`,
-                    color: '#000000',
-                    lineHeight: '1.3',
-                    textAlign: 'center',
-                  }}
-                >
-                  {location && <span>{location}{contactItems.length > 0 ? ' | ' : ''}</span>}
-                  {contactItems.join(' | ')}
-                </div>
-              </div>
-            )}
-
-            {page.includeHeader && hasPhoto && (
-              <div
-                onPointerDown={photoInteractive?.onPointerDown}
-                style={{
-                  position: 'absolute',
-                  left: `${photoX}px`,
-                  top: `${photoY}px`,
-                  width: `${photoSize}px`,
-                  height: `${photoSize}px`,
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  border: photoInteractive?.isDragging ? '2px solid #2563eb' : '1px solid #d1d5db',
-                  boxShadow: photoInteractive?.isDragging ? '0 12px 24px rgba(37,99,235,0.25)' : '0 2px 8px rgba(0,0,0,0.08)',
-                  cursor: photoInteractive?.onPointerDown ? (photoInteractive.isDragging ? 'grabbing' : 'grab') : 'default',
-                  userSelect: 'none',
-                  touchAction: 'none',
-                  backgroundColor: '#ffffff',
-                  zIndex: 120,
-                }}
-                title={photoInteractive ? 'Drag to reposition' : undefined}
-              >
-                <img
-                  src={photoDataUrl}
-                  alt="Profile"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }}
-                />
-              </div>
-            )}
-
-            {page.includeSummary && hasSummary && (
-              <div style={{ marginBottom: '14px' }}>
-                <div style={{ marginTop: '6px', marginBottom: '6px' }}>
-                  <h2
+            <div style={{ height: '100%', overflow: 'hidden' }}>
+              {page.includeHeader && (
+                <div style={{ marginBottom: '14px', minHeight: `${HEADER_HEIGHT}px`, textAlign: 'center' }}>
+                  <h1
                     style={{
                       fontFamily,
-                      fontSize: `${cv.summaryTitleFontSize ?? 12}pt`,
+                      fontSize: `${personalInfo?.fullNameFontSize ?? 18}pt`,
                       fontWeight: 'bold',
-                      margin: '0 0 3px 0',
-                      borderBottom: '1.5px solid #000000',
-                      paddingBottom: '3px',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
+                      margin: '0 0 6px 0',
                       color: '#000000',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.2px',
                     }}
                   >
-                    {mapSectionTitle(summaryTitle || 'Profile Summary')}
-                  </h2>
+                    {fullName || 'YOUR NAME'}
+                  </h1>
+
+                  <div
+                    style={{
+                      fontFamily,
+                      fontSize: `${personalInfo?.contactFontSize ?? 10}pt`,
+                      color: '#000000',
+                      lineHeight: '1.3',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {location && <span>{location}{contactItems.length > 0 ? ' | ' : ''}</span>}
+                    {contactItems.join(' | ')}
+                  </div>
                 </div>
+              )}
 
-                <ul style={{ margin: 0, paddingLeft: '18px' }}>
-                  {(summaryLines.length > 0 ? summaryLines : [normalizeBulletLine(summary || '')]).map((line, i) => (
-                    <li
-                      key={`summary-${i}`}
-                      style={{
-                        marginBottom: '3px',
-                        fontFamily,
-                        fontSize: `${cv.summaryFontSize ?? 11}pt`,
-                        listStyleType: 'disc',
-                      }}
-                    >
-                      {line}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {page.sections.map((section) => {
-              const standardTitle = mapSectionTitle(section.title);
+              {page.includeHeader && hasPhoto && (
+                <div
+                  onPointerDown={photoInteractive?.onPointerDown}
+                  style={{
+                    position: 'absolute',
+                    left: `${photoX}px`,
+                    top: `${photoY}px`,
+                    width: `${photoSize}px`,
+                    height: `${photoSize}px`,
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    border: photoInteractive?.isDragging ? '2px solid #2563eb' : '1px solid #d1d5db',
+                    boxShadow: photoInteractive?.isDragging ? '0 12px 24px rgba(37,99,235,0.25)' : '0 2px 8px rgba(0,0,0,0.08)',
+                    cursor: photoInteractive?.onPointerDown ? (photoInteractive.isDragging ? 'grabbing' : 'grab') : 'default',
+                    userSelect: 'none',
+                    touchAction: 'none',
+                    backgroundColor: '#ffffff',
+                    zIndex: 120,
+                  }}
+                  title={photoInteractive ? 'Drag to reposition' : undefined}
+                >
+                  <img
+                    src={photoDataUrl}
+                    alt="Profile"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }}
+                  />
+                </div>
+              )}
 
-              return (
-                <SectionWrapper key={section.id} id={section.id}>
-                  <div style={{ marginTop: '16px', marginBottom: '6px' }}>
+              {page.includeSummary && hasSummary && (
+                <div style={{ marginBottom: '14px' }}>
+                  <div style={{ marginTop: '6px', marginBottom: '6px' }}>
                     <h2
                       style={{
                         fontFamily,
-                        fontSize: `${section.titleFontSize ?? 12}pt`,
+                        fontSize: `${cv.summaryTitleFontSize ?? 12}pt`,
                         fontWeight: 'bold',
                         margin: '0 0 3px 0',
                         borderBottom: '1.5px solid #000000',
@@ -337,72 +326,113 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                         color: '#000000',
                       }}
                     >
-                      {standardTitle}
+                      {mapSectionTitle(summaryTitle || 'Profile Summary')}
                     </h2>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {section.items?.map((item) => (
-                      <ItemWrapper key={item.id} id={item.id} sectionId={section.id}>
-                        <div style={{ marginBottom: '12px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                            <span style={{ fontFamily, fontSize: `${item.titleFontSize ?? 11}pt`, fontWeight: 'bold' }}>{item.title}</span>
-                            {item.date && <span style={{ fontFamily, fontSize: `${item.dateFontSize ?? 11}pt` }}>{item.date}</span>}
-                          </div>
-
-                          {(item.subtitle || item.location) && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                              <span style={{ fontFamily, fontSize: `${item.subtitleFontSize ?? 11}pt`, fontStyle: 'italic' }}>{item.subtitle}</span>
-                              {item.location && <span style={{ fontFamily, fontSize: `${item.locationFontSize ?? 11}pt` }}>{item.location}</span>}
-                            </div>
-                          )}
-
-                          {item.bullets && (
-                            <ul style={{ margin: '4px 0 0 0', paddingLeft: '18px' }}>
-                              {item.bullets
-                                .split('\n')
-                                .map((line) => line.trim())
-                                .filter(Boolean)
-                                .map((line, i) => (
-                                  <li
-                                    key={`${item.id}-${i}`}
-                                    style={{
-                                      fontFamily,
-                                      fontSize: `${item.bulletsFontSize ?? 11}pt`,
-                                      marginBottom: '3px',
-                                      listStyleType: 'disc',
-                                    }}
-                                  >
-                                    {normalizeBulletLine(line)}
-                                  </li>
-                                ))}
-                            </ul>
-                          )}
-                        </div>
-                      </ItemWrapper>
+                  <ul style={{ margin: 0, paddingLeft: '18px' }}>
+                    {(summaryLines.length > 0 ? summaryLines : [normalizeBulletLine(summary || '')]).map((line, i) => (
+                      <li
+                        key={`summary-${i}`}
+                        style={{
+                          marginBottom: '3px',
+                          fontFamily,
+                          fontSize: `${cv.summaryFontSize ?? 11}pt`,
+                          listStyleType: 'disc',
+                        }}
+                      >
+                        {line}
+                      </li>
                     ))}
-                  </div>
-                </SectionWrapper>
-              );
-            })}
+                  </ul>
+                </div>
+              )}
+              {page.sections.map((section) => {
+                const standardTitle = mapSectionTitle(section.title);
 
-            {isLastPage && (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `${PAGE_MARGIN}px`,
-                  right: `${PAGE_MARGIN}px`,
-                  bottom: '14px',
-                  textAlign: 'right',
-                  fontFamily,
-                  fontSize: '8pt',
-                  color: '#666666',
-                  letterSpacing: '0.2px',
-                }}
-              >
-                Created with Pathica
-              </div>
-            )}
+                return (
+                  <SectionWrapper key={section.id} id={section.id}>
+                    <div style={{ marginTop: '16px', marginBottom: '6px' }}>
+                      <h2
+                        style={{
+                          fontFamily,
+                          fontSize: `${section.titleFontSize ?? 12}pt`,
+                          fontWeight: 'bold',
+                          margin: '0 0 3px 0',
+                          borderBottom: '1.5px solid #000000',
+                          paddingBottom: '3px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          color: '#000000',
+                        }}
+                      >
+                        {standardTitle}
+                      </h2>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {section.items?.map((item) => (
+                        <ItemWrapper key={item.id} id={item.id} sectionId={section.id}>
+                          <div style={{ marginBottom: '12px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                              <span style={{ fontFamily, fontSize: `${item.titleFontSize ?? 11}pt`, fontWeight: 'bold' }}>{item.title}</span>
+                              {item.date && <span style={{ fontFamily, fontSize: `${item.dateFontSize ?? 11}pt` }}>{item.date}</span>}
+                            </div>
+
+                            {(item.subtitle || item.location) && (
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                <span style={{ fontFamily, fontSize: `${item.subtitleFontSize ?? 11}pt`, fontStyle: 'italic' }}>{item.subtitle}</span>
+                                {item.location && <span style={{ fontFamily, fontSize: `${item.locationFontSize ?? 11}pt` }}>{item.location}</span>}
+                              </div>
+                            )}
+
+                            {item.bullets && (
+                              <ul style={{ margin: '4px 0 0 0', paddingLeft: '18px' }}>
+                                {item.bullets
+                                  .split('\n')
+                                  .map((line) => line.trim())
+                                  .filter(Boolean)
+                                  .map((line, i) => (
+                                    <li
+                                      key={`${item.id}-${i}`}
+                                      style={{
+                                        fontFamily,
+                                        fontSize: `${item.bulletsFontSize ?? 11}pt`,
+                                        marginBottom: '3px',
+                                        listStyleType: 'disc',
+                                      }}
+                                    >
+                                      {normalizeBulletLine(line)}
+                                    </li>
+                                  ))}
+                              </ul>
+                            )}
+                          </div>
+                        </ItemWrapper>
+                      ))}
+                    </div>
+                  </SectionWrapper>
+                );
+              })}
+
+              {isLastPage && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: `${PAGE_MARGIN}px`,
+                    right: `${PAGE_MARGIN}px`,
+                    bottom: '14px',
+                    textAlign: 'right',
+                    fontFamily,
+                    fontSize: '8pt',
+                    color: '#666666',
+                    letterSpacing: '0.2px',
+                  }}
+                >
+                  Created with Pathica
+                </div>
+              )}
+            </div>
           </div>
         );
       })}
