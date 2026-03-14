@@ -41,6 +41,9 @@ export const metadata: Metadata = {
     shortcut: '/tab_icon.png',
     apple: '/tab_icon.png',
   },
+  verification: {
+    google: 'M8NvMtJfNmsjvotVeDv0Ayv10pGMEICuQwd4ewVQmj0',
+  },
 };
 
 export default function RootLayout({
