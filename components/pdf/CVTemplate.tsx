@@ -43,25 +43,27 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function countWrappedLines(text: string, fontSize: number): number {
-  if (!text) return 0;
-  // Approx 85 chars fit per line at 11pt, in a 686px container
-  const charsPerLine = 85 * (11 / fontSize);
-  const lines = text.split('\n').map((line) => line.trim()).filter(Boolean);
-  if (lines.length === 0) return 0;
-  return lines.reduce((acc, line) => acc + Math.ceil(Math.max(1, line.length) / charsPerLine), 0);
-}
 
 function ptToPx(pt: number): number {
   return pt * 1.333;
 }
 
+function countWrappedLines(text: string, fontSize: number, isBullet = true): number {
+  if (!text) return 0;
+  // Available width: 686px. Bullets use 18px left padding (668px).
+  const availWidth = isBullet ? 668 : 686;
+  const charsPerLine = Math.floor(availWidth / (ptToPx(fontSize) * 0.55));
+  const lines = text.split('\n').map((line) => line.trim()).filter(Boolean);
+  if (lines.length === 0) return 0;
+  return lines.reduce((acc, line) => acc + Math.ceil(Math.max(1, line.length) / charsPerLine), 0);
+}
+
 function estimateSummaryHeight(summary?: string, fontSize = 11, titleFontSize = 12): number {
   if (!summary?.trim()) return 0;
-  const lines = Math.max(1, countWrappedLines(summary, fontSize));
-  const titlePx = ptToPx(titleFontSize);
-  const fontPx = ptToPx(fontSize);
-  return (titlePx * 1.5 + 20) + (lines * fontPx * 1.5) + 14;
+  const titleHeight = 16 + 6 + 3 + 3 + 1.5 + (ptToPx(titleFontSize) * 1.4); // exact margin/padding inside heading + wrapper padding
+  const lines = Math.max(1, countWrappedLines(summary, fontSize, true));
+  const textHeight = lines * (ptToPx(fontSize) * 1.4 + 3); // li marginBottom is 3px
+  return titleHeight + textHeight + 14; // wrapper marginBottom 14px
 }
 
 function estimateItemHeight(item: Item): number {
@@ -69,20 +71,27 @@ function estimateItemHeight(item: Item): number {
   const subtitlePx = ptToPx(item.subtitleFontSize ?? 11);
   const bulletsPx = ptToPx(item.bulletsFontSize ?? 11);
 
-  const totalWrappedBulletLines = countWrappedLines(item.bullets || '', item.bulletsFontSize ?? 11);
+  let height = 12; // div wrapper marginBottom
 
-  const titleRow = titlePx * 1.5;
-  const subtitleRow = item.subtitle || item.location ? (subtitlePx * 1.5) : 0;
+  height += titlePx * 1.4;
 
-  // each bullet has line-height 1.4 plus 3px margin-bottom plus general padding 4px
-  const bulletHeight = totalWrappedBulletLines > 0 ? totalWrappedBulletLines * (bulletsPx * 1.4 + 5) + 4 : 0;
+  if (item.subtitle || item.location) {
+    height += subtitlePx * 1.4;
+  }
 
-  return titleRow + subtitleRow + bulletHeight + 20; // 20px extra buffer for item bottom margin & gap
+  if (item.bullets) {
+    const totalLines = countWrappedLines(item.bullets, item.bulletsFontSize ?? 11, true);
+    if (totalLines > 0) {
+      height += 4; // ul marginTop
+      height += totalLines * (bulletsPx * 1.4 + 3);
+    }
+  }
+  return height;
 }
 
 function estimateSectionHeight(section: Section): number {
   const headingPx = ptToPx(section.titleFontSize ?? 12);
-  const heading = headingPx * 1.5 + 20;
+  const heading = 43.5 + (headingPx * 1.4); // heading margin/padding + section wrapper marginBottom (14px)
   const itemsHeight = (section.items || []).reduce((total, item) => total + estimateItemHeight(item), 0);
   return heading + itemsHeight;
 }
@@ -136,9 +145,9 @@ function paginateSectionsByPage(
 
   for (const section of sections) {
     const headingPx = ptToPx(section.titleFontSize ?? 12);
-    const headingHeight = headingPx * 1.5 + 20;
+    const headingHeight = 43.5 + (headingPx * 1.4);
 
-    if (remaining < headingHeight + 40 && currentPageSections.length > 0) {
+    if (remaining < headingHeight + 20 && currentPageSections.length > 0) {
       pushNewPage();
     }
 
@@ -151,7 +160,7 @@ function paginateSectionsByPage(
       const itemHeight = estimateItemHeight(item);
 
       if (itemHeight > remaining) {
-        if (currentPageSections.length === 1 && currentSectionPart.items.length === 0 && remaining >= otherPageAvailable - headingHeight - 40) {
+        if (currentPageSections.length === 1 && currentSectionPart.items.length === 0 && remaining >= otherPageAvailable - headingHeight - 20) {
           // Extremely large single item on a fresh page. Let it stay to not loop infinitely.
           currentSectionPart.items.push(item);
           remaining -= itemHeight;
