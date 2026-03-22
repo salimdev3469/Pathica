@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -8,6 +8,7 @@ import type { Locale } from '@/lib/locale';
 import { useCV, Section } from '@/context/CVContext';
 import { SectionCard } from './SectionCard';
 import { PersonalInfoForm } from './PersonalInfoForm';
+import { JobMatcher } from './JobMatcher';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -215,7 +216,12 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
   };
 
   return (
-    <div className="custom-scrollbar mx-auto w-full max-w-2xl flex-1 overflow-y-auto p-4 md:p-8">
+    <div className="custom-scrollbar mx-auto w-full max-w-2xl flex-1 px-4 py-6 md:overflow-y-auto md:p-8 relative">
+      <div className="md:hidden fixed bottom-6 right-6 z-50">
+        <Button onClick={() => document.getElementById('preview-section')?.scrollIntoView({ behavior: 'smooth' })} className="rounded-full shadow-2xl h-14 px-6 text-lg">
+           <FileText className="mr-2" /> {t('Preview PDF', 'PDF Önizle')}
+        </Button>
+      </div>
       <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -283,12 +289,17 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
             </Select>
           </div>
         </div>
-        {isAuthenticated && (
-          <Button onClick={handleSave} disabled={isSaving} className="shrink-0 gap-2">
-            {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            {t('Save CV', 'CV Kaydet')}
-          </Button>
-        )}
+        <div className="flex flex-col gap-2 md:flex-row md:items-center shrink-0">
+          {isAuthenticated && (
+            <JobMatcher locale={locale} />
+          )}
+          {isAuthenticated && (
+            <Button onClick={handleSave} disabled={isSaving} className="gap-2">
+              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {t('Save CV', 'CV Kaydet')}
+            </Button>
+          )}
+        </div>
       </div>
 
       <PersonalInfoForm locale={locale} />

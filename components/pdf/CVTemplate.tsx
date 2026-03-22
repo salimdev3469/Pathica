@@ -160,7 +160,8 @@ function paginateSectionsByPage(
     const headingHeight = h2Px + 16 + 6 + 3 + 6 + 14;
 
     // If section heading alone doesn't fit on the current page, start a new page
-    if (remaining < headingHeight + 20 && currentPageSections.length > 0) {
+    // Allow bleeding 20px into bottom margin for headings
+    if (remaining < headingHeight - 20 && currentPageSections.length > 0) {
       pushNewPage();
     }
 
@@ -172,7 +173,8 @@ function paginateSectionsByPage(
     for (const item of items) {
       const itemHeight = estimateItemHeight(item);
 
-      if (itemHeight > remaining) {
+      // Allow items to bleed up to 48px into the bottom margin (safe since bottom margin is 54px)
+      if (itemHeight > remaining + 48) {
         if (currentPageSections.length === 1 && currentSectionPart.items.length === 0 && remaining >= otherPageAvailable - headingHeight - 20) {
           // Extremely large single item on a fresh page. Let it stay to not loop infinitely.
           currentSectionPart.items.push(item);

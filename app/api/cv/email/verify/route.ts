@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { generateCvPdfBuffer } from '@/lib/cv-pdf';
 import { sendCvPdfEmail } from '@/lib/email';
 
+export const dynamic = 'force-dynamic';
+
 function getAppUrl(req: Request) {
   const origin = new URL(req.url).origin;
   return process.env.NEXT_PUBLIC_APP_URL || origin;

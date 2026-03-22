@@ -24,8 +24,9 @@ import {
     useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
 import { X } from 'lucide-react';
+
+export const PreviewContext = React.createContext({ scale: 1, showTutorial: false, dismissTutorial: () => {} });
 
 const PAGE_WIDTH = 794;
 const PAGE_HEIGHT = 1123;
@@ -38,7 +39,11 @@ function clamp(value: number, min: number, max: number) {
 }
 
 // Drag Wrapper for Sections
-const DraggableSectionWrapper = ({ id, children, state, showTutorial, onDismiss, isFirst, scale }: { id: string, children: React.ReactNode, state: CVState, showTutorial?: boolean, onDismiss?: () => void, isFirst?: boolean, scale: number }) => {
+const DraggableSectionWrapper = ({ id, children }: { id: string, children: React.ReactNode }) => {
+    const { state } = useCV();
+    const { scale, showTutorial, dismissTutorial } = React.useContext(PreviewContext);
+    const isFirst = state.sections.length > 0 && state.sections[0].id === id;
+
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: `section-${id}`,
         data: { type: 'Section', id }
@@ -90,7 +95,7 @@ const DraggableSectionWrapper = ({ id, children, state, showTutorial, onDismiss,
                             <span className="font-bold text-sm flex items-center gap-1.5">
                                 Tip
                             </span>
-                            <button onClick={(e) => { e.stopPropagation(); onDismiss?.(); }} className="text-blue-200 hover:text-white transition-colors bg-blue-700/50 hover:bg-blue-700 p-1 rounded-full">
+                            <button onClick={(e) => { e.stopPropagation(); dismissTutorial(); }} className="text-blue-200 hover:text-white transition-colors bg-blue-700/50 hover:bg-blue-700 p-1 rounded-full">
                                 <X size={14} />
                             </button>
                         </div>
@@ -109,7 +114,8 @@ const DraggableSectionWrapper = ({ id, children, state, showTutorial, onDismiss,
 };
 
 // Drag Wrapper for Items (Sub-Sections)
-const DraggableItemWrapper = ({ id, sectionId, children, scale }: { id: string, sectionId: string, children: React.ReactNode, scale: number }) => {
+const DraggableItemWrapper = ({ id, sectionId, children }: { id: string, sectionId: string, children: React.ReactNode }) => {
+    const { scale } = React.useContext(PreviewContext);
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: `item-${id}`,
         data: { type: 'Item', id, sectionId }
@@ -407,43 +413,9 @@ export function CVPreview() {
         }
     };
 
-    const SectionWrapperComponent = React.useCallback(
-        ({ id, children }: { id: string, children: React.ReactNode }) => {
-            const isFirst = state.sections.length > 0 && state.sections[0].id === id;
-            return (
-                <DraggableSectionWrapper
-                    id={id}
-                    state={state}
-                    isFirst={isFirst}
-                    showTutorial={showTutorial}
-                    onDismiss={dismissTutorial}
-                    scale={scale}
-                >
-                    {children}
-                </DraggableSectionWrapper>
-            );
-        },
-        [state, showTutorial, scale]
-    );
-
-    const ItemWrapperComponent = React.useCallback(
-        ({ id, sectionId, children }: { id: string, sectionId: string, children: React.ReactNode }) => {
-            return (
-                <DraggableItemWrapper
-                    id={id}
-                    sectionId={sectionId}
-                    scale={scale}
-                >
-                    {children}
-                </DraggableItemWrapper>
-            );
-        },
-        [scale]
-    );
-
     return (
-        <div className="flex flex-col h-full h-screen sticky top-0">
-            <div className="flex items-center justify-between p-4 bg-white border-b shadow-sm z-10">
+        <div className="flex flex-col min-h-screen md:h-screen md:sticky top-0 sticky">
+            <div className="flex items-center justify-between p-4 bg-white border-b shadow-sm z-10 sticky top-0">
                 <h2 className="font-semibold text-lg text-slate-800">Preview</h2>
                 <div className="flex gap-2">
 
@@ -470,20 +442,22 @@ export function CVPreview() {
                         onDragEnd={handleDragEnd}
                     >
                         <SortableContext items={state.sections.map(s => `section-${s.id}`)} strategy={verticalListSortingStrategy}>
-                            <div className="shadow-2xl relative">
-                                <CVTemplate
-                                    previewMode
-                                    cv={state}
-                                    SectionWrapper={SectionWrapperComponent}
-                                    ItemWrapper={ItemWrapperComponent}
-                                    photoPositionOverride={photoDragPosition || undefined}
-                                    photoInteractive={
-                                        state.personalInfo?.photoDataUrl
-                                            ? { onPointerDown: handlePhotoPointerDown, isDragging: isPhotoDragging }
-                                            : undefined
-                                    }
-                                />
-                            </div>
+                            <PreviewContext.Provider value={{ scale, showTutorial, dismissTutorial }}>
+                                <div className="shadow-2xl relative">
+                                    <CVTemplate
+                                        previewMode
+                                        cv={state}
+                                        SectionWrapper={DraggableSectionWrapper}
+                                        ItemWrapper={DraggableItemWrapper}
+                                        photoPositionOverride={photoDragPosition || undefined}
+                                        photoInteractive={
+                                            state.personalInfo?.photoDataUrl
+                                                ? { onPointerDown: handlePhotoPointerDown, isDragging: isPhotoDragging }
+                                                : undefined
+                                        }
+                                    />
+                                </div>
+                            </PreviewContext.Provider>
                         </SortableContext>
                     </DndContext>
                 </div>
