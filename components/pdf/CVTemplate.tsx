@@ -322,8 +322,10 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                       textAlign: 'center',
                     }}
                   >
-                    {location && <span>{location}{contactItems.length > 0 ? ' | ' : ''}</span>}
-                    {contactItems.join(' | ')}
+                    {(() => {
+                      const allItems = [location, ...contactItems].filter(Boolean);
+                      return allItems.join(' | ');
+                    })()}
                   </div>
                 </div>
               )}
