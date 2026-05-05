@@ -9,7 +9,7 @@ export default async function NewCVPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/cv/guest');
   }
 
   const { data: cv, error } = await supabase

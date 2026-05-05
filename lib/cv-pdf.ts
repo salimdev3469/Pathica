@@ -3,6 +3,26 @@ import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 import { CVTemplate } from '@/components/pdf/CVTemplate';
 
+import fs from 'fs';
+
+const getLocalChromePath = () => {
+  const paths = [
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+    // Common user-local installation path on Windows
+    process.env.LOCALAPPDATA ? `${process.env.LOCALAPPDATA}\\Google\\Chrome\\Application\\chrome.exe` : null,
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser'
+  ].filter(Boolean) as string[];
+
+  for (const p of paths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+};
+
 export async function generateCvPdfBuffer(cvState: any): Promise<Buffer> {
   if (!cvState || !cvState.sections) {
     throw new Error('Invalid CV state provided');
@@ -34,9 +54,18 @@ export async function generateCvPdfBuffer(cvState: any): Promise<Buffer> {
     </html>
   `;
 
+  const isDev = process.env.NODE_ENV === 'development';
+  let execPath = '';
+
+  if (isDev) {
+    execPath = getLocalChromePath() || '';
+  } else {
+    execPath = await chromium.executablePath();
+  }
+
   const browser = await puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
+    args: isDev ? ['--no-sandbox', '--disable-setuid-sandbox'] : chromium.args,
+    executablePath: execPath,
     headless: true,
   });
 
@@ -46,7 +75,7 @@ export async function generateCvPdfBuffer(cvState: any): Promise<Buffer> {
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
-      printBackground: false,
+      printBackground: true,
       margin: {
         top: '0px',
         right: '0px',

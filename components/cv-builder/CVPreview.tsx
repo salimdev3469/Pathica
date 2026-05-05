@@ -346,7 +346,8 @@ export function CVPreview() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to generate PDF');
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || 'Failed to generate PDF');
             }
 
             const blob = await response.blob();
@@ -366,7 +367,8 @@ export function CVPreview() {
             toast.success('CV downloaded successfully!');
         } catch (error) {
             console.error('Download error:', error);
-            toast.error('Failed to download CV');
+            const msg = error instanceof Error ? error.message : 'Failed to download CV';
+            toast.error(msg);
         } finally {
             setIsDownloading(false);
         }
@@ -414,7 +416,7 @@ export function CVPreview() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen md:h-screen md:sticky top-0 sticky">
+        <div className="flex flex-col min-h-screen md:h-screen sticky top-0">
             <div className="flex items-center justify-between p-4 bg-white border-b shadow-sm z-10 sticky top-0">
                 <h2 className="font-semibold text-lg text-slate-800">Preview</h2>
                 <div className="flex gap-2">

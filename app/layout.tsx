@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import NavigationFeedback from '@/components/NavigationFeedback';
 import ThemeToggle from '@/components/theme-toggle';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
+import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -60,6 +61,7 @@ export default function RootLayout({
           <CssHealthCheck />
           <NavigationFeedback />
           {children}
+          <Toaster />
           <div className="fixed bottom-5 right-5 z-[100]">
             <ThemeToggle />
           </div>
