@@ -54,8 +54,9 @@ export function SectionCard({ section, locale = 'en' }: SectionCardProps) {
                                 type="number"
                                 min={8}
                                 max={36}
-                                value={section.titleFontSize ?? 12}
-                                onChange={(e) => dispatch({ type: 'UPDATE_SECTION', payload: { id: section.id, titleFontSize: Number(e.target.value) } })}
+                                value={section.titleFontSize || ''}
+                                placeholder="12"
+                                onChange={(e) => dispatch({ type: 'UPDATE_SECTION', payload: { id: section.id, titleFontSize: e.target.value === '' ? 12 : Number(e.target.value) } })}
                                 className="h-9 w-16 px-2 text-sm"
                                 title={t('Font Size', 'Yazı Büyüklüğü')}
                             />

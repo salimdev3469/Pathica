@@ -102,14 +102,32 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
             <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Full Name', 'Ad Soyad')}</label>
             <div className="flex gap-2">
               <Input value={personalInfo?.fullName || ''} onChange={(e) => handleInfoChange('fullName', e.target.value)} className="bg-white flex-1" />
-              <Input type="number" min={8} max={48} value={personalInfo?.fullNameFontSize ?? 18} onChange={(e) => handleInfoChange('fullNameFontSize', Number(e.target.value))} className="bg-white w-16 px-2" title={t('Font Size', 'Yazı Büyüklüğü')} />
+              <Input
+                type="number"
+                min={8}
+                max={48}
+                value={personalInfo?.fullNameFontSize || ''}
+                placeholder="18"
+                onChange={(e) => handleInfoChange('fullNameFontSize', e.target.value === '' ? 18 : Number(e.target.value))}
+                className="bg-white w-16 px-2"
+                title={t('Font Size', 'Yazı Büyüklüğü')}
+              />
             </div>
           </div>
           <div className="flex flex-col gap-1">
             <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Email & {t('Contact Font Size', 'İletişim Font Büyüklüğü')}</label>
             <div className="flex gap-2">
               <Input value={personalInfo?.email || ''} onChange={(e) => handleInfoChange('email', e.target.value)} className="bg-white flex-1" />
-              <Input type="number" min={6} max={24} value={personalInfo?.contactFontSize ?? 10} onChange={(e) => handleInfoChange('contactFontSize', Number(e.target.value))} className="bg-white w-16 px-2" title={t('Contact Info Font Size', 'İletişim Font Büyüklüğü')} />
+              <Input
+                type="number"
+                min={6}
+                max={24}
+                value={personalInfo?.contactFontSize || ''}
+                placeholder="10"
+                onChange={(e) => handleInfoChange('contactFontSize', e.target.value === '' ? 10 : Number(e.target.value))}
+                className="bg-white w-16 px-2"
+                title={t('Contact Info Font Size', 'İletişim Font Büyüklüğü')}
+              />
             </div>
           </div>
           <div className="flex flex-col gap-1">
@@ -179,7 +197,16 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
               className="bg-white flex-1"
               placeholder={t('e.g. Profile Summary', 'Orn. Profil Ozeti')}
             />
-            <Input type="number" min={8} max={36} value={state.summaryTitleFontSize ?? 12} onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, summaryTitleFontSize: Number(e.target.value) } })} className="bg-white w-16 px-2" title={t('Font Size', 'Yazı Büyüklüğü')} />
+            <Input
+              type="number"
+              min={8}
+              max={36}
+              value={state.summaryTitleFontSize || ''}
+              placeholder="12"
+              onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, summaryTitleFontSize: e.target.value === '' ? 12 : Number(e.target.value) } })}
+              className="bg-white w-16 px-2"
+              title={t('Font Size', 'Yazı Büyüklüğü')}
+            />
           </div>
           <label className="mt-2 pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Summary Content', 'Ozet Icerigi')}</label>
           <div className="relative">
@@ -190,7 +217,16 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
               placeholder={t('Enter a brief summary...', 'Kisa bir ozet girin...')}
             />
             <div className="absolute right-2 top-2 w-16">
-              <Input type="number" min={6} max={24} value={state.summaryFontSize ?? 11} onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, summaryFontSize: Number(e.target.value) } })} className="bg-white px-2 h-8 text-xs" title={t('Font Size', 'Yazı Büyüklüğü')} />
+              <Input
+                type="number"
+                min={6}
+                max={24}
+                value={state.summaryFontSize || ''}
+                placeholder="11"
+                onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, summaryFontSize: e.target.value === '' ? 11 : Number(e.target.value) } })}
+                className="bg-white px-2 h-8 text-xs"
+                title={t('Font Size', 'Yazı Büyüklüğü')}
+              />
             </div>
           </div>
         </div>

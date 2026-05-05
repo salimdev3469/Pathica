@@ -270,7 +270,7 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
           <p className="mt-2 text-slate-500">{t('Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!', 'Bilgileri doldurup alt bölümler ekleyerek ATS uyumlu CV oluştur. Önizlemede sürükle-bırak ile sıralamayı değiştirebilirsin!')}</p>
           <div className="mt-4 max-w-xs">
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              {t('CV Font', 'CV Yazı Tipi')}
+              {t('Font & Letter Spacing', 'Yazı Tipi ve Harf Aralığı')}
             </label>
             <div className="flex gap-2">
               <div className="flex-1">
@@ -295,8 +295,9 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
                   <input
                     type="number"
                     step="0.1"
-                    value={state.letterSpacing ?? 0}
-                    onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, letterSpacing: parseFloat(e.target.value) || 0 } })}
+                    value={state.letterSpacing || ''}
+                    placeholder="0"
+                    onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, letterSpacing: e.target.value === '' ? 0 : parseFloat(e.target.value) } })}
                     className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   />
                   <span className="absolute right-3 top-2.5 text-[10px] font-bold text-slate-400">px</span>
