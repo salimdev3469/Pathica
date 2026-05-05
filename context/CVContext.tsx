@@ -4,6 +4,7 @@ import { DEFAULT_CV_FONT, normalizeCvFont, type CvFontKey } from '@/lib/cv-fonts
 
 export interface PersonalInfo {
     fullName: string;
+    jobTitle: string;
     email: string;
     phone: string;
     location: string;
@@ -15,6 +16,7 @@ export interface PersonalInfo {
     photoY?: number;
     photoSize?: number;
     fullNameFontSize?: number;
+    jobTitleFontSize?: number;
     contactFontSize?: number;
     letterSpacing?: number;
 }

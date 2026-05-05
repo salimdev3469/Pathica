@@ -26,6 +26,7 @@ type SaveCvState = {
     fontFamily?: string;
     personalInfo?: {
         fullName?: string;
+        jobTitle?: string;
         email?: string;
         phone?: string;
         location?: string;
@@ -37,6 +38,7 @@ type SaveCvState = {
         photoY?: number;
         photoSize?: number;
         fullNameFontSize?: number;
+        jobTitleFontSize?: number;
         contactFontSize?: number;
     };
     summaryTitle?: string;

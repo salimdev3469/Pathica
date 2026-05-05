@@ -252,8 +252,9 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
 
   // Header height: h1 (fontPx * 1.4 + margin-bottom 6) + contact-div (contactPx * 1.3) + wrapper marginBottom 14
   const fullNamePx = ptToPx(personalInfo?.fullNameFontSize ?? 18);
+  const jobTitlePx = ptToPx(personalInfo?.jobTitleFontSize ?? 14);
   const contactPx = ptToPx(personalInfo?.contactFontSize ?? 10);
-  const actualHeaderHeight = (fullNamePx * 1.4 + 6) + (contactPx * 1.3) + 14;
+  const actualHeaderHeight = (fullNamePx * 1.4 + 6) + (personalInfo?.jobTitle ? jobTitlePx * 1.4 + 4 : 0) + (contactPx * 1.3) + 14;
 
   const summaryBlockHeight = hasSummary ? estimateSummaryHeight(summary, cv.summaryFontSize ?? 11, cv.summaryTitleFontSize ?? 12) : 0;
   const firstPageAvailable = CONTENT_HEIGHT - actualHeaderHeight - summaryBlockHeight;
@@ -312,6 +313,22 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                   >
                     {fullName || 'YOUR NAME'}
                   </h1>
+
+                  {personalInfo?.jobTitle && (
+                    <div
+                      style={{
+                        fontFamily,
+                        fontSize: `${personalInfo?.jobTitleFontSize ?? 14}pt`,
+                        fontWeight: '600',
+                        margin: '-4px 0 8px 0',
+                        color: '#475569',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      {personalInfo.jobTitle}
+                    </div>
+                  )}
 
                   <div
                     style={{

@@ -115,6 +115,22 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
             </div>
           </div>
           <div className="flex flex-col gap-1">
+            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Job Title', 'Meslek / Ünvan')}</label>
+            <div className="flex gap-2">
+              <Input value={personalInfo?.jobTitle || ''} onChange={(e) => handleInfoChange('jobTitle', e.target.value)} className="bg-white flex-1" />
+              <Input
+                type="number"
+                min={8}
+                max={36}
+                value={personalInfo?.jobTitleFontSize || ''}
+                placeholder="14"
+                onChange={(e) => handleInfoChange('jobTitleFontSize', e.target.value === '' ? 14 : Number(e.target.value))}
+                className="bg-white w-16 px-2"
+                title={t('Font Size', 'Yazı Büyüklüğü')}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
             <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Email & {t('Contact Font Size', 'İletişim Font Büyüklüğü')}</label>
             <div className="flex gap-2">
               <Input value={personalInfo?.email || ''} onChange={(e) => handleInfoChange('email', e.target.value)} className="bg-white flex-1" />
