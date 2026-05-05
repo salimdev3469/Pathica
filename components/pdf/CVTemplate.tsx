@@ -287,6 +287,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               height: `${PAGE_HEIGHT}px`,
               padding: `${PAGE_MARGIN}px`,
               letterSpacing: `${cv.letterSpacing ?? 0}px`,
+              fontFamily,
               backgroundColor: '#ffffff',
               boxSizing: 'border-box',
               position: 'relative',
