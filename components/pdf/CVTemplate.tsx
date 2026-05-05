@@ -187,8 +187,7 @@ function paginateSectionsByPage(
           }
 
           pushNewPage();
-          currentSectionPart = { ...section, items: [] };
-          remaining -= headingHeight;
+          currentSectionPart = { ...section, items: [], isContinuation: true };
           currentPageSections.push(currentSectionPart);
 
           currentSectionPart.items.push(item);
@@ -397,23 +396,25 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
 
                 return (
                   <SectionWrapper key={section.id} id={section.id}>
-                    <div style={{ marginTop: '16px', marginBottom: '6px' }}>
-                      <h2
-                        style={{
-                          fontFamily,
-                          fontSize: `${section.titleFontSize ?? 12}pt`,
-                          fontWeight: 'bold',
-                          margin: '0 0 3px 0',
-                          borderBottom: '1.5px solid #000000',
-                          paddingBottom: '3px',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          color: '#000000',
-                        }}
-                      >
-                        {standardTitle}
-                      </h2>
-                    </div>
+                    {!section.isContinuation && (
+                      <div style={{ marginTop: '16px', marginBottom: '6px' }}>
+                        <h2
+                          style={{
+                            fontFamily,
+                            fontSize: `${section.titleFontSize ?? 12}pt`,
+                            fontWeight: 'bold',
+                            margin: '0 0 3px 0',
+                            borderBottom: '1.5px solid #000000',
+                            paddingBottom: '3px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            color: '#000000',
+                          }}
+                        >
+                          {standardTitle}
+                        </h2>
+                      </div>
+                    )}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {section.items?.map((item) => (

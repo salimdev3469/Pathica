@@ -39,6 +39,7 @@ export interface Section {
     position: number;
     items: Item[];
     titleFontSize?: number;
+    isContinuation?: boolean;
 }
 
 export interface CVState {
