@@ -321,7 +321,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                         fontSize: `${personalInfo?.jobTitleFontSize ?? 14}pt`,
                         fontWeight: '600',
                         margin: '-4px 0 8px 0',
-                        color: '#475569',
+                        color: '#000000',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
                       }}
