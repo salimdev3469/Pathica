@@ -81,6 +81,7 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
     let summaryTitle = locale === 'tr' ? 'Profil Özeti' : 'Profile Summary';
     let summaryTitleFontSize: number | undefined;
     let summaryFontSize: number | undefined;
+    let letterSpacing: number | undefined;
     let fontFamily = normalizeCvFont(undefined);
     if (summarySection) {
         const summaryField = summarySection.cv_fields.find((field) => field.label === 'summary') || summarySection.cv_fields[0];
@@ -108,6 +109,12 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
         if (summaryFontSizeField?.value) {
             const parsed = parseInt(summaryFontSizeField.value, 10);
             if (!isNaN(parsed)) summaryFontSize = parsed;
+        }
+
+        const letterSpacingField = summarySection.cv_fields.find((field) => field.label === 'letter_spacing');
+        if (letterSpacingField?.value) {
+            const parsed = parseFloat(letterSpacingField.value);
+            if (!isNaN(parsed)) letterSpacing = parsed;
         }
     }
     // Filter normal sections
@@ -152,6 +159,7 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
         fontFamily,
         summary: summary || '',
         ...(summaryFontSize !== undefined && { summaryFontSize }),
+        ...(letterSpacing !== undefined && { letterSpacing }),
         sections,
     };
 

@@ -24,6 +24,7 @@ import {
     useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { X } from 'lucide-react';
 
 export const PreviewContext = React.createContext({ scale: 1, showTutorial: false, dismissTutorial: () => {} });
@@ -39,15 +40,18 @@ function clamp(value: number, min: number, max: number) {
 }
 
 // Drag Wrapper for Sections
-const DraggableSectionWrapper = ({ id, children }: { id: string, children: React.ReactNode }) => {
+const DraggableSectionWrapper = ({ id, children, isContinuation }: { id: string, children: React.ReactNode, isContinuation?: boolean }) => {
     const { state } = useCV();
     const { scale, showTutorial, dismissTutorial } = React.useContext(PreviewContext);
-    const isFirst = state.sections.length > 0 && state.sections[0].id === id;
-
+    
+    // Only make it sortable if it's not a continuation
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: `section-${id}`,
-        data: { type: 'Section', id }
+        data: { type: 'Section', id },
+        disabled: isContinuation
     });
+
+    const isFirst = state.sections.length > 0 && state.sections[0].id === id;
 
     const section = state.sections.find(s => s.id === id);
     if (!section) return <div style={{ marginBottom: '14px' }}>{children}</div>;
@@ -77,16 +81,18 @@ const DraggableSectionWrapper = ({ id, children }: { id: string, children: React
         <SortableContext items={(section.items || []).map(i => `item-${i.id}`)} strategy={verticalListSortingStrategy}>
             <div ref={setNodeRef} style={style} className={`group/section ${isFirst && showTutorial ? 'ring-2 ring-primary/50 ring-offset-4 rounded-md' : ''}`}>
                 {/* Drag Handle for Section - Top Aligned to avoid overlapping with items */}
-                <div
-                    {...attributes}
-                    {...listeners}
-                    className={`absolute -left-[50px] top-1 w-10 flex flex-col items-center justify-start cursor-grab active:cursor-grabbing transition-opacity ${isFirst && showTutorial ? 'opacity-100' : 'opacity-0 group-hover/section:opacity-100'}`}
-                    title="Drag to reorder this section"
-                >
-                    <div className={`bg-slate-800 text-white shadow-md p-1.5 rounded-md transition-colors ${isFirst && showTutorial ? 'animate-bounce shadow-primary/50' : 'hover:bg-slate-700'}`}>
-                        <GripVertical size={16} />
+                {!isContinuation && (
+                    <div
+                        {...attributes}
+                        {...listeners}
+                        className={`absolute -left-[50px] top-1 w-10 flex flex-col items-center justify-start cursor-grab active:cursor-grabbing transition-opacity ${isFirst && showTutorial ? 'opacity-100' : 'opacity-100 md:opacity-0 md:group-hover/section:opacity-100'}`}
+                        title="Drag to reorder this section"
+                    >
+                        <div className={`bg-slate-800 text-white shadow-md p-1.5 rounded-md transition-colors ${isFirst && showTutorial ? 'animate-bounce shadow-primary/50' : 'hover:bg-slate-700'}`}>
+                            <GripVertical size={16} />
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Tutorial Balloon - Inside the page pointing left */}
                 {isFirst && showTutorial && (
@@ -148,7 +154,7 @@ const DraggableItemWrapper = ({ id, sectionId, children }: { id: string, section
             <div
                 {...attributes}
                 {...listeners}
-                className="absolute -left-[28px] top-1 cursor-grab active:cursor-grabbing opacity-0 group-hover/item:opacity-100 transition-opacity"
+                className="absolute -left-[28px] top-1 cursor-grab active:cursor-grabbing opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity"
                 title="Drag to reorder item"
             >
                 <div className="bg-white border text-slate-400 hover:text-slate-600 shadow-sm p-0.5 rounded flex items-center justify-center">
@@ -442,6 +448,7 @@ export function CVPreview() {
                         sensors={sensors}
                         collisionDetection={closestCenter}
                         onDragEnd={handleDragEnd}
+                        modifiers={[restrictToVerticalAxis]}
                     >
                         <SortableContext items={state.sections.map(s => `section-${s.id}`)} strategy={verticalListSortingStrategy}>
                             <PreviewContext.Provider value={{ scale, showTutorial, dismissTutorial }}>

@@ -5,6 +5,7 @@ import { getCvFontStack } from '@/lib/cv-fonts';
 interface WrapperProps {
   children: React.ReactNode;
   id: string;
+  isContinuation?: boolean;
 }
 
 interface PhotoInteractiveProps {
@@ -285,6 +286,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               width: `${PAGE_WIDTH}px`,
               height: `${PAGE_HEIGHT}px`,
               padding: `${PAGE_MARGIN}px`,
+              letterSpacing: `${cv.letterSpacing ?? 0}px`,
               backgroundColor: '#ffffff',
               boxSizing: 'border-box',
               position: 'relative',
@@ -293,7 +295,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               pageBreakAfter: !previewMode && !isLastPage ? 'always' : 'auto',
             }}
           >
-            <div style={{ height: '100%', overflow: 'hidden' }}>
+            <div style={{ height: '100%', overflow: previewMode ? 'visible' : 'hidden' }}>
               {page.includeHeader && (
                 <div style={{ marginBottom: '14px', minHeight: `${actualHeaderHeight}px`, textAlign: 'center' }}>
                   <h1
@@ -395,7 +397,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                 const standardTitle = mapSectionTitle(section.title);
 
                 return (
-                  <SectionWrapper key={section.id} id={section.id}>
+                  <SectionWrapper key={`${section.id}-${pageIndex}`} id={section.id} isContinuation={section.isContinuation}>
                     {!section.isContinuation && (
                       <div style={{ marginTop: '16px', marginBottom: '6px' }}>
                         <h2

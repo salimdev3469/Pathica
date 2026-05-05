@@ -43,6 +43,7 @@ type SaveCvState = {
     summaryTitleFontSize?: number;
     summary?: string;
     summaryFontSize?: number;
+    letterSpacing?: number;
     sections?: SaveSection[];
 };
 
@@ -215,6 +216,16 @@ export async function POST(req: Request) {
                     value: String(cvState.summaryFontSize),
                     field_type: 'number',
                     position: 4,
+                });
+            }
+
+            if (typeof cvState.letterSpacing === 'number') {
+                summaryFields.push({
+                    section_id: summarySection.id,
+                    label: 'letter_spacing',
+                    value: String(cvState.letterSpacing),
+                    field_type: 'number',
+                    position: 5,
                 });
             }
 

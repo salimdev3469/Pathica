@@ -16,6 +16,7 @@ export interface PersonalInfo {
     photoSize?: number;
     fullNameFontSize?: number;
     contactFontSize?: number;
+    letterSpacing?: number;
 }
 
 export interface Item {
@@ -40,6 +41,7 @@ export interface Section {
     items: Item[];
     titleFontSize?: number;
     isContinuation?: boolean;
+    letterSpacing?: number;
 }
 
 export interface CVState {
@@ -52,6 +54,7 @@ export interface CVState {
     sections: Section[];
     summaryTitleFontSize?: number;
     summaryFontSize?: number;
+    letterSpacing?: number;
 }
 
 type CVAction =
@@ -91,6 +94,7 @@ const defaultCVState: CVState = {
     },
     summaryTitle: 'Profile Summary',
     summary: 'Ã¢â‚¬Â¢ Proven ability in analyzing large datasets, debugging SQL queries, and transforming data to drive business decisions.\nÃ¢â‚¬Â¢ Proficient in creating compelling, interactive dashboards using Power BI, enhancing data accessibility and understanding.\nÃ¢â‚¬Â¢ Strong command over Excel, SQL, Power BI, enabling efficient data manipulation and analysis.\nÃ¢â‚¬Â¢ Proficient in market research, requirement gathering, qualitative and quantitative analysis.',
+    letterSpacing: 0,
     sections: [
         {
             id: crypto.randomUUID(),
@@ -232,6 +236,7 @@ export const CVProvider = ({ children, initialState }: { children: ReactNode; in
         summaryTitleFontSize: initialState.summaryTitleFontSize ?? defaultCVState.summaryTitleFontSize,
         summary: initialState.summary || '',
         summaryFontSize: initialState.summaryFontSize ?? defaultCVState.summaryFontSize,
+        letterSpacing: initialState.letterSpacing ?? defaultCVState.letterSpacing,
         sections: initialState.sections || []
     } : defaultCVState;
 
