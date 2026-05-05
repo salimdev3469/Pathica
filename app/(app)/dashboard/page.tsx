@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import LogoutButton from '@/components/LogoutButton';
 import GenerateCvFromJobButton from '@/components/dashboard/GenerateCvFromJobButton';
 import CvShareActions from '@/components/dashboard/CvShareActions';
+import CvCardActions from '@/components/dashboard/CvCardActions';
 import { createClient } from '@/lib/supabase-server';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 
@@ -172,15 +173,12 @@ export default async function DashboardPage() {
                                         </div>
                                     </CardHeader>
                                     <CardContent>
-                                        <Button
-                                            variant="outline"
-                                            className="h-11 w-full rounded-xl border-slate-200 bg-white text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-                                            asChild
-                                        >
-                                            <Link href={`/cv/${cv.id}`}>
-                                                <Edit2 className="mr-2 h-4 w-4" /> {t('Open Editor', 'Editörü Aç')}
-                                            </Link>
-                                        </Button>
+                                        <CvCardActions 
+                                            cvId={cv.id} 
+                                            cvTitle={cv.title} 
+                                            atsScore={ats.score}
+                                            locale={locale}
+                                        />
                                     </CardContent>
                                 </Card>
                             );
