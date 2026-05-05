@@ -181,14 +181,14 @@ function paginateSectionsByPage(
           currentSectionPart.items.push(item);
           remaining -= itemHeight;
         } else {
-          // If empty title part was already pushed on this overflowing page
-          if (currentSectionPart.items.length === 0) {
+          const itemsAlreadyOnPage = currentSectionPart.items.length > 0;
+          if (!itemsAlreadyOnPage) {
             currentPageSections.pop();
             remaining += headingHeight;
           }
 
           pushNewPage();
-          currentSectionPart = { ...section, items: [], isContinuation: true };
+          currentSectionPart = { ...section, items: [], isContinuation: itemsAlreadyOnPage };
           currentPageSections.push(currentSectionPart);
 
           currentSectionPart.items.push(item);
