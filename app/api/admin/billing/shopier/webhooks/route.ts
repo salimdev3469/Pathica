@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-server';
 import {
   ShopierApiRequestError,
   createShopierWebhookSubscription,
+  deleteShopierWebhookSubscription,
   listShopierWebhookSubscriptions,
   resolveShopierWebhookNotificationUrl,
   type ShopierWebhookEvent,
@@ -191,13 +192,31 @@ export async function POST() {
   try {
     const existing = await listShopierWebhookSubscriptions();
     const normalizedExpected = normalizeUrl(expectedUrl);
-
+    const deleted: ShopierWebhookSubscription[] = [];
     const created: ShopierWebhookSubscription[] = [];
+
     for (const event of REQUIRED_EVENTS) {
-      const alreadyExists = existing.some(
-        (item) => item.event === event && normalizeUrl(item.url) === normalizedExpected,
-      );
-      if (alreadyExists) {
+      const eventSubscriptions = existing.filter((item) => item.event === event);
+      let expectedExists = false;
+
+      for (const subscription of eventSubscriptions) {
+        const isExpectedUrl = normalizeUrl(subscription.url) === normalizedExpected;
+
+        if (isExpectedUrl && !expectedExists) {
+          expectedExists = true;
+          continue;
+        }
+
+        await deleteShopierWebhookSubscription(subscription.id);
+        deleted.push(subscription);
+
+        const index = existing.findIndex((item) => item.id === subscription.id);
+        if (index >= 0) {
+          existing.splice(index, 1);
+        }
+      }
+
+      if (expectedExists) {
         continue;
       }
 
@@ -213,7 +232,9 @@ export async function POST() {
     const health = await buildWebhookHealth();
     return NextResponse.json({
       ok: true,
+      deletedCount: deleted.length,
       createdCount: created.length,
+      deleted: deleted.map((item) => ({ id: item.id, event: item.event, url: item.url })),
       created: created.map((item) => ({ id: item.id, event: item.event, url: item.url })),
       newWebhookTokens: newTokens,
       newWebhookTokenCount: newTokens.length,
@@ -225,7 +246,12 @@ export async function POST() {
     const code = shopierError?.code || 'SHOPIER_API_ERROR';
     const message = shopierError?.message || 'Failed to sync Shopier webhooks.';
 
-    const status = code === 'SHOPIER_PAT_MISSING' ? 400 : code === 'SHOPIER_PAT_REVOKED' ? 401 : 502;
+    const status =
+      code === 'SHOPIER_PAT_MISSING' || code === 'SHOPIER_WEBHOOK_ID_MISSING'
+        ? 400
+        : code === 'SHOPIER_PAT_REVOKED'
+          ? 401
+          : 502;
     return NextResponse.json({ error: message, code }, { status });
   }
 }

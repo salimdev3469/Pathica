@@ -314,37 +314,59 @@ function parseWebhookSubscriptions(raw: unknown): ShopierWebhookSubscription[] {
 
 async function requestShopier(path: string, init?: RequestInit): Promise<unknown> {
   const token = readShopierPat();
-  const response = await fetch(`https://api.shopier.com/v1${path}`, {
-    method: init?.method || 'GET',
-    headers: {
-      accept: 'application/json',
-      authorization: `Bearer ${token}`,
-      'content-type': 'application/json',
-      ...(init?.headers || {}),
-    },
-    body: init?.body,
-    cache: 'no-store',
-  });
+  const attemptRequest = async (): Promise<unknown> => {
+    const response = await fetch(`https://api.shopier.com/v1${path}`, {
+      method: init?.method || 'GET',
+      headers: {
+        accept: 'application/json',
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json',
+        ...(init?.headers || {}),
+      },
+      body: init?.body,
+      cache: 'no-store',
+    });
 
-  const body = await response.json().catch(() => null);
-  if (response.ok) {
-    return body;
+    const body = await response.json().catch(() => null);
+    if (response.ok) {
+      return body;
+    }
+
+    const message =
+      String((body as Record<string, unknown> | null)?.message || '') ||
+      String((body as Record<string, unknown> | null)?.error || '') ||
+      `Shopier API request failed with status ${response.status}.`;
+
+    if (response.status === 401 && /revoked/i.test(message)) {
+      throw new ShopierApiRequestError('SHOPIER_PAT_REVOKED', message, response.status);
+    }
+
+    if (response.status === 401) {
+      throw new ShopierApiRequestError('SHOPIER_UNAUTHORIZED', message, response.status);
+    }
+
+    throw new ShopierApiRequestError('SHOPIER_API_ERROR', message, response.status);
+  };
+
+  const RETRIABLE_STATUSES = new Set([429, 502, 503, 504]);
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await attemptRequest();
+    } catch (error) {
+      lastError = error;
+      const shopierError = error as ShopierApiRequestError;
+      const status = Number(shopierError?.status || 0);
+      const isRetriable = RETRIABLE_STATUSES.has(status);
+      if (!isRetriable || attempt === 2) {
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, (attempt + 1) * 400));
+    }
   }
 
-  const message =
-    String((body as Record<string, unknown> | null)?.message || '') ||
-    String((body as Record<string, unknown> | null)?.error || '') ||
-    `Shopier API request failed with status ${response.status}.`;
-
-  if (response.status === 401 && /revoked/i.test(message)) {
-    throw new ShopierApiRequestError('SHOPIER_PAT_REVOKED', message, response.status);
-  }
-
-  if (response.status === 401) {
-    throw new ShopierApiRequestError('SHOPIER_UNAUTHORIZED', message, response.status);
-  }
-
-  throw new ShopierApiRequestError('SHOPIER_API_ERROR', message, response.status);
+  throw lastError;
 }
 
 export async function listShopierWebhookSubscriptions(): Promise<ShopierWebhookSubscription[]> {
@@ -371,4 +393,19 @@ export async function createShopierWebhookSubscription(
   }
 
   return parsed[0];
+}
+
+export async function deleteShopierWebhookSubscription(subscriptionId: string): Promise<void> {
+  const id = String(subscriptionId || '').trim();
+  if (!id) {
+    throw new ShopierApiRequestError(
+      'SHOPIER_WEBHOOK_ID_MISSING',
+      'Webhook subscription ID is required for deletion.',
+      null,
+    );
+  }
+
+  await requestShopier(`/webhooks/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
 }

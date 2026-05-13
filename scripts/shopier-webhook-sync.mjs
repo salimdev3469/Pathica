@@ -59,26 +59,42 @@ function parseWebhookSubscriptions(raw) {
 }
 
 async function requestShopier(pat, method, apiPath, body) {
-  const response = await fetch(`https://api.shopier.com/v1${apiPath}`, {
-    method,
-    headers: {
-      authorization: `Bearer ${pat}`,
-      accept: 'application/json',
-      'content-type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  const retriableStatuses = new Set([429, 502, 503, 504]);
+  let lastError = null;
 
-  const payload = await response.json().catch(() => null);
-  if (response.ok) {
-    return payload;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const response = await fetch(`https://api.shopier.com/v1${apiPath}`, {
+        method,
+        headers: {
+          authorization: `Bearer ${pat}`,
+          accept: 'application/json',
+          'content-type': 'application/json',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (response.ok) {
+        return payload;
+      }
+
+      const message =
+        String(payload?.message || '') || String(payload?.error || '') || `Shopier API failed (${response.status}).`;
+      const err = new Error(message);
+      err.status = response.status;
+      throw err;
+    } catch (error) {
+      lastError = error;
+      const status = Number(error?.status || 0);
+      if (!retriableStatuses.has(status) || attempt === 2) {
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, (attempt + 1) * 400));
+    }
   }
 
-  const message =
-    String(payload?.message || '') || String(payload?.error || '') || `Shopier API failed (${response.status}).`;
-  const err = new Error(message);
-  err.status = response.status;
-  throw err;
+  throw lastError;
 }
 
 function upsertEnvLine(envText, key, value) {
@@ -132,10 +148,29 @@ async function main() {
 
   const expectedWebhookUrl = `${appUrl}/api/shopier/webhook`;
   const subscriptions = parseWebhookSubscriptions(await requestShopier(pat, 'GET', '/webhooks?limit=50'));
+  const deleted = [];
+  for (const event of REQUIRED_EVENTS) {
+    const eventSubscriptions = subscriptions.filter((item) => item.event === event);
+    let expectedExists = false;
+
+    for (const item of eventSubscriptions) {
+      const matchesExpected = normalizeUrl(item.url) === normalizeUrl(expectedWebhookUrl);
+
+      if (matchesExpected && !expectedExists) {
+        expectedExists = true;
+        continue;
+      }
+
+      await requestShopier(pat, 'DELETE', `/webhooks/${encodeURIComponent(item.id)}`);
+      deleted.push(item);
+    }
+  }
+
+  const activeSubscriptions = subscriptions.filter((item) => !deleted.some((removed) => removed.id === item.id));
 
   const created = [];
   for (const event of REQUIRED_EVENTS) {
-    const matched = subscriptions.some(
+    const matched = activeSubscriptions.some(
       (item) => item.event === event && normalizeUrl(item.url) === normalizeUrl(expectedWebhookUrl),
     );
     if (matched) continue;
@@ -149,7 +184,7 @@ async function main() {
       throw new Error(`Webhook created but response could not be parsed for event ${event}.`);
     }
     created.push(createdItems[0]);
-    subscriptions.push(createdItems[0]);
+    activeSubscriptions.push(createdItems[0]);
   }
 
   const newTokens = created.map((item) => String(item.token || '').trim()).filter(Boolean);
@@ -171,13 +206,24 @@ async function main() {
       .filter((item) => item.event === event && normalizeUrl(item.url) !== normalizeUrl(expectedWebhookUrl))
       .map((item) => item.id),
   }));
+  const finalCoverage = REQUIRED_EVENTS.map((event) => ({
+    event,
+    matched: activeSubscriptions.some(
+      (item) => item.event === event && normalizeUrl(item.url) === normalizeUrl(expectedWebhookUrl),
+    ),
+    conflictingIds: activeSubscriptions
+      .filter((item) => item.event === event && normalizeUrl(item.url) !== normalizeUrl(expectedWebhookUrl))
+      .map((item) => item.id),
+  }));
 
   console.log('Shopier webhook sync complete.');
   console.log(`Expected URL: ${expectedWebhookUrl}`);
+  console.log(`Deleted subscriptions: ${deleted.length}`);
   console.log(`Created subscriptions: ${created.length}`);
   console.log(`New tokens received: ${newTokens.length}`);
   console.log(`SHOPIER_WEBHOOK_TOKEN count (.env.local): ${mergedTokens.length}`);
-  console.log('Coverage:', JSON.stringify(coverage, null, 2));
+  console.log('Coverage before sync:', JSON.stringify(coverage, null, 2));
+  console.log('Coverage after sync:', JSON.stringify(finalCoverage, null, 2));
 }
 
 main().catch((error) => {
