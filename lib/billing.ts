@@ -750,10 +750,10 @@ export function publicBillingPackages() {
 
 export function getBillingSummaryText(locale: Locale = 'en') {
   if (locale === 'tr') {
-    return 'Abonelik yok. Tek seferlik satın alma. Sabit USD fiyatlandırma.';
+    return 'Abonelik yok. Tek seferlik satın alma. Sabit TL fiyatlandırma.';
   }
 
-  return 'No subscription. One-time purchase. USD fixed pricing.';
+  return 'No subscription. One-time purchase. TRY fixed pricing.';
 }
 
 async function grantCreditsForPaymentFallback(paymentId: string, reason: string) {

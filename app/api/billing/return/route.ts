@@ -349,7 +349,7 @@ export async function GET(req: NextRequest) {
         payment: paymentResponse(currentPayment),
         creditedNow: grantResult.creditedNow,
         wallet: grantResult.wallet,
-        summary: 'No subscription. One-time purchase. USD fixed pricing.',
+        summary: 'No subscription. One-time purchase. TRY fixed pricing.',
       });
     }
 

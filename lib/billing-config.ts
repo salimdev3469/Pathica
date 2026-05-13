@@ -29,7 +29,7 @@ export const BILLING_PACKAGES: BillingPackage[] = [
     code: 'starter',
     name: 'Starter',
     credits: 100,
-    priceUsd: 4.99,
+    priceUsd: 79,
     shopierProductIdEnv: 'SHOPIER_PRODUCT_ID_STARTER',
     shopierProductUrlEnv: 'SHOPIER_PRODUCT_URL_STARTER',
   },
@@ -37,7 +37,7 @@ export const BILLING_PACKAGES: BillingPackage[] = [
     code: 'pro',
     name: 'Pro',
     credits: 300,
-    priceUsd: 9.99,
+    priceUsd: 129,
     highlight: true,
     shopierProductIdEnv: 'SHOPIER_PRODUCT_ID_PRO',
     shopierProductUrlEnv: 'SHOPIER_PRODUCT_URL_PRO',
@@ -46,14 +46,18 @@ export const BILLING_PACKAGES: BillingPackage[] = [
     code: 'mega',
     name: 'Mega',
     credits: 1000,
-    priceUsd: 19.99,
+    priceUsd: 259,
     shopierProductIdEnv: 'SHOPIER_PRODUCT_ID_MEGA',
     shopierProductUrlEnv: 'SHOPIER_PRODUCT_URL_MEGA',
   },
 ];
 
 export function formatUsd(value: number): string {
-  return `$${value.toFixed(2)}`;
+  return new Intl.NumberFormat('tr-TR', {
+    style: 'currency',
+    currency: 'TRY',
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 export function getBillingPackageByCode(code: string | null | undefined): BillingPackage | null {

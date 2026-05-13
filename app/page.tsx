@@ -138,7 +138,7 @@ export default async function Home() {
       offers: {
         '@type': 'Offer',
         price: '0',
-        priceCurrency: 'USD',
+        priceCurrency: 'TRY',
       },
       description: t(
         'Pathica helps job seekers build ATS-friendly resumes, optimize role keywords, and export professional PDF CVs.',
@@ -530,7 +530,7 @@ export default async function Home() {
         <section className="border-t bg-white py-24">
           <div className="container mx-auto max-w-6xl px-6">
             <div className="mx-auto mb-12 max-w-3xl text-center">
-              <h2 className={sectionTitleClass}>{t('Simple Fixed-USD Pricing', 'Sabit USD Fiyatlandırma')}</h2>
+              <h2 className={sectionTitleClass}>{t('Simple Fixed-TL Pricing', 'Sabit TL Fiyatlandırma')}</h2>
               <p className="mt-3 text-slate-600">
                 {t('Build free. Preview free. Pay only when you export or need advanced tools.', 'Ücretsiz oluştur. Ücretsiz önizle. Sadece export veya gelişmiş araç gerektiğinde öde.')}
               </p>

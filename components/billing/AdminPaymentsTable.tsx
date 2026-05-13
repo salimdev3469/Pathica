@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatUsd } from '@/lib/billing-config';
 
 type AdminPayment = {
   id: string;
@@ -124,7 +125,7 @@ export default function AdminPaymentsTable({ initialPayments }: AdminPaymentsTab
                 <tr key={payment.id}>
                   <td className="px-3 py-2 text-slate-700">{payment.buyer_email}</td>
                   <td className="px-3 py-2 text-slate-700">
-                    {payment.package_code} (${Number(payment.package_price_usd).toFixed(2)}) / {payment.credit_amount}
+                    {payment.package_code} ({formatUsd(Number(payment.package_price_usd))}) / {payment.credit_amount}
                   </td>
                   <td className="px-3 py-2 text-slate-700">{payment.status}</td>
                   <td className="px-3 py-2 text-slate-700">{payment.shopier_order_id || '-'}</td>
