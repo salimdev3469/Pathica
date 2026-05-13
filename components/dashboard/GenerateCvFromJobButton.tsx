@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import type { Locale } from '@/lib/locale';
@@ -32,6 +33,7 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
 
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [error, setError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -51,7 +53,7 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
       const generateRes = await fetch('/api/cv/generate-from-job', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobDescription }),
+        body: JSON.stringify({ jobTitle, jobDescription }),
       });
 
       const generateData = (await generateRes.json().catch(() => null)) as GenerateResponse | { error?: string } | null;
@@ -112,6 +114,12 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
         </DialogHeader>
 
         <div className="space-y-2">
+          <Input
+            value={jobTitle}
+            onChange={(event) => setJobTitle(event.target.value)}
+            placeholder={t('Target role title (optional)', 'Hedef rol başlığı (opsiyonel)')}
+            disabled={isGenerating}
+          />
           <Textarea
             value={jobDescription}
             onChange={(event) => setJobDescription(event.target.value)}

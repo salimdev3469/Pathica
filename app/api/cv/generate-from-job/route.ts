@@ -5,6 +5,7 @@ import { flashModel } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase-server';
 
 type GenerateRequest = {
+  jobTitle?: string;
   jobDescription?: string;
 };
 
@@ -96,6 +97,7 @@ export async function POST(req: Request) {
     userId = user.id;
 
     const body = (await req.json()) as GenerateRequest;
+    const jobTitle = sanitizeField(normalizeText(body.jobTitle), 90);
     const jobDescription = normalizeText(body.jobDescription);
 
     if (!jobDescription || jobDescription.length < 40) {
@@ -134,7 +136,7 @@ export async function POST(req: Request) {
         {
           id: crypto.randomUUID(),
           user_id: user.id,
-          title: 'AI Generated CV',
+          title: jobTitle ? `${jobTitle} CV Draft` : 'AI Generated CV',
         },
       ])
       .select('id')
@@ -145,8 +147,8 @@ export async function POST(req: Request) {
       throw new Error('Could not create CV shell.');
     }
 
-    const generated = await generateCvDraft(jobDescription);
-    const cvState = buildCvState(cvRow.id, generated, jobDescription);
+    const generated = await generateCvDraft(jobDescription, jobTitle || null);
+    const cvState = buildCvState(cvRow.id, generated, jobDescription, jobTitle || null);
 
     return NextResponse.json({ cvId: cvRow.id, cvState }, { status: 200 });
   } catch (error) {
@@ -169,7 +171,7 @@ export async function POST(req: Request) {
   }
 }
 
-async function generateCvDraft(jobDescription: string): Promise<RawGeneratedCv | null> {
+async function generateCvDraft(jobDescription: string, targetRoleTitle: string | null): Promise<RawGeneratedCv | null> {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return null;
@@ -216,7 +218,7 @@ Requirements:
 - Keep content dense and editable.
 
 User input:
-${jobDescription}`;
+${targetRoleTitle ? `Target role title: ${targetRoleTitle}\n` : ''}${jobDescription}`;
 
     const generationPromise = flashModel.generateContent(prompt);
     const timeoutPromise = new Promise<null>((resolve) => {
@@ -260,8 +262,13 @@ function parseGeneratedJson(rawText: string): RawGeneratedCv | null {
   }
 }
 
-function buildCvState(cvId: string, generated: RawGeneratedCv | null, sourceInput: string): CvStatePayload {
-  const fallback = buildFallbackDraft(sourceInput);
+function buildCvState(
+  cvId: string,
+  generated: RawGeneratedCv | null,
+  sourceInput: string,
+  targetRoleTitle: string | null,
+): CvStatePayload {
+  const fallback = buildFallbackDraft(sourceInput, targetRoleTitle);
 
   const title = sanitizeField(asString(generated?.title), 90) || fallback.title;
   const summary = sanitizeField(asString(generated?.summary), 900) || fallback.summary;
@@ -376,12 +383,12 @@ function ensureRequiredSections(input: DraftSection[], fallbackSections: DraftSe
   return sections;
 }
 
-function buildFallbackDraft(sourceInput: string): {
+function buildFallbackDraft(sourceInput: string, targetRoleTitle?: string | null): {
   title: string;
   summary: string;
   sections: DraftSection[];
 } {
-  const roleHint = extractRoleHint(sourceInput);
+  const roleHint = targetRoleTitle && targetRoleTitle.trim().length > 2 ? targetRoleTitle.trim() : extractRoleHint(sourceInput);
   const keywordList = extractKeywords(sourceInput).slice(0, 12);
 
   return {
