@@ -126,6 +126,13 @@ function safeEqual(a: string, b: string): boolean {
   return crypto.timingSafeEqual(left, right);
 }
 
+function normalizeWebhookSecret(secret: string): string {
+  return String(secret || '')
+    .trim()
+    .replace(/^['"](.*)['"]$/s, '$1')
+    .trim();
+}
+
 export function verifyShopierWebhookSignature(
   rawBody: string,
   signatureHeader: string | null,
@@ -139,7 +146,7 @@ export function verifyShopierWebhookSignature(
   const secrets = Array.isArray(secretOrSecrets) ? secretOrSecrets : [secretOrSecrets];
 
   for (const secret of secrets) {
-    const normalized = String(secret || '').trim();
+    const normalized = normalizeWebhookSecret(secret || '');
     if (!normalized) continue;
 
     const hmacHex = crypto.createHmac('sha256', normalized).update(rawBody).digest('hex');

@@ -31,7 +31,12 @@ function normalizeEvent(eventHeader: string | null): string {
 function resolveWebhookTokensFromEnv(): string[] {
   return String(process.env.SHOPIER_WEBHOOK_TOKEN || '')
     .split(',')
-    .map((token) => token.trim())
+    .map((token) =>
+      token
+        .trim()
+        .replace(/^['"](.*)['"]$/s, '$1')
+        .trim(),
+    )
     .filter(Boolean);
 }
 

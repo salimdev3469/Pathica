@@ -198,6 +198,27 @@ export async function createPendingShopierPayment(input: {
   pkg: BillingPackage;
   checkoutUrl: string;
 }) {
+  const recentThreshold = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+  const { data: recentPending, error: recentPendingError } = await supabaseAdmin
+    .from('shopier_payments')
+    .select('*')
+    .eq('user_id', input.userId)
+    .eq('package_code', input.pkg.code)
+    .eq('status', 'pending')
+    .is('shopier_order_id', null)
+    .gte('created_at', recentThreshold)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (recentPendingError) {
+    throw recentPendingError;
+  }
+
+  if (recentPending) {
+    return recentPending as BillingPayment;
+  }
+
   const { data, error } = await supabaseAdmin
     .from('shopier_payments')
     .insert({
@@ -256,7 +277,8 @@ export async function getUserBillingPayments(userId: string, limit = 10): Promis
     throw error;
   }
 
-  return (data as BillingPayment[]) || [];
+  const payments = (data as BillingPayment[]) || [];
+  return Promise.all(payments.map((payment) => reconcileCreditedPaymentRecord(payment)));
 }
 
 export async function getUserLedger(userId: string, limit = 20) {
@@ -276,6 +298,36 @@ export async function getUserLedger(userId: string, limit = 20) {
 
 export async function grantCreditsForPayment(paymentId: string, reason?: string) {
   const appliedReason = reason || 'shopier_package_purchase';
+  const existingPayment = await getBillingPaymentById(paymentId);
+  if (!existingPayment) {
+    return {
+      success: false,
+      code: 'PAYMENT_NOT_FOUND',
+      userId: null,
+      creditBalance: 0,
+      ledgerId: null,
+    };
+  }
+
+  if (!existingPayment.user_id) {
+    return {
+      success: false,
+      code: 'USER_NOT_MAPPED',
+      userId: null,
+      creditBalance: 0,
+      ledgerId: null,
+    };
+  }
+
+  if (!['paid', 'credited'].includes(existingPayment.status)) {
+    return {
+      success: false,
+      code: 'PAYMENT_NOT_PAID',
+      userId: existingPayment.user_id,
+      creditBalance: 0,
+      ledgerId: null,
+    };
+  }
 
   try {
     const { data, error } = await supabaseAdmin.rpc('grant_credits_for_payment', {
@@ -604,6 +656,16 @@ async function grantCreditsForPaymentFallback(paymentId: string, reason: string)
     };
   }
 
+  if (payment.status !== 'paid') {
+    return {
+      success: false,
+      code: 'PAYMENT_NOT_PAID',
+      userId: payment.user_id,
+      creditBalance: 0,
+      ledgerId: null,
+    };
+  }
+
   const { data: existingLedger, error: existingLedgerError } = await supabaseAdmin
     .from('credit_ledger')
     .select('id')
@@ -696,4 +758,45 @@ async function grantCreditsForPaymentFallback(paymentId: string, reason: string)
     creditBalance: targetBalance,
     ledgerId: createdLedger?.id || null,
   };
+}
+
+async function reconcileCreditedPaymentRecord(payment: BillingPayment): Promise<BillingPayment> {
+  if (!payment.user_id || payment.status === 'credited') {
+    return payment;
+  }
+
+  const { data: ledgerHit, error: ledgerError } = await supabaseAdmin
+    .from('credit_ledger')
+    .select('id,created_at')
+    .eq('user_id', payment.user_id)
+    .eq('delta', payment.credit_amount)
+    .contains('metadata', { payment_id: payment.id })
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (ledgerError || !ledgerHit?.id) {
+    return payment;
+  }
+
+  const creditedAt = String(ledgerHit.created_at || new Date().toISOString());
+  const { data: updated, error: updateError } = await supabaseAdmin
+    .from('shopier_payments')
+    .update({
+      status: 'credited',
+      credited_at: payment.credited_at || creditedAt,
+      paid_at: payment.paid_at || creditedAt,
+      updated_at: new Date().toISOString(),
+      failure_reason: payment.failure_reason || null,
+    })
+    .eq('id', payment.id)
+    .in('status', ['pending', 'paid'])
+    .select('*')
+    .maybeSingle();
+
+  if (updateError || !updated) {
+    return payment;
+  }
+
+  return updated as BillingPayment;
 }

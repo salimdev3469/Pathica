@@ -25,7 +25,7 @@ function normalizeUrl(value) {
 function readWebhookTokens(value) {
   return String(value || '')
     .split(',')
-    .map((token) => token.trim())
+    .map((token) => token.trim().replace(/^['"](.*)['"]$/s, '$1').trim())
     .filter(Boolean);
 }
 

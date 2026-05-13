@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,9 +34,11 @@ type ReturnPayload = {
 };
 
 export default function BillingReturnStatus({ paymentId, orderId }: BillingReturnStatusProps) {
+  const router = useRouter();
   const [data, setData] = useState<ReturnPayload | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [manualOrderId, setManualOrderId] = useState(orderId || '');
+  const [didAutoRedirect, setDidAutoRedirect] = useState(false);
 
   const query = useMemo(() => {
     const params = new URLSearchParams();
@@ -61,6 +64,37 @@ export default function BillingReturnStatus({ paymentId, orderId }: BillingRetur
   useEffect(() => {
     void fetchStatus();
   }, [fetchStatus]);
+
+  const shouldPoll =
+    Boolean(query) &&
+    !data?.error &&
+    (!data?.payment || ['pending', 'paid'].includes(String(data.payment.status || '').toLowerCase()) || data?.status === 'processing');
+
+  useEffect(() => {
+    if (!shouldPoll) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      void fetchStatus();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [fetchStatus, shouldPoll]);
+
+  useEffect(() => {
+    const paymentStatus = String(data?.payment?.status || '').toLowerCase();
+    if (paymentStatus !== 'credited' || didAutoRedirect) {
+      return;
+    }
+
+    setDidAutoRedirect(true);
+    const timer = setTimeout(() => {
+      router.replace('/dashboard?billing=payment_success');
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [data?.payment?.status, didAutoRedirect, router]);
 
   if (!query) {
     return <p className="text-sm text-slate-600">Missing `payment_id` or `order_id` query parameter.</p>;
@@ -137,6 +171,9 @@ export default function BillingReturnStatus({ paymentId, orderId }: BillingRetur
             Wallet balance: <strong>{data.wallet.creditBalance}</strong> credits · Free exports left:{' '}
             <strong>{data.wallet.freeExportsRemaining}</strong>
           </p>
+          {String(data?.payment?.status || '').toLowerCase() === 'credited' ? (
+            <p className="mt-2 text-xs text-emerald-700">Payment verified. Redirecting to dashboard...</p>
+          ) : null}
         </div>
       ) : null}
     </div>
