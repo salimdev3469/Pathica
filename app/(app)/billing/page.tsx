@@ -7,6 +7,7 @@ import CheckoutButton from '@/components/billing/CheckoutButton';
 import {
   ADVANCED_AI_CREDIT_COST,
   BILLING_PACKAGES,
+  COVER_LETTER_CREDIT_COST,
   FREE_SIGNUP_AI_CREDITS,
   FREE_SIGNUP_EXPORTS,
   PDF_EXPORT_CREDIT_COST,
@@ -62,7 +63,7 @@ export default async function BillingPage() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">{t('Billing & Credits', 'Ödeme ve Krediler')}</h1>
-            <p className="mt-2 text-sm text-slate-600">{getBillingSummaryText()}</p>
+            <p className="mt-2 text-sm text-slate-600">{getBillingSummaryText(locale)}</p>
           </div>
           <Button variant="outline" asChild>
             <Link href="/dashboard">{t('Back to Dashboard', 'Panele Dön')}</Link>
@@ -105,14 +106,18 @@ export default async function BillingPage() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-slate-700">
               <p>
-                {t('Advanced AI call cost', 'Gelişmiş AI çağrı maliyeti')}: <strong>{ADVANCED_AI_CREDIT_COST}</strong>{' '}
-                {t('credit', 'kredi')}
+                {t('Tailor / Match Job / Generate from Job cost', 'Tailor / Match Job / Generate from Job maliyeti')}:{' '}
+                <strong>{ADVANCED_AI_CREDIT_COST}</strong> {t('credits', 'kredi')}
+              </p>
+              <p>
+                {t('Cover Letter generation cost', 'Cover Letter üretim maliyeti')}: <strong>{COVER_LETTER_CREDIT_COST}</strong>{' '}
+                {t('credits', 'kredi')}
               </p>
               <p>
                 {t('PDF export cost (after first free export)', 'PDF export maliyeti (ilk ücretsiz export sonrası)')}:{' '}
                 <strong>{PDF_EXPORT_CREDIT_COST}</strong> {t('credits', 'kredi')}
               </p>
-              <p className="pt-1 text-xs text-slate-500">{getBillingSummaryText()}</p>
+              <p className="pt-1 text-xs text-slate-500">{getBillingSummaryText(locale)}</p>
             </CardContent>
           </Card>
         </div>
@@ -154,7 +159,7 @@ export default async function BillingPage() {
                       className="w-full"
                       label={configured ? t('Buy with Shopier', 'Shopier ile Satın Al') : t('Not Configured', 'Yapılandırılmadı')}
                     />
-                    <p className="text-xs text-slate-500">{getBillingSummaryText()}</p>
+                    <p className="text-xs text-slate-500">{getBillingSummaryText(locale)}</p>
                   </CardContent>
                 </Card>
               );

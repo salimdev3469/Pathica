@@ -6,6 +6,7 @@ import CssHealthCheck from '@/components/CssHealthCheck';
 import { ThemeProvider } from '@/components/theme-provider';
 import NavigationFeedback from '@/components/NavigationFeedback';
 import ThemeToggle from '@/components/theme-toggle';
+import SiteFooter from '@/components/layout/SiteFooter';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { getBaseUrl } from '@/lib/seo/config';
 import { Toaster } from '@/components/ui/sonner';
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
     apple: '/tab_icon.png',
   },
   verification: {
-    google: 'M8NvMtJfNmsjvotVeDv0Ayv10pGMEICuQwd4ewVQmj0',
+    google: 'CbHZSPwIaXqcWldwqnhU9ylhYQy_Zep0WJVxMMCdmlE',
   },
 };
 
@@ -71,6 +72,7 @@ export default function RootLayout({
           <CssHealthCheck />
           <NavigationFeedback />
           {children}
+          <SiteFooter locale={locale} />
           <Toaster />
           <div className="fixed bottom-5 right-5 z-[100]">
             <ThemeToggle />

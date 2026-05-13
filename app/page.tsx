@@ -13,6 +13,7 @@ import LanguageToggle from '@/components/language-toggle';
 import {
   ADVANCED_AI_CREDIT_COST,
   BILLING_PACKAGES,
+  COVER_LETTER_CREDIT_COST,
   FREE_SIGNUP_AI_CREDITS,
   FREE_SIGNUP_EXPORTS,
   PDF_EXPORT_CREDIT_COST,
@@ -71,7 +72,7 @@ export default async function Home() {
   const heroPrimaryHref = isAuthenticated ? '/dashboard' : '/cv/new';
   const logoSrc = getLogoSrc();
   const footerLogoSrc = getFooterLogoSrc();
-  const billingSummaryText = getBillingSummaryText();
+  const billingSummaryText = getBillingSummaryText(locale);
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
   const animatedColumnTemplatesLeft = cvTemplateSeeds;
   const animatedColumnTemplatesRight = [...cvTemplateSeeds].reverse();
@@ -560,8 +561,17 @@ export default async function Home() {
                   </ul>
                   <p className="mt-4 text-xs text-slate-500">
                     {t('After free usage: PDF export costs', 'Ücretsiz hak sonrası: PDF export maliyeti')}{' '}
-                    <strong>{PDF_EXPORT_CREDIT_COST}</strong> {t('credits, advanced AI call costs', 'kredi, gelişmiş AI çağrısı maliyeti')}{' '}
-                    <strong>{ADVANCED_AI_CREDIT_COST}</strong> {t('credit.', 'kredi.')}
+                    <strong>{PDF_EXPORT_CREDIT_COST}</strong>{' '}
+                    {t(
+                      'credits. Tailor, Match Job, and Generate from Job cost',
+                      'kredi. Tailor, Match Job ve Generate from Job maliyeti',
+                    )}{' '}
+                    <strong>{ADVANCED_AI_CREDIT_COST}</strong>{' '}
+                    {t(
+                      'credits each. Cover Letter costs',
+                      'kredi (her biri). Cover Letter maliyeti',
+                    )}{' '}
+                    <strong>{COVER_LETTER_CREDIT_COST}</strong> {t('credits.', 'kredi.')}
                   </p>
                 </CardContent>
               </Card>
@@ -637,20 +647,6 @@ export default async function Home() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 py-12 text-center text-slate-400 border-t border-slate-800">
-        <div className="container mx-auto px-6 flex flex-col items-center">
-          <div className="flex items-center gap-2 text-xl font-bold text-white mb-6">
-            <Image src={footerLogoSrc} alt={t('Pathica footer logo', 'Pathica alt logosu')} width={144} height={144} className="h-36 w-36 object-contain" />
-          </div>
-          <p className="mb-6 max-w-sm mx-auto">
-            {t('The automated, AI-driven way to build resumes that pass ATS tests and win interviews.', 'ATS testlerini geçen ve mülakat şansını artıran özgeçmişleri AI destekli şekilde oluştur.')}
-          </p>
-          <div className="text-sm">
-            &copy; {new Date().getFullYear()} {t('All rights reserved.', 'Tüm hakları saklıdır.')}
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -64,7 +64,7 @@ export default function CvShareActions({ cvId, cvTitle, atsScore }: CvShareActio
   };
 
   return (
-    <div className="mb-3 flex items-center justify-end">
+    <div className="shrink-0">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button

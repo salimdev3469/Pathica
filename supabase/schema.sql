@@ -117,6 +117,8 @@ create table if not exists shopier_payments (
   shopier_order_id text unique,
   shopier_product_id text,
   checkout_url text,
+  legal_acceptance jsonb,
+  legal_accepted_at timestamptz,
   failure_reason text,
   paid_at timestamptz,
   credited_at timestamptz,
@@ -128,6 +130,8 @@ create table if not exists shopier_payments (
 
 create index if not exists idx_shopier_payments_user_status on shopier_payments(user_id, status, created_at desc);
 create index if not exists idx_shopier_payments_email_status on shopier_payments(buyer_email, status, created_at desc);
+alter table if exists shopier_payments add column if not exists legal_acceptance jsonb;
+alter table if exists shopier_payments add column if not exists legal_accepted_at timestamptz;
 
 create table if not exists shopier_webhook_events (
   id uuid primary key default gen_random_uuid(),

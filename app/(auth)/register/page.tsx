@@ -143,10 +143,10 @@ export default function RegisterPage() {
             </CardHeader>
 
             <CardContent className="grid gap-4">
-              <Button 
-                variant="outline" 
-                onClick={handleGoogleLogin} 
-                className="h-11 w-full rounded-full text-md font-medium border-slate-200 hover:bg-slate-50 transition-all duration-200" 
+              <Button
+                variant="outline"
+                onClick={handleGoogleLogin}
+                className="h-11 w-full rounded-full text-md font-medium border-slate-200 hover:bg-slate-50 transition-all duration-200"
                 disabled={isBusy}
               >
                 {isGoogleLoading ? (
@@ -200,7 +200,7 @@ export default function RegisterPage() {
               <form onSubmit={handleRegister} className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="m@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-full px-4" />
+                  <Input id="email" type="email" placeholder="youremail@address.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-full px-4" />
                 </div>
 
                 <div className="grid gap-2">

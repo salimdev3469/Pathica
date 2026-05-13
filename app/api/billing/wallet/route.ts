@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import {
   ADVANCED_AI_CREDIT_COST,
+  ADVANCED_AI_FEATURE_CREDIT_COSTS,
   BILLING_PACKAGES,
+  COVER_LETTER_CREDIT_COST,
   FREE_SIGNUP_AI_CREDITS,
   FREE_SIGNUP_EXPORTS,
   PDF_EXPORT_CREDIT_COST,
@@ -45,6 +47,8 @@ export async function GET() {
         freeSignupAiCredits: FREE_SIGNUP_AI_CREDITS,
         freeSignupExports: FREE_SIGNUP_EXPORTS,
         advancedAiCreditCost: ADVANCED_AI_CREDIT_COST,
+        coverLetterCreditCost: COVER_LETTER_CREDIT_COST,
+        advancedAiFeatureCreditCosts: ADVANCED_AI_FEATURE_CREDIT_COSTS,
         pdfExportCreditCost: PDF_EXPORT_CREDIT_COST,
       },
       summaryText: getBillingSummaryText(),

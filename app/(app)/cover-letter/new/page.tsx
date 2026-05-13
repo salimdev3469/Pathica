@@ -14,7 +14,7 @@ export default async function NewCoverLetterPage() {
 
     const { data: cvs } = await supabase
         .from('cvs')
-        .select('id,title,state')
+        .select('id,title')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 

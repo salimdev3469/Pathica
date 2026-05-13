@@ -12,8 +12,15 @@ export type BillingPackage = {
 
 export const FREE_SIGNUP_AI_CREDITS = 10;
 export const FREE_SIGNUP_EXPORTS = 1;
-export const ADVANCED_AI_CREDIT_COST = 1;
-export const PDF_EXPORT_CREDIT_COST = 20;
+export const ADVANCED_AI_CREDIT_COST = 10;
+export const COVER_LETTER_CREDIT_COST = 15;
+export const PDF_EXPORT_CREDIT_COST = 25;
+export const ADVANCED_AI_FEATURE_CREDIT_COSTS = {
+  tailor: ADVANCED_AI_CREDIT_COST,
+  match_job: ADVANCED_AI_CREDIT_COST,
+  generate_from_job: ADVANCED_AI_CREDIT_COST,
+  cover_letter: COVER_LETTER_CREDIT_COST,
+} as const;
 export const PENDING_MATCH_WINDOW_MINUTES = numberFromEnv('BILLING_PENDING_MATCH_WINDOW_MINUTES', 180);
 export const RETURN_RECONCILE_WINDOW_MINUTES = numberFromEnv('BILLING_RETURN_RECONCILE_WINDOW_MINUTES', 720);
 
@@ -73,6 +80,11 @@ export function getShopierCheckoutUrl(pkg: BillingPackage): string | null {
 
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+export function getAdvancedAiCreditCost(feature: string): number {
+  const cost = ADVANCED_AI_FEATURE_CREDIT_COSTS[feature as keyof typeof ADVANCED_AI_FEATURE_CREDIT_COSTS];
+  return Number.isFinite(cost) ? cost : ADVANCED_AI_CREDIT_COST;
 }
 
 function numberFromEnv(key: string, fallback: number): number {

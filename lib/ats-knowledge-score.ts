@@ -249,7 +249,37 @@ function buildReason(input: {
         return 'ATS baseline is solid; improve role-specific keywords to increase competitiveness.';
     }
 
-    return reasonParts.join(' ').slice(0, 180);
+    return joinReasonPartsSafely(reasonParts);
+}
+
+function joinReasonPartsSafely(parts: string[]): string {
+    const MAX_REASON_LENGTH = 260;
+    const selectedParts: string[] = [];
+    let totalLength = 0;
+
+    for (const part of parts) {
+        const normalizedPart = part.trim();
+        if (!normalizedPart) {
+            continue;
+        }
+
+        const additionalLength = selectedParts.length === 0 ? normalizedPart.length : normalizedPart.length + 1;
+        if (selectedParts.length > 0 && totalLength + additionalLength > MAX_REASON_LENGTH) {
+            break;
+        }
+
+        selectedParts.push(normalizedPart);
+        totalLength += additionalLength;
+    }
+
+    if (selectedParts.length === 0) {
+        return parts
+            .map((part) => part.trim())
+            .filter(Boolean)
+            .join(' ');
+    }
+
+    return selectedParts.join(' ');
 }
 
 function sectionLabel(id: AtsSectionConceptId): string {

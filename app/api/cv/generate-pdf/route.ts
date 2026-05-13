@@ -3,6 +3,25 @@ import { consumePdfExportCredit, refundConsumption } from '@/lib/billing';
 import { generateCvPdfBuffer } from '@/lib/cv-pdf';
 import { createClient } from '@/lib/supabase-server';
 
+function buildContentDisposition(title: unknown) {
+  const baseName = typeof title === 'string' && title.trim() ? title.trim() : 'cv';
+  const sanitized = baseName.replace(/[\r\n"]/g, '').trim() || 'cv';
+
+  const asciiFallback =
+    sanitized
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\x20-\x7E]/g, '-')
+      .replace(/[^a-zA-Z0-9._-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'cv';
+
+  const encodedUtf8 = encodeURIComponent(sanitized)
+    .replace(/['()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
+
+  return `attachment; filename="${asciiFallback}.pdf"; filename*=UTF-8''${encodedUtf8}.pdf`;
+}
+
 export async function POST(req: Request) {
   let userId: string | null = null;
   let consumption: Awaited<ReturnType<typeof consumePdfExportCredit>> | null = null;
@@ -54,7 +73,7 @@ export async function POST(req: Request) {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${cvState.title || 'cv'}.pdf"`,
+        'Content-Disposition': buildContentDisposition(cvState.title),
       },
     });
   } catch (error) {

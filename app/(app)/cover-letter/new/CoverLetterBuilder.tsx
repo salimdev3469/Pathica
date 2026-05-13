@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Sparkles, AlertCircle, ArrowLeft, Save } from 'lucide-react';
+import { Loader2, Sparkles, AlertCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,6 @@ import Link from 'next/link';
 type CV = {
     id: string;
     title: string;
-    state: any;
 };
 
 export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale: Locale }) {
@@ -40,15 +39,19 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
             return;
         }
 
-        const selectedCv = cvs.find(c => c.id === selectedCvId);
-        
         setIsGenerating(true);
         try {
+            const cvStateRes = await fetch(`/api/cv/${selectedCvId}/state`);
+            const cvStateData = await cvStateRes.json();
+            if (!cvStateRes.ok) {
+                throw new Error(cvStateData.error || t('Failed to load selected CV.', 'Seçilen CV yüklenemedi.'));
+            }
+
             const res = await fetch('/api/cv/cover-letter', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    cvState: selectedCv?.state,
+                    cvState: cvStateData,
                     jobTitle,
                     company,
                     jobDescription,
@@ -70,8 +73,9 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                 router.push(`/cover-letter/${data.id}`);
                 router.refresh();
             }
-        } catch (err: any) {
-            setError(err.message || t('An unexpected error occurred.', 'Beklenmeyen bir hata oluştu.'));
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : t('An unexpected error occurred.', 'Beklenmeyen bir hata oluştu.');
+            setError(message);
         } finally {
             setIsGenerating(false);
         }

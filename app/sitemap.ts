@@ -55,6 +55,48 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     },
+    {
+      url: absolute(baseUrl, '/gizlilik-politikasi'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: absolute(baseUrl, '/kvkk-aydinlatma-metni'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: absolute(baseUrl, '/kullanim-kosullari'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: absolute(baseUrl, '/mesafeli-satis-sozlesmesi'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: absolute(baseUrl, '/on-bilgilendirme-formu'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: absolute(baseUrl, '/iptal-iade-politikasi'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: absolute(baseUrl, '/iletisim'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
   ];
 
   const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({

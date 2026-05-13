@@ -13,15 +13,18 @@ import LogoutButton from '@/components/LogoutButton';
 import GenerateCvFromJobButton from '@/components/dashboard/GenerateCvFromJobButton';
 import CvShareActions from '@/components/dashboard/CvShareActions';
 import CvCardActions from '@/components/dashboard/CvCardActions';
+import AtsReason from '@/components/dashboard/AtsReason';
 import LiveTokenCounter from '@/components/billing/LiveTokenCounter';
 import { getBillingSummaryText, getWalletSnapshot } from '@/lib/billing';
+import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
 import { createClient } from '@/lib/supabase-server';
-import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
+import { LOCALE_COOKIE_NAME, normalizeLocale, type Locale } from '@/lib/locale';
 
 type DashboardCv = {
     id: string;
     title: string;
     updated_at: string;
+    ats_score: number | null;
 };
 
 type AtsFieldRow = {
@@ -32,6 +35,29 @@ type AtsFieldRow = {
 type AtsSectionRow = {
     cv_id: string;
     cv_fields?: AtsFieldRow[];
+};
+
+type CvFieldRow = {
+    label: string;
+    value: string;
+    field_type: string | null;
+    position: number;
+};
+
+type CvSectionRow = {
+    cv_id: string;
+    title: string;
+    position: number;
+    cv_fields?: CvFieldRow[];
+};
+
+type ScoreItem = {
+    title?: string;
+    subtitle?: string;
+    date?: string;
+    location?: string;
+    bullets?: string;
+    position?: number;
 };
 
 type AtsMeta = {
@@ -64,7 +90,7 @@ export default async function DashboardPage() {
 
     const { data: cvs } = await supabase
         .from('cvs')
-        .select('id,title,updated_at')
+        .select('id,title,updated_at,ats_score')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
@@ -109,6 +135,42 @@ export default async function DashboardPage() {
                 score: Number.isFinite(parsedScore) ? Math.max(0, Math.min(100, Math.round(parsedScore))) : null,
                 reason: reasonRaw || null,
             });
+        }
+
+        for (const cv of cvList) {
+            const fromMeta = atsByCvId.get(cv.id);
+            if (fromMeta?.score !== null) {
+                continue;
+            }
+
+            if (typeof cv.ats_score === 'number' && Number.isFinite(cv.ats_score)) {
+                atsByCvId.set(cv.id, {
+                    score: Math.max(0, Math.min(100, Math.round(cv.ats_score))),
+                    reason: fromMeta?.reason || null,
+                });
+            }
+        }
+
+        const cvIdsMissingScore = cvList
+            .filter((cv) => {
+                const ats = atsByCvId.get(cv.id);
+                return !ats || ats.score === null;
+            })
+            .map((cv) => cv.id);
+
+        if (cvIdsMissingScore.length > 0) {
+            const { data: fallbackSections } = await supabase
+                .from('cv_sections')
+                .select('cv_id,title,position,cv_fields(label,value,field_type,position)')
+                .in('cv_id', cvIdsMissingScore)
+                .neq('title', '_ats_meta');
+
+            const computedByCvId = buildComputedAtsByCvId((fallbackSections || []) as CvSectionRow[]);
+
+            for (const cvId of cvIdsMissingScore) {
+                const computed = computedByCvId.get(cvId) || buildDefaultAtsMeta();
+                atsByCvId.set(cvId, computed);
+            }
         }
     }
 
@@ -183,7 +245,7 @@ export default async function DashboardPage() {
                         </div>
                     </div>
 
-                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{getBillingSummaryText()}</p>
+                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{getBillingSummaryText(locale)}</p>
                     {billingSchemaMissing ? (
                         <p className="mt-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
                             Billing şeması henüz uygulanmamış: `supabase/schema.sql` dosyasını SQL Editor’da çalıştırın.
@@ -195,11 +257,7 @@ export default async function DashboardPage() {
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                         {cvList.map((cv) => {
                             const ats = atsByCvId.get(cv.id) || { score: null, reason: null };
-                            const reasonPreview = ats.reason
-                                ? ats.reason.length > 150
-                                    ? `${ats.reason.slice(0, 147)}...`
-                                    : ats.reason
-                                : null;
+                            const localizedReason = ats.reason ? localizeAtsReason(ats.reason, locale) : null;
 
                             return (
                                 <Card
@@ -207,10 +265,12 @@ export default async function DashboardPage() {
                                     className="group rounded-2xl border-slate-200 bg-white/95 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
                                 >
                                     <CardHeader>
-                                        <CvShareActions cvId={cv.id} cvTitle={cv.title} atsScore={ats.score} />
-                                        <CardTitle className="flex items-start justify-between text-xl text-slate-900 dark:text-slate-100">
-                                            <span className="truncate pr-2">{cv.title}</span>
-                                        </CardTitle>
+                                        <div className="flex items-start justify-between gap-2">
+                                            <CardTitle className="min-w-0 flex-1 text-xl text-slate-900 dark:text-slate-100">
+                                                <span className="block truncate pr-2">{cv.title}</span>
+                                            </CardTitle>
+                                            <CvShareActions cvId={cv.id} cvTitle={cv.title} atsScore={ats.score} />
+                                        </div>
                                         <CardDescription className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
                                             <Calendar className="h-3 w-3" />
                                             {t('Updated', 'Güncellendi')}{' '}
@@ -231,8 +291,8 @@ export default async function DashboardPage() {
                                                     ATS {t('Score', 'Skoru')}: {t('Pending', 'Bekleniyor')}
                                                 </span>
                                             )}
-                                            {reasonPreview && (
-                                                <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{t('Why', 'Neden')}: {reasonPreview}</p>
+                                            {localizedReason && (
+                                                <AtsReason reason={localizedReason} locale={locale} />
                                             )}
                                         </div>
                                     </CardHeader>
@@ -240,7 +300,6 @@ export default async function DashboardPage() {
                                         <CvCardActions 
                                             cvId={cv.id} 
                                             cvTitle={cv.title} 
-                                            atsScore={ats.score}
                                             locale={locale}
                                         />
                                     </CardContent>
@@ -350,6 +409,207 @@ function getAtsScoreStyles(score: number) {
     }
 
     return 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/40 dark:bg-rose-400/10 dark:text-rose-300';
+}
+
+function localizeAtsReason(reason: string, locale: Locale): string {
+    if (locale !== 'tr' || !reason) {
+        return reason;
+    }
+
+    const translatedSectionsPrefix = 'Eksik temel bölümler:';
+    const missingSectionsMatch = reason.match(/^Missing core sections:\s*([^.]*)\.?/i);
+    let localized = reason.trim();
+
+    if (missingSectionsMatch) {
+        const rawLabels = missingSectionsMatch[1]?.trim() || '';
+        const translatedLabels = rawLabels ? translateAtsSectionLabels(rawLabels) : '';
+        const translatedMissingCore = translatedLabels
+            ? `${translatedSectionsPrefix} ${translatedLabels}.`
+            : 'Eksik temel bölümler.';
+
+        localized = localized.replace(
+            /^Missing core sections:\s*[^.]*\.?\s*/i,
+            `${translatedMissingCore} `,
+        );
+    }
+
+    const replacements: Array<[RegExp, string]> = [
+        [/Expand summary with role-specific keywords\.?/i, 'Özeti role özel anahtar kelimelerle genişlet.'],
+        [/Add more concise bullet points for recent roles\.?/i, 'Son roller için daha öz ve net madde işaretleri ekle.'],
+        [/Include measurable outcomes \(%\/numbers\) in achievements\.?/i, 'Başarılara ölçülebilir çıktılar (%/sayılar) ekle.'],
+        [/Start bullet points with stronger[^.]*\.?/i, 'Madde işaretlerine daha güçlü aksiyon fiilleriyle başla.'],
+        [/Add clear dates for experience and education entries\.?/i, 'Deneyim ve eğitim girdilerine net tarih ekle.'],
+        [
+            /Strong ATS baseline: complete structure, quantified impact, and clear role language\.?/i,
+            'ATS temeli güçlü: yapı tamam, etki ölçülebilir ve rol dili net.',
+        ],
+        [
+            /ATS baseline is solid; improve role-specific keywords to increase competitiveness\.?/i,
+            'ATS temeli sağlam; rekabetçiliği artırmak için role özel anahtar kelimeleri geliştir.',
+        ],
+    ];
+
+    for (const [pattern, translation] of replacements) {
+        localized = localized.replace(pattern, translation);
+    }
+
+    return localized.replace(/\s+/g, ' ').trim();
+}
+
+function translateAtsSectionLabels(labels: string): string {
+    const dictionary: Record<string, string> = {
+        Experience: 'Deneyim',
+        Education: 'Eğitim',
+        Skills: 'Yetenekler',
+        Projects: 'Projeler',
+        Certifications: 'Sertifikalar',
+        Languages: 'Diller',
+    };
+
+    return labels
+        .split(',')
+        .map((part) => part.trim())
+        .map((part) => dictionary[part] || part)
+        .join(', ');
+}
+
+function buildComputedAtsByCvId(rows: CvSectionRow[]): Map<string, AtsMeta> {
+    const grouped = new Map<string, CvSectionRow[]>();
+    for (const row of rows) {
+        const list = grouped.get(row.cv_id);
+        if (list) {
+            list.push(row);
+        } else {
+            grouped.set(row.cv_id, [row]);
+        }
+    }
+
+    const result = new Map<string, AtsMeta>();
+    grouped.forEach((sections, cvId) => {
+        const scored = calculateKnowledgeBasedAts(buildKnowledgeScoreInput(sections));
+        result.set(cvId, {
+            score: scored.score,
+            reason: null,
+        });
+    });
+
+    return result;
+}
+
+function buildKnowledgeScoreInput(rows: CvSectionRow[]) {
+    const sortedRows = [...rows].sort((a, b) => a.position - b.position);
+
+    const personalInfoSection = sortedRows.find((section) => section.title === '_personal_info');
+    const summarySection = sortedRows.find((section) => section.title === '_summary');
+    const contentSections = sortedRows.filter(
+        (section) => section.title !== '_personal_info' && section.title !== '_summary' && section.title !== '_ats_meta',
+    );
+
+    const personalInfo = parsePersonalInfo(personalInfoSection?.cv_fields);
+    const summary = extractSummary(summarySection?.cv_fields);
+    const sections = contentSections.map((section, sectionIndex) => ({
+        title: section.title,
+        position: typeof section.position === 'number' ? section.position : sectionIndex,
+        items: (Array.isArray(section.cv_fields) ? section.cv_fields : [])
+            .filter((field) => field.field_type === 'item')
+            .sort((a, b) => a.position - b.position)
+            .map((field, fieldIndex) => parseScoreItem(field, fieldIndex)),
+    }));
+
+    return {
+        personalInfo,
+        summary,
+        sections,
+    };
+}
+
+function parsePersonalInfo(fields: CvFieldRow[] | undefined): Record<string, string> {
+    if (!Array.isArray(fields)) {
+        return {};
+    }
+
+    const personalInfoRaw = fields.find((field) => field.label === 'personal_info')?.value;
+    if (!personalInfoRaw) {
+        return {};
+    }
+
+    try {
+        const parsed = JSON.parse(personalInfoRaw) as Record<string, unknown>;
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+            return {};
+        }
+
+        const mapped = Object.entries(parsed).reduce<Record<string, string>>((acc, [key, value]) => {
+            if (typeof value === 'string') {
+                const normalized = value.trim();
+                if (normalized) {
+                    acc[key] = normalized;
+                }
+            }
+            return acc;
+        }, {});
+
+        return mapped;
+    } catch {
+        return {};
+    }
+}
+
+function extractSummary(fields: CvFieldRow[] | undefined): string {
+    if (!Array.isArray(fields)) {
+        return '';
+    }
+
+    return fields.find((field) => field.label === 'summary')?.value || '';
+}
+
+function parseScoreItem(field: CvFieldRow, index: number): ScoreItem {
+    if (!field.value) {
+        return { position: index };
+    }
+
+    try {
+        const parsed = JSON.parse(field.value) as Record<string, unknown>;
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+            return {
+                title: field.label || 'item',
+                bullets: field.value,
+                position: index,
+            };
+        }
+
+        return {
+            title: asNonEmptyString(parsed.title) || field.label || 'item',
+            subtitle: asNonEmptyString(parsed.subtitle),
+            date: asNonEmptyString(parsed.date),
+            location: asNonEmptyString(parsed.location),
+            bullets: asNonEmptyString(parsed.bullets) || '',
+            position: typeof parsed.position === 'number' ? parsed.position : index,
+        };
+    } catch {
+        return {
+            title: field.label || 'item',
+            bullets: field.value,
+            position: index,
+        };
+    }
+}
+
+function asNonEmptyString(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+        return undefined;
+    }
+
+    const normalized = value.trim();
+    return normalized ? normalized : undefined;
+}
+
+function buildDefaultAtsMeta(): AtsMeta {
+    const baseline = calculateKnowledgeBasedAts({});
+    return {
+        score: baseline.score,
+        reason: null,
+    };
 }
 
 function getLogoSrc() {

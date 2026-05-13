@@ -131,10 +131,10 @@ export default function LoginPage() {
             </CardHeader>
 
             <CardContent className="grid gap-4">
-              <Button 
-                variant="outline" 
-                onClick={handleGoogleLogin} 
-                className="h-11 w-full rounded-full text-md font-medium border-slate-200 hover:bg-slate-50 transition-all duration-200" 
+              <Button
+                variant="outline"
+                onClick={handleGoogleLogin}
+                className="h-11 w-full rounded-full text-md font-medium border-slate-200 hover:bg-slate-50 transition-all duration-200"
                 disabled={isBusy}
               >
                 {isGoogleLoading ? (
@@ -188,7 +188,7 @@ export default function LoginPage() {
               <form onSubmit={handleEmailLogin} className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="m@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-full px-4" />
+                  <Input id="email" type="email" placeholder="youremail@address.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-full px-4" />
                 </div>
 
                 <div className="grid gap-2">
@@ -213,7 +213,7 @@ export default function LoginPage() {
 
             <CardFooter className="flex flex-col gap-2 rounded-b-xl border-t bg-slate-50/50 pt-4 sm:bg-white">
               <div className="text-center text-sm text-slate-500">
-                Don&apos;t have an account?{' '}
+                {t("Don't have an account?", 'Hesabın yok mu?')}{' '}
                 <Link href={`/register?next=${encodeURIComponent(next)}`} className="font-semibold text-slate-900 hover:underline">
                   {t('Sign up', 'Kayıt ol')}
                 </Link>

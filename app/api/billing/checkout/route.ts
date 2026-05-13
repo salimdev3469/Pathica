@@ -7,6 +7,9 @@ export const dynamic = 'force-dynamic';
 
 type CheckoutRequest = {
   packageCode?: string;
+  legalAccepted?: boolean;
+  legalAcceptedAt?: string;
+  legalAcceptedDocuments?: string[];
 };
 
 export async function POST(req: Request) {
@@ -27,9 +30,17 @@ export async function POST(req: Request) {
     const body = (await req.json().catch(() => null)) as CheckoutRequest | null;
     const packageCode = String(body?.packageCode || '').trim().toLowerCase();
     const pkg = getBillingPackageByCode(packageCode);
+    const legalAccepted = Boolean(body?.legalAccepted);
 
     if (!pkg) {
       return NextResponse.json({ error: 'Invalid package' }, { status: 400 });
+    }
+
+    if (!legalAccepted) {
+      return NextResponse.json(
+        { error: 'Ödemeye devam etmek için gerekli sözleşme ve bilgilendirme metinlerini kabul etmelisiniz.' },
+        { status: 400 },
+      );
     }
 
     const checkoutUrl = getShopierCheckoutUrl(pkg);
@@ -37,11 +48,41 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Payment link is not configured for this package.' }, { status: 503 });
     }
 
+    const legalAcceptedAtInput = String(body?.legalAcceptedAt || '').trim();
+    const parsedAcceptedAt = legalAcceptedAtInput ? Date.parse(legalAcceptedAtInput) : NaN;
+    const legalAcceptedAt = Number.isNaN(parsedAcceptedAt)
+      ? new Date().toISOString()
+      : new Date(parsedAcceptedAt).toISOString();
+
+    const legalAcceptedDocuments = Array.isArray(body?.legalAcceptedDocuments)
+      ? body.legalAcceptedDocuments
+        .map((item) => String(item || '').trim())
+        .filter(Boolean)
+      : [];
+
+    const legalAcceptance = {
+      accepted: true as const,
+      acceptedAt: legalAcceptedAt,
+      documents: legalAcceptedDocuments,
+      packageCode: pkg.code,
+      packagePriceUsd: pkg.priceUsd,
+      source: 'billing_checkout',
+    };
+
+    console.info('Checkout legal consent captured', {
+      userId: user.id,
+      packageCode: pkg.code,
+      packagePriceUsd: pkg.priceUsd,
+      legalAcceptedAt,
+      acceptedDocuments: legalAcceptedDocuments,
+    });
+
     const payment = await createPendingShopierPayment({
       userId: user.id,
       buyerEmail: user.email,
       pkg,
       checkoutUrl,
+      legalAcceptance,
     });
 
     const wallet = await getWalletSnapshot(user.id);

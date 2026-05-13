@@ -1,10 +1,11 @@
 import { supabaseAdmin } from '@/lib/supabase';
+import type { Locale } from '@/lib/locale';
 import {
-  ADVANCED_AI_CREDIT_COST,
   BILLING_PACKAGES,
   FREE_SIGNUP_AI_CREDITS,
   FREE_SIGNUP_EXPORTS,
   PDF_EXPORT_CREDIT_COST,
+  getAdvancedAiCreditCost,
   type BillingPackage,
   type BillingPackageCode,
 } from '@/lib/billing-config';
@@ -38,6 +39,8 @@ export type BillingPayment = {
   shopier_order_id: string | null;
   shopier_product_id: string | null;
   checkout_url: string | null;
+  legal_acceptance?: Record<string, unknown> | null;
+  legal_accepted_at?: string | null;
   failure_reason: string | null;
   paid_at: string | null;
   credited_at: string | null;
@@ -69,6 +72,15 @@ type SupabaseErrorLike = {
   code?: string;
   message?: string;
 } | null;
+
+export type CheckoutLegalAcceptance = {
+  accepted: true;
+  acceptedAt: string;
+  documents: string[];
+  packageCode: BillingPackageCode;
+  packagePriceUsd: number;
+  source: string;
+};
 
 const BILLING_ADMIN_EMAILS = String(process.env.BILLING_ADMIN_EMAILS || '')
   .split(',')
@@ -165,7 +177,7 @@ async function consumeEntitlement(userId: string, feature: string, cost: number,
 }
 
 export async function consumeAdvancedAiCredit(userId: string, feature: string, metadata?: Record<string, unknown>) {
-  return consumeEntitlement(userId, feature, ADVANCED_AI_CREDIT_COST, false, metadata);
+  return consumeEntitlement(userId, feature, getAdvancedAiCreditCost(feature), false, metadata);
 }
 
 export async function consumePdfExportCredit(userId: string, metadata?: Record<string, unknown>) {
@@ -197,7 +209,19 @@ export async function createPendingShopierPayment(input: {
   buyerEmail: string;
   pkg: BillingPackage;
   checkoutUrl: string;
+  legalAcceptance?: CheckoutLegalAcceptance;
 }) {
+  const isMissingLegalAcceptanceColumn = (error: SupabaseErrorLike): boolean => {
+    const code = String(error?.code || '');
+    const message = String(error?.message || '').toLowerCase();
+    return (
+      code === '42703' ||
+      code === 'PGRST204' ||
+      message.includes('legal_acceptance') ||
+      message.includes('legal_accepted_at')
+    );
+  };
+
   const recentThreshold = new Date(Date.now() - 15 * 60 * 1000).toISOString();
   const { data: recentPending, error: recentPendingError } = await supabaseAdmin
     .from('shopier_payments')
@@ -216,22 +240,75 @@ export async function createPendingShopierPayment(input: {
   }
 
   if (recentPending) {
+    if (!recentPending.legal_acceptance && input.legalAcceptance) {
+      const { data: patchedPending, error: patchError } = await supabaseAdmin
+        .from('shopier_payments')
+        .update({
+          legal_acceptance: input.legalAcceptance,
+          legal_accepted_at: input.legalAcceptance.acceptedAt,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', recentPending.id)
+        .select('*')
+        .maybeSingle();
+
+      if (patchError && !isMissingLegalAcceptanceColumn(patchError)) {
+        throw patchError;
+      }
+
+      if (patchError && isMissingLegalAcceptanceColumn(patchError)) {
+        console.warn(
+          'TODO: Persist legal acceptance by applying latest supabase/schema.sql (shopier_payments.legal_acceptance columns missing).',
+        );
+      } else if (patchedPending) {
+        return patchedPending as BillingPayment;
+      }
+    }
+
     return recentPending as BillingPayment;
   }
 
+  const baseInsertPayload = {
+    user_id: input.userId,
+    buyer_email: normalizeEmail(input.buyerEmail),
+    package_code: input.pkg.code,
+    package_price_usd: input.pkg.priceUsd,
+    credit_amount: input.pkg.credits,
+    status: 'pending',
+    checkout_url: input.checkoutUrl,
+  };
+
+  const insertPayloadWithLegal = input.legalAcceptance
+    ? {
+      ...baseInsertPayload,
+      legal_acceptance: input.legalAcceptance,
+      legal_accepted_at: input.legalAcceptance.acceptedAt,
+    }
+    : baseInsertPayload;
+
   const { data, error } = await supabaseAdmin
     .from('shopier_payments')
-    .insert({
-      user_id: input.userId,
-      buyer_email: normalizeEmail(input.buyerEmail),
-      package_code: input.pkg.code,
-      package_price_usd: input.pkg.priceUsd,
-      credit_amount: input.pkg.credits,
-      status: 'pending',
-      checkout_url: input.checkoutUrl,
-    })
+    .insert(insertPayloadWithLegal)
     .select('*')
     .single();
+
+  if (error && input.legalAcceptance && isMissingLegalAcceptanceColumn(error)) {
+    console.warn(
+      'TODO: Persist legal acceptance by applying latest supabase/schema.sql (shopier_payments.legal_acceptance columns missing).',
+    );
+
+    const retry = await supabaseAdmin
+      .from('shopier_payments')
+      .insert(baseInsertPayload)
+      .select('*')
+      .single();
+
+    if (retry.error || !retry.data) {
+      throw retry.error || new Error('Failed to create pending payment.');
+    }
+
+    return retry.data as BillingPayment;
+  }
 
   if (error || !data) {
     throw error || new Error('Failed to create pending payment.');
@@ -671,7 +748,11 @@ export function publicBillingPackages() {
   }));
 }
 
-export function getBillingSummaryText() {
+export function getBillingSummaryText(locale: Locale = 'en') {
+  if (locale === 'tr') {
+    return 'Abonelik yok. Tek seferlik satın alma. Sabit USD fiyatlandırma.';
+  }
+
   return 'No subscription. One-time purchase. USD fixed pricing.';
 }
 

@@ -135,7 +135,12 @@ export async function POST(req: Request) {
         // Update CV title
         await supabase
             .from('cvs')
-            .update({ title: cvState.title, updated_at: new Date().toISOString() })
+            .update({
+                title: cvState.title,
+                updated_at: new Date().toISOString(),
+                ats_score: atsMeta.score,
+                ats_score_updated_at: new Date().toISOString(),
+            })
             .eq('id', cvState.id);
 
         // Simplest way to update sections/fields perfectly is to delete old and insert new.
