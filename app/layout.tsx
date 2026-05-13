@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import NavigationFeedback from '@/components/NavigationFeedback';
 import ThemeToggle from '@/components/theme-toggle';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
+import { getBaseUrl } from '@/lib/seo/config';
 import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = localFont({
@@ -21,12 +22,21 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech'),
+  metadataBase: new URL(getBaseUrl()),
   title: {
     default: 'Pathica | ATS-Friendly Resume Builder',
     template: '%s | Pathica',
   },
   description: 'Build an ATS-friendly resume online, optimize keywords, and improve your job application outcomes with Pathica.',
+  keywords: ['resume builder', 'cv builder', 'ats resume builder', 'online cv oluştur', 'cv oluşturucu'],
+  alternates: {
+    canonical: '/',
+    languages: {
+      en: '/en',
+      tr: '/tr',
+      'x-default': '/en',
+    },
+  },
   openGraph: {
     title: 'Pathica | ATS-Friendly Resume Builder',
     description: 'Create, optimize, and export ATS-friendly resumes with practical tools and examples.',

@@ -403,3 +403,36 @@ begin
     select true, 'OK', v_payment.user_id, v_wallet.credit_balance + v_payment.credit_amount, v_ledger_id;
 end;
 $$;
+
+create table if not exists public.cover_letters (
+    id uuid default gen_random_uuid() primary key,
+    user_id uuid references auth.users(id) not null,
+    cv_id uuid references public.cvs(id),
+    job_title text,
+    company_name text,
+    job_description text,
+    content text not null,
+    language text default 'tr',
+    tone text default 'professional',
+    length text default 'medium',
+    created_at timestamp with time zone default now() not null,
+    updated_at timestamp with time zone default now() not null
+);
+
+alter table public.cover_letters enable row level security;
+
+create policy "Users can view their own cover letters"
+    on public.cover_letters for select
+    using (auth.uid() = user_id);
+
+create policy "Users can insert their own cover letters"
+    on public.cover_letters for insert
+    with check (auth.uid() = user_id);
+
+create policy "Users can update their own cover letters"
+    on public.cover_letters for update
+    using (auth.uid() = user_id);
+
+create policy "Users can delete their own cover letters"
+    on public.cover_letters for delete
+    using (auth.uid() = user_id);

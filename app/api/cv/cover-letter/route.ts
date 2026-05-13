@@ -16,10 +16,10 @@ export async function POST(req: Request) {
         }
         userId = user.id;
 
-        const { cvState, jobDescription, company } = await req.json();
+        const { cvState, jobDescription, company, jobTitle, language = 'tr', tone = 'professional', length = 'medium' } = await req.json();
 
-        if (!cvState || !jobDescription) {
-            return NextResponse.json({ error: 'CV and Job Description are required' }, { status: 400 });
+        if (!cvState) {
+            return NextResponse.json({ error: 'CV data is required' }, { status: 400 });
         }
 
         consumption = await consumeAdvancedAiCredit(user.id, 'cover_letter', {
@@ -47,18 +47,21 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Could not consume AI entitlement.' }, { status: 500 });
         }
 
-        const prompt = `You are an expert career coach. Write a customized, ATS-friendly cover letter based on this CV and Job Description.
+        let lengthPrompt = 'Exactly 3 paragraphs';
+        if (length === 'short') lengthPrompt = '1-2 short paragraphs, concise and direct';
+        if (length === 'long') lengthPrompt = '3-4 detailed paragraphs, thoroughly explaining fit';
+
+        const prompt = `You are an expert career coach writing a customized, ATS-friendly cover letter.
     Rules:
     - Return plain text only. No markdown formatting.
-    - Exactly 3 paragraphs: 
-      1) Introduction (state role applied for, enthusiasm, and a hook based on experience)
-      2) Body (highlight 2-3 specific achievements from the CV that map directly to the job description)
-      3) Conclusion (reiterate enthusiasm, cultural fit, and call to action)
+    - Write in ${language === 'tr' ? 'Turkish' : language === 'en' ? 'English' : language}.
+    - Tone should be ${tone}.
+    - Length: ${lengthPrompt}.
     - Do not use placeholder brackets like [Your Name]. Use the actual name and details from the CV if available. If not, omit them gracefully.
-    - The target company is: ${company || 'the target company'}.
+    - Target Job Title: ${jobTitle || 'the position'}.
+    - Target Company: ${company || 'the target company'}.
 
-    Job Description:
-    ${jobDescription}
+    ${jobDescription ? `Job Description:\n${jobDescription}` : 'No job description provided. Focus on highlighting the best aspects of the CV for the Target Job Title.'}
 
     CV Data:
     ${JSON.stringify(cvState)}`;
@@ -66,7 +69,30 @@ export async function POST(req: Request) {
         const result = await flashModel.generateContent(prompt);
         const responseText = result.response.text();
 
-        return NextResponse.json({ coverLetter: responseText });
+        const { data: savedCoverLetter, error: dbError } = await supabase
+            .from('cover_letters')
+            .insert({
+                user_id: user.id,
+                cv_id: cvState.id || null,
+                job_title: jobTitle || null,
+                company_name: company || null,
+                job_description: jobDescription || null,
+                content: responseText,
+                language,
+                tone,
+                length,
+            })
+            .select()
+            .single();
+
+        if (dbError) {
+            console.error('Failed to save cover letter to DB:', dbError);
+        }
+
+        return NextResponse.json({ 
+            coverLetter: responseText,
+            id: savedCoverLetter?.id 
+        });
     } catch (error: unknown) {
         if (userId && consumption?.ok) {
             try {

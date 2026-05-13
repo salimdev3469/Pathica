@@ -70,6 +70,14 @@ export default async function DashboardPage() {
 
     const cvList = (cvs || []) as DashboardCv[];
     const cvIds = cvList.map((cv) => cv.id);
+
+    const { data: coverLetters } = await supabase
+        .from('cover_letters')
+        .select('id,job_title,company_name,updated_at')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+    const coverLetterList = coverLetters || [];
+
     let wallet = { creditBalance: 0, freeExportsRemaining: 0 };
     let billingSchemaMissing = false;
 
@@ -261,6 +269,70 @@ export default async function DashboardPage() {
                                 <Plus className="mr-2 h-5 w-5" /> {t('Create Your First CV', 'İlk CV’ni Oluştur')}
                             </Link>
                         </Button>
+                    </div>
+                )}
+
+                <section className="mt-12 mb-7 rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 sm:p-6">
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{t('My Cover Letters', 'Ön Yazılarım')}</h2>
+                            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                                {t('Create and manage personalized cover letters for your job applications.', 'İş başvurularınız için kişiselleştirilmiş ön yazılar oluşturun ve yönetin.')}
+                            </p>
+                        </div>
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                            <Button
+                                asChild
+                                className="h-11 gap-2 rounded-xl bg-slate-900 px-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-black hover:shadow-md dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                            >
+                                <Link href="/cover-letter/new">
+                                    <Plus className="h-4 w-4" /> {t('New Cover Letter', 'Yeni Ön Yazı')}
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                </section>
+
+                {coverLetterList.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                        {coverLetterList.map((cl) => (
+                            <Card
+                                key={cl.id}
+                                className="group rounded-2xl border-slate-200 bg-white/95 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
+                            >
+                                <CardHeader>
+                                    <CardTitle className="text-xl text-slate-900 dark:text-slate-100">
+                                        <span className="truncate pr-2">{cl.job_title || t('Untitled', 'İsimsiz')}</span>
+                                    </CardTitle>
+                                    <CardDescription className="flex flex-col gap-1 text-slate-500 dark:text-slate-400">
+                                        {cl.company_name && <span>{cl.company_name}</span>}
+                                        <div className="flex items-center gap-1 text-xs">
+                                            <Calendar className="h-3 w-3" />
+                                            {formatDistanceToNow(new Date(cl.updated_at), locale === 'tr' ? { locale: trLocale } : undefined)} {t('ago', 'önce')}
+                                        </div>
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex items-center gap-2">
+                                        <Button asChild variant="outline" className="w-full text-sm font-medium">
+                                            <Link href={`/cover-letter/${cl.id}`}>
+                                                {t('Edit / View', 'Düzenle / Görüntüle')}
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white/95 py-12 dark:border-slate-700 dark:bg-slate-900/80">
+                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+                            <FileText className="h-8 w-8" />
+                        </div>
+                        <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">{t('No Cover Letters', 'Ön Yazı Yok')}</h3>
+                        <p className="mb-6 max-w-sm text-center text-sm text-slate-500 dark:text-slate-400">
+                            {t('Create your first personalized cover letter for your dream job.', 'Hayalinizdeki iş için ilk kişiselleştirilmiş ön yazınızı oluşturun.')}
+                        </p>
                     </div>
                 )}
             </main>

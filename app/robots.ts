@@ -1,14 +1,31 @@
 import type { MetadataRoute } from 'next';
+import { getBaseUrl } from '@/lib/seo/config';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
+  const baseUrl = getBaseUrl();
 
   return {
-    rules: {
-      userAgent: '*',
-      allow: ['/', '/cv/new', '/blog'],
-      disallow: ['/api/', '/auth/', '/login', '/register', '/welcome', '/dashboard', '/applications', '/cv/', '/share/', '/email/'],
-    },
+    rules: [
+      {
+        userAgent: '*',
+        allow: ['/', '/en', '/en/', '/tr', '/tr/', '/blog', '/cv/new'],
+        disallow: [
+          '/api/',
+          '/auth/',
+          '/login',
+          '/register',
+          '/welcome',
+          '/dashboard',
+          '/applications',
+          '/admin',
+          '/billing',
+          '/cv/guest',
+          '/cv/',
+          '/share/',
+          '/email/',
+        ],
+      },
+    ],
     sitemap: `${baseUrl}/sitemap.xml`,
     host: baseUrl,
   };

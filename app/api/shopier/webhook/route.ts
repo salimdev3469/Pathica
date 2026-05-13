@@ -1,8 +1,10 @@
+import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import {
   createReviewPaymentFromWebhook,
   findPaymentByShopierOrderId,
   grantCreditsForPayment,
+  listPendingPaymentsByPackage,
   listPendingPaymentsByEmailAndPackage,
   markPaymentPaid,
   markWebhookEventProcessed,
@@ -60,28 +62,54 @@ function selectPendingPaymentCandidate(
   return { candidate: pool[0], reason: null as string | null };
 }
 
+function buildTrackedWebhookId(webhookId: string, eventName: string, rawBody: string): string {
+  if (webhookId) {
+    return webhookId;
+  }
+
+  const digest = crypto.createHash('sha256').update(`${eventName}:${rawBody}`).digest('hex').slice(0, 24);
+  return `missing-id:${eventName}:${digest}`;
+}
+
+function parsePayload(rawBody: string): unknown {
+  try {
+    return JSON.parse(rawBody) as unknown;
+  } catch {
+    return {
+      parse_error: 'invalid_json',
+      raw_body_preview: rawBody.slice(0, 5000),
+    };
+  }
+}
+
 export async function POST(req: Request) {
   const webhookId = String(req.headers.get('Shopier-Webhook-Id') || req.headers.get('shopier-webhook-id') || '').trim();
   const eventName = normalizeEvent(req.headers.get('Shopier-Event') || req.headers.get('shopier-event'));
+  let trackedWebhookId: string | null = null;
 
   try {
     const rawBody = await req.text();
+    const payload = parsePayload(rawBody);
+    trackedWebhookId = buildTrackedWebhookId(webhookId, eventName, rawBody);
+    const insertedEvent = await upsertWebhookEvent({
+      webhookId: trackedWebhookId,
+      event: eventName,
+      payload,
+    });
+
+    // A webhook retry with the same webhook id should not trigger duplicate processing.
+    if (!insertedEvent && webhookId) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+
     const signature = req.headers.get('Shopier-Signature') || req.headers.get('shopier-signature');
     const webhookSecrets = resolveWebhookTokensFromEnv();
 
     const isValid = verifyShopierWebhookSignature(rawBody, signature, webhookSecrets);
     if (!isValid) {
+      await markWebhookEventProcessed(trackedWebhookId, 'failed', 'INVALID_SIGNATURE');
       return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 });
     }
-
-    const payload = (JSON.parse(rawBody) as unknown) ?? {};
-
-    const trackedWebhookId = webhookId || `missing-id:${Date.now()}`;
-    await upsertWebhookEvent({
-      webhookId: trackedWebhookId,
-      event: eventName,
-      payload,
-    });
 
     if (!eventName.startsWith('order.')) {
       await markWebhookEventProcessed(trackedWebhookId, 'ignored');
@@ -109,7 +137,7 @@ export async function POST(req: Request) {
     }
 
     const matchedPackage = productIds.map((id) => getBillingPackageByProductId(id)).find(Boolean) || null;
-    if (!matchedPackage || !buyerEmail) {
+    if (!matchedPackage) {
       await markWebhookEventProcessed(trackedWebhookId, 'failed', 'PRODUCT_OR_EMAIL_UNRESOLVED');
       return NextResponse.json({ received: true, ignored: true });
     }
@@ -144,12 +172,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ received: true, paymentId: existingOrderPayment.id });
     }
 
-    const pendingCandidates = await listPendingPaymentsByEmailAndPackage({
-      buyerEmail,
-      packageCode: matchedPackage.code,
-      limit: 5,
-    });
-    const pendingSelection = selectPendingPaymentCandidate(pendingCandidates, orderCreatedAt);
+    const pendingCandidates =
+      buyerEmail.length > 0
+        ? await listPendingPaymentsByEmailAndPackage({
+            buyerEmail,
+            packageCode: matchedPackage.code,
+            limit: 5,
+          })
+        : [];
+
+    const fallbackPendingCandidates =
+      pendingCandidates.length > 0
+        ? pendingCandidates
+        : await listPendingPaymentsByPackage({
+            packageCode: matchedPackage.code,
+            limit: 10,
+          });
+    const pendingSelection = selectPendingPaymentCandidate(fallbackPendingCandidates, orderCreatedAt);
     const pendingPayment = pendingSelection.candidate;
 
     if (pendingPayment) {
@@ -205,9 +244,9 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Shopier webhook processing failed:', error);
 
-    if (webhookId) {
+    if (trackedWebhookId) {
       try {
-        await markWebhookEventProcessed(webhookId, 'failed', error instanceof Error ? error.message : 'UNKNOWN_ERROR');
+        await markWebhookEventProcessed(trackedWebhookId, 'failed', error instanceof Error ? error.message : 'UNKNOWN_ERROR');
       } catch (markError) {
         console.error('Failed to mark webhook event as failed:', markError);
       }

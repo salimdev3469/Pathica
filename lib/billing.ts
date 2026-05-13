@@ -372,6 +372,24 @@ export async function listPendingPaymentsByEmailAndPackage(input: {
   return (data as BillingPayment[]) || [];
 }
 
+export async function listPendingPaymentsByPackage(input: { packageCode: BillingPackageCode; limit?: number }) {
+  const safeLimit = Number.isFinite(input.limit) ? Math.max(1, Math.min(30, Math.floor(input.limit || 1))) : 1;
+  const { data, error } = await supabaseAdmin
+    .from('shopier_payments')
+    .select('*')
+    .eq('package_code', input.packageCode)
+    .eq('status', 'pending')
+    .is('shopier_order_id', null)
+    .order('created_at', { ascending: false })
+    .limit(safeLimit);
+
+  if (error) {
+    throw error;
+  }
+
+  return (data as BillingPayment[]) || [];
+}
+
 export async function findPaymentByShopierOrderId(orderId: string) {
   const { data, error } = await supabaseAdmin
     .from('shopier_payments')

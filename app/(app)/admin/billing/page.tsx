@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import AdminPaymentsTable from '@/components/billing/AdminPaymentsTable';
+import AdminShopierWebhookCard from '@/components/billing/AdminShopierWebhookCard';
 import { Button } from '@/components/ui/button';
 import { getBillingSummaryText, isBillingAdminEmail, listAdminPayments } from '@/lib/billing';
 import { createClient } from '@/lib/supabase-server';
@@ -37,6 +38,8 @@ export default async function AdminBillingPage() {
         <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
           Manual fallback mode: approve or reject unmatched Shopier payments when webhook matching cannot auto-map a user.
         </div>
+
+        <AdminShopierWebhookCard />
 
         <AdminPaymentsTable initialPayments={payments} />
       </main>

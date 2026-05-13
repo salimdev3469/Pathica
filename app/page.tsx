@@ -30,6 +30,11 @@ export const metadata: Metadata = {
   description: 'Build an ATS-friendly resume, optimize keywords, and improve job application outcomes with Pathica.',
   alternates: {
     canonical: '/',
+    languages: {
+      en: '/en',
+      tr: '/tr',
+      'x-default': '/en',
+    },
   },
   openGraph: {
     title: 'Pathica | AI Resume Builder and ATS Resume Tools',
