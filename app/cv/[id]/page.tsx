@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import { CVState, Section, Item, PersonalInfo } from '@/context/CVContext';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { normalizeCvFont } from '@/lib/cv-fonts';
+import { isCvTemplateSlug } from '@/lib/cv-templates';
 
 type CvFieldRow = {
     id: string;
@@ -82,6 +83,7 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
     let summaryTitleFontSize: number | undefined;
     let summaryFontSize: number | undefined;
     let letterSpacing: number | undefined;
+    let templateSlug: CVState['templateSlug'] = null;
     let fontFamily = normalizeCvFont(undefined);
     if (summarySection) {
         const summaryField = summarySection.cv_fields.find((field) => field.label === 'summary') || summarySection.cv_fields[0];
@@ -115,6 +117,11 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
         if (letterSpacingField?.value) {
             const parsed = parseFloat(letterSpacingField.value);
             if (!isNaN(parsed)) letterSpacing = parsed;
+        }
+
+        const templateSlugField = summarySection.cv_fields.find((field) => field.label === 'template_slug');
+        if (templateSlugField?.value && isCvTemplateSlug(templateSlugField.value)) {
+            templateSlug = templateSlugField.value;
         }
     }
     // Filter normal sections
@@ -153,6 +160,7 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
     const initialState: CVState = {
         id: cvData.id,
         title: cvData.title,
+        templateSlug,
         personalInfo: personalInfo || ({} as PersonalInfo),
         summaryTitle,
         ...(summaryTitleFontSize !== undefined && { summaryTitleFontSize }),

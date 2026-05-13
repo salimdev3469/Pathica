@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Zap, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { Loader2, Zap, AlertTriangle, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCV, CVState } from '@/context/CVContext';
 import { Button } from '@/components/ui/button';
@@ -60,7 +60,11 @@ export function JobMatcher({ locale }: JobMatcherProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Analysis failed');
+        const payload = (await response.json().catch(() => ({}))) as { error?: string; code?: string };
+        if (response.status === 402 || payload.code === 'INSUFFICIENT_CREDITS') {
+          throw new Error(t('Insufficient credits. Open Billing to continue.', 'Yetersiz kredi. Devam etmek için Ödeme sayfasını açın.'));
+        }
+        throw new Error(payload.error || 'Analysis failed');
       }
 
       const data = await response.json();

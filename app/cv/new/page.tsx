@@ -2,14 +2,36 @@ import { createClient } from '@/lib/supabase-server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
+import { getCvTemplateSeed } from '@/lib/cv-templates';
 
-export default async function NewCVPage() {
+type NewCVPageProps = {
+  searchParams?: {
+    template?: string;
+    restoreGuest?: string;
+  };
+};
+
+export default async function NewCVPage({ searchParams }: NewCVPageProps) {
   const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const template = getCvTemplateSeed(searchParams?.template)?.slug;
+  const shouldRestoreGuest = searchParams?.restoreGuest === '1';
+  const forwardParams = new URLSearchParams();
+
+  if (template) {
+    forwardParams.set('template', template);
+  }
+
+  if (shouldRestoreGuest) {
+    forwardParams.set('restoreGuest', '1');
+  }
+
+  const forwardQuery = forwardParams.toString();
+  const forwardSuffix = forwardQuery ? `?${forwardQuery}` : '';
 
   if (!user) {
-    redirect('/cv/guest');
+    redirect(`/cv/guest${forwardSuffix}`);
   }
 
   const { data: cv, error } = await supabase
@@ -23,5 +45,5 @@ export default async function NewCVPage() {
     redirect('/dashboard?error=failed_to_create');
   }
 
-  redirect(`/cv/${cv.id}`);
+  redirect(`/cv/${cv.id}${forwardSuffix}`);
 }

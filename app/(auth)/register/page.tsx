@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createBrowserClient } from '@/lib/supabase';
@@ -30,6 +30,8 @@ export default function RegisterPage() {
 
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get('next') || '/welcome';
   const supabase = createBrowserClient();
   const isBusy = isLoading || isGoogleLoading;
 
@@ -43,11 +45,11 @@ export default function RegisterPage() {
     setStatusMessage({ type: 'info', text: t('Creating your account...', 'Hesabınız oluşturuluyor...') });
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/welcome`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
         },
       });
 
@@ -55,9 +57,15 @@ export default function RegisterPage() {
         setStatusMessage({ type: 'error', text: error.message });
         toast.error(error.message);
       } else {
-        setStatusMessage({ type: 'success', text: t('Account created. Preparing your dashboard...', 'Hesap oluşturuldu. Pano hazırlanıyor...') });
+        const hasSession = Boolean(data.session);
+        setStatusMessage({
+          type: 'success',
+          text: hasSession
+            ? t('Account created. Redirecting...', 'Hesap oluşturuldu. Yönlendiriliyor...')
+            : t('Account created. Check your email to verify your account.', 'Hesap oluşturuldu. Doğrulama için e-postanı kontrol et.'),
+        });
         toast.success(t('Registration successful', 'Kayıt başarılı'));
-        router.push('/welcome');
+        router.push(hasSession ? next : '/welcome');
       }
     } catch (error) {
       const message = getErrorMessage(error);
@@ -73,9 +81,6 @@ export default function RegisterPage() {
     setStatusMessage({ type: 'info', text: t('Redirecting to Google sign-up...', 'Google kaydına yönlendiriliyor...') });
 
     try {
-      const searchParams = new URLSearchParams(window.location.search);
-      const next = searchParams.get('next') || '/welcome';
-      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -221,7 +226,7 @@ export default function RegisterPage() {
             <CardFooter className="flex flex-col gap-2 rounded-b-xl border-t bg-slate-50/50 pt-4 sm:bg-white">
               <div className="text-center text-sm text-slate-500">
                 {t('Already have an account?', 'Zaten hesabın var mı?')}{' '}
-                <Link href="/login" className="font-semibold text-slate-900 hover:underline">
+                <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-slate-900 hover:underline">
                   {t('Sign in', 'Giriş Yap')}
                 </Link>
               </div>

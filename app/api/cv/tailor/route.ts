@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
+import { consumeAdvancedAiCredit, refundConsumption } from '@/lib/billing';
 import { proModel } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase-server';
 
 export async function POST(req: Request) {
+    let userId: string | null = null;
+    let consumption: Awaited<ReturnType<typeof consumeAdvancedAiCredit>> | null = null;
+
     try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -10,21 +14,36 @@ export async function POST(req: Request) {
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        const { data: subscription } = await supabase
-            .from('subscriptions')
-            .select('plan')
-            .eq('user_id', user.id)
-            .single();
-
-        if (!subscription || subscription.plan === 'free') {
-            return NextResponse.json({ error: 'This feature is currently unavailable.' }, { status: 403 });
-        }
+        userId = user.id;
 
         const { cvState, jobDescription } = await req.json();
 
         if (!cvState || !jobDescription) {
             return NextResponse.json({ error: 'CV data and job description are required' }, { status: 400 });
+        }
+
+        consumption = await consumeAdvancedAiCredit(user.id, 'tailor', {
+            cv_id: cvState?.id || null,
+            input_length: String(jobDescription || '').length,
+        });
+
+        if (!consumption.ok && consumption.code === 'INSUFFICIENT_CREDITS') {
+            return NextResponse.json(
+                {
+                    error: 'Insufficient credits. Buy a package to use advanced AI tools.',
+                    code: 'INSUFFICIENT_CREDITS',
+                    status: 402,
+                    wallet: {
+                        creditBalance: consumption.creditBalance,
+                        freeExportsRemaining: consumption.freeExportsRemaining,
+                    },
+                },
+                { status: 402 },
+            );
+        }
+
+        if (!consumption.ok) {
+            return NextResponse.json({ error: 'Could not consume AI entitlement.' }, { status: 500 });
         }
 
         const prompt = `You are a professional technical recruiter and resume writer.
@@ -50,11 +69,24 @@ export async function POST(req: Request) {
             return NextResponse.json(tailoredCV);
         } catch (parseError) {
             console.error('Failed to parse tailored CV JSON:', parseError);
-            return NextResponse.json({ error: 'Failed to process AI tailoring' }, { status: 500 });
+            throw new Error('Failed to process AI tailoring');
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
+        if (userId && consumption?.ok) {
+            try {
+                await refundConsumption(
+                    userId,
+                    'tailor',
+                    consumption.consumedCredits,
+                    consumption.consumedFreeExport,
+                    { reason: 'tailor_failed' },
+                );
+            } catch (refundError) {
+                console.error('Failed to refund tailor credits:', refundError);
+            }
+        }
+
         console.error('Tailor error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
-

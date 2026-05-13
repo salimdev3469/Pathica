@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createBrowserClient } from '@/lib/supabase';
@@ -30,6 +30,8 @@ export default function LoginPage() {
 
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get('next') || '/dashboard';
   const supabase = createBrowserClient();
   const isBusy = isLoading || isGoogleLoading;
 
@@ -49,9 +51,9 @@ export default function LoginPage() {
         setAuthMessage({ type: 'error', text: error.message });
         toast.error(error.message);
       } else {
-        setAuthMessage({ type: 'success', text: t('Login successful. Redirecting to dashboard...', 'Giriş başarılı. Panele yönlendiriliyor...') });
+        setAuthMessage({ type: 'success', text: t('Login successful. Redirecting...', 'Giriş başarılı. Yönlendiriliyor...') });
         toast.success(t('Logged in successfully', 'Giriş başarılı'));
-        router.push('/dashboard');
+        router.push(next);
       }
     } catch (error) {
       const message = getErrorMessage(error);
@@ -67,9 +69,6 @@ export default function LoginPage() {
     setAuthMessage({ type: 'info', text: t('Redirecting to Google sign-in...', 'Google girişine yönlendiriliyor...') });
 
     try {
-      const searchParams = new URLSearchParams(window.location.search);
-      const next = searchParams.get('next') || '/dashboard';
-      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -215,7 +214,7 @@ export default function LoginPage() {
             <CardFooter className="flex flex-col gap-2 rounded-b-xl border-t bg-slate-50/50 pt-4 sm:bg-white">
               <div className="text-center text-sm text-slate-500">
                 Don&apos;t have an account?{' '}
-                <Link href="/register" className="font-semibold text-slate-900 hover:underline">
+                <Link href={`/register?next=${encodeURIComponent(next)}`} className="font-semibold text-slate-900 hover:underline">
                   {t('Sign up', 'Kayıt ol')}
                 </Link>
               </div>

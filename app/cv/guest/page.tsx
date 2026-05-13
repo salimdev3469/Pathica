@@ -5,16 +5,25 @@ import { cookies } from 'next/headers';
 import { CVState } from '@/context/CVContext';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { normalizeCvFont } from '@/lib/cv-fonts';
+import { getCvTemplateSeed, getLocalizedText, getCvTemplateDefaultFont } from '@/lib/cv-templates';
 
-export default function GuestCVPage() {
+type GuestCVPageProps = {
+    searchParams?: {
+        template?: string;
+    };
+};
+
+export default function GuestCVPage({ searchParams }: GuestCVPageProps) {
     const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
+    const template = getCvTemplateSeed(searchParams?.template);
 
-    // Provide default empty state for guest users
     const initialState: CVState = {
         id: 'guest-cv',
-        title: locale === 'tr' ? 'Başlıksız CV' : 'Untitled CV',
+        title: template ? `${getLocalizedText(template.name, locale)} CV` : locale === 'tr' ? 'Başlıksız CV' : 'Untitled CV',
+        templateSlug: template?.slug ?? null,
         personalInfo: {
             fullName: '',
+            jobTitle: '',
             email: '',
             phone: '',
             location: '',
@@ -24,9 +33,39 @@ export default function GuestCVPage() {
         },
         summaryTitle: locale === 'tr' ? 'Profil Özeti' : 'Profile Summary',
         summary: '',
-        fontFamily: normalizeCvFont(undefined),
+        fontFamily: normalizeCvFont(template ? getCvTemplateDefaultFont(template.slug) : undefined),
         sections: [],
     };
+
+    if (template) {
+        initialState.personalInfo = {
+            ...initialState.personalInfo,
+            fullName: template.personalInfo.fullName,
+            jobTitle: getLocalizedText(template.personalInfo.jobTitle, locale),
+            email: template.personalInfo.email,
+            phone: template.personalInfo.phone,
+            location: getLocalizedText(template.personalInfo.location, locale),
+            linkedin: template.personalInfo.linkedin,
+            portfolio: template.personalInfo.portfolio,
+            github: template.personalInfo.github,
+        };
+        initialState.summaryTitle = getLocalizedText(template.summaryTitle, locale);
+        initialState.summary = getLocalizedText(template.summary, locale);
+        initialState.sections = template.sections.map((section, sectionIndex) => ({
+            id: crypto.randomUUID(),
+            title: getLocalizedText(section.title, locale),
+            position: sectionIndex,
+            items: section.items.map((item, itemIndex) => ({
+                id: crypto.randomUUID(),
+                title: getLocalizedText(item.title, locale),
+                subtitle: getLocalizedText(item.subtitle, locale),
+                date: item.date,
+                location: getLocalizedText(item.location, locale),
+                bullets: getLocalizedText(item.bullets, locale),
+                position: itemIndex,
+            })),
+        }));
+    }
 
     return (
         <CVProvider initialState={initialState}>

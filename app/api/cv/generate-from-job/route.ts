@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
+import { consumeAdvancedAiCredit, refundConsumption } from '@/lib/billing';
 import { flashModel } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase-server';
 
@@ -80,6 +81,9 @@ const GENERIC_RECOMMENDATION =
   '- Recommendation: Replace mock values with your real details before applying.';
 
 export async function POST(req: Request) {
+  let userId: string | null = null;
+  let consumption: Awaited<ReturnType<typeof consumeAdvancedAiCredit>> | null = null;
+
   try {
     const supabase = createClient();
     const {
@@ -89,6 +93,7 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    userId = user.id;
 
     const body = (await req.json()) as GenerateRequest;
     const jobDescription = normalizeText(body.jobDescription);
@@ -98,6 +103,29 @@ export async function POST(req: Request) {
         { error: 'Please provide a more detailed input (at least 40 characters).' },
         { status: 400 },
       );
+    }
+
+    consumption = await consumeAdvancedAiCredit(user.id, 'generate_from_job', {
+      input_length: jobDescription.length,
+    });
+
+    if (!consumption.ok && consumption.code === 'INSUFFICIENT_CREDITS') {
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits. Buy a package to use advanced AI tools.',
+          code: 'INSUFFICIENT_CREDITS',
+          status: 402,
+          wallet: {
+            creditBalance: consumption.creditBalance,
+            freeExportsRemaining: consumption.freeExportsRemaining,
+          },
+        },
+        { status: 402 },
+      );
+    }
+
+    if (!consumption.ok) {
+      return NextResponse.json({ error: 'Could not consume AI entitlement.' }, { status: 500 });
     }
 
     const { data: cvRow, error: cvCreateError } = await supabase
@@ -114,7 +142,7 @@ export async function POST(req: Request) {
 
     if (cvCreateError || !cvRow) {
       console.error('Failed to create CV row:', cvCreateError);
-      return NextResponse.json({ error: 'Could not create CV shell.' }, { status: 500 });
+      throw new Error('Could not create CV shell.');
     }
 
     const generated = await generateCvDraft(jobDescription);
@@ -122,6 +150,20 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ cvId: cvRow.id, cvState }, { status: 200 });
   } catch (error) {
+    if (userId && consumption?.ok) {
+      try {
+        await refundConsumption(
+          userId,
+          'generate_from_job',
+          consumption.consumedCredits,
+          consumption.consumedFreeExport,
+          { reason: 'ai_generation_failed' },
+        );
+      } catch (refundError) {
+        console.error('Failed to refund generate-from-job credits:', refundError);
+      }
+    }
+
     console.error('Generate from job route error:', error);
     return NextResponse.json({ error: 'Failed to generate CV draft.' }, { status: 500 });
   }

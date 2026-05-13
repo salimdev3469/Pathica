@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { DEFAULT_CV_FONT, normalizeCvFont, type CvFontKey } from '@/lib/cv-fonts';
+import type { CvTemplateSlug } from '@/lib/cv-templates';
 
 export interface PersonalInfo {
     fullName: string;
@@ -49,6 +50,7 @@ export interface Section {
 export interface CVState {
     id: string;
     title: string;
+    templateSlug?: CvTemplateSlug | null;
     fontFamily: CvFontKey;
     personalInfo: PersonalInfo;
     summaryTitle: string;
@@ -78,6 +80,7 @@ type CVAction =
 const defaultCVState: CVState = {
     id: crypto.randomUUID(),
     title: 'My CV',
+    templateSlug: null,
     fontFamily: DEFAULT_CV_FONT,
     personalInfo: {
         fullName: 'PRADEEP M',
@@ -129,6 +132,7 @@ const cvReducer = (state: CVState, action: CVAction): CVState => {
             return {
                 ...defaultCVState,
                 ...action.payload,
+                templateSlug: action.payload.templateSlug ?? state.templateSlug ?? defaultCVState.templateSlug,
                 personalInfo: action.payload.personalInfo || defaultCVState.personalInfo,
                 sections: action.payload.sections || [],
                 fontFamily: normalizeCvFont(action.payload.fontFamily),
@@ -232,6 +236,7 @@ export const CVProvider = ({ children, initialState }: { children: ReactNode; in
     // Merge initial state properties safely in case DB load has missing new properties
     const safeInitialState = initialState ? {
         ...initialState,
+        templateSlug: initialState.templateSlug ?? defaultCVState.templateSlug,
         fontFamily: normalizeCvFont(initialState.fontFamily),
         personalInfo: initialState.personalInfo || defaultCVState.personalInfo,
         summaryTitle: initialState.summaryTitle || defaultCVState.summaryTitle,
@@ -254,4 +259,3 @@ export const useCV = () => {
     }
     return context;
 };
-

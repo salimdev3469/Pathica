@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
+import { consumeAdvancedAiCredit, refundConsumption } from '@/lib/billing';
 import { flashModel } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+    let userId: string | null = null;
+    let consumption: Awaited<ReturnType<typeof consumeAdvancedAiCredit>> | null = null;
+
     try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -12,11 +16,36 @@ export async function POST(req: Request) {
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+        userId = user.id;
 
         const { jobDescription, cvState } = await req.json();
 
         if (!jobDescription || !cvState) {
             return NextResponse.json({ error: 'jobDescription and cvState are required' }, { status: 400 });
+        }
+
+        consumption = await consumeAdvancedAiCredit(user.id, 'match_job', {
+            cv_id: cvState?.id || null,
+            input_length: String(jobDescription || '').length,
+        });
+
+        if (!consumption.ok && consumption.code === 'INSUFFICIENT_CREDITS') {
+            return NextResponse.json(
+                {
+                    error: 'Insufficient credits. Buy a package to use advanced AI tools.',
+                    code: 'INSUFFICIENT_CREDITS',
+                    status: 402,
+                    wallet: {
+                        creditBalance: consumption.creditBalance,
+                        freeExportsRemaining: consumption.freeExportsRemaining,
+                    },
+                },
+                { status: 402 },
+            );
+        }
+
+        if (!consumption.ok) {
+            return NextResponse.json({ error: 'Could not consume AI entitlement.' }, { status: 500 });
         }
 
         const prompt = `You are an expert ATS optimizer and career coach.
@@ -58,7 +87,21 @@ ${JSON.stringify(cvState)}
 
         return NextResponse.json(parsed);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+        if (userId && consumption?.ok) {
+            try {
+                await refundConsumption(
+                    userId,
+                    'match_job',
+                    consumption.consumedCredits,
+                    consumption.consumedFreeExport,
+                    { reason: 'match_job_failed' },
+                );
+            } catch (refundError) {
+                console.error('Failed to refund match-job credits:', refundError);
+            }
+        }
+
         console.error('Job Match Error:', error);
         return NextResponse.json({ error: 'Failed to match job' }, { status: 500 });
     }

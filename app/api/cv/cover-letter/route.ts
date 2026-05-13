@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
+import { consumeAdvancedAiCredit, refundConsumption } from '@/lib/billing';
 import { flashModel } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase-server';
 
 export async function POST(req: Request) {
+    let userId: string | null = null;
+    let consumption: Awaited<ReturnType<typeof consumeAdvancedAiCredit>> | null = null;
+
     try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -10,21 +14,37 @@ export async function POST(req: Request) {
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        const { data: subscription } = await supabase
-            .from('subscriptions')
-            .select('plan')
-            .eq('user_id', user.id)
-            .single();
-
-        if (!subscription || subscription.plan === 'free') {
-            return NextResponse.json({ error: 'This feature is currently unavailable.' }, { status: 403 });
-        }
+        userId = user.id;
 
         const { cvState, jobDescription, company } = await req.json();
 
         if (!cvState || !jobDescription) {
             return NextResponse.json({ error: 'CV and Job Description are required' }, { status: 400 });
+        }
+
+        consumption = await consumeAdvancedAiCredit(user.id, 'cover_letter', {
+            cv_id: cvState?.id || null,
+            input_length: String(jobDescription || '').length,
+            company: company || null,
+        });
+
+        if (!consumption.ok && consumption.code === 'INSUFFICIENT_CREDITS') {
+            return NextResponse.json(
+                {
+                    error: 'Insufficient credits. Buy a package to use advanced AI tools.',
+                    code: 'INSUFFICIENT_CREDITS',
+                    status: 402,
+                    wallet: {
+                        creditBalance: consumption.creditBalance,
+                        freeExportsRemaining: consumption.freeExportsRemaining,
+                    },
+                },
+                { status: 402 },
+            );
+        }
+
+        if (!consumption.ok) {
+            return NextResponse.json({ error: 'Could not consume AI entitlement.' }, { status: 500 });
         }
 
         const prompt = `You are an expert career coach. Write a customized, ATS-friendly cover letter based on this CV and Job Description.
@@ -47,9 +67,22 @@ export async function POST(req: Request) {
         const responseText = result.response.text();
 
         return NextResponse.json({ coverLetter: responseText });
-    } catch (error: any) {
+    } catch (error: unknown) {
+        if (userId && consumption?.ok) {
+            try {
+                await refundConsumption(
+                    userId,
+                    'cover_letter',
+                    consumption.consumedCredits,
+                    consumption.consumedFreeExport,
+                    { reason: 'cover_letter_failed' },
+                );
+            } catch (refundError) {
+                console.error('Failed to refund cover-letter credits:', refundError);
+            }
+        }
+
         console.error('Cover letter error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
-

@@ -83,6 +83,33 @@
   }
 }
 
+@keyframes cv-column-scroll-down {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+.cv-paper-column-track {
+  animation: cv-column-scroll-down 18s linear infinite;
+  will-change: transform;
+}
+
+.cv-paper-column-track-fast {
+  animation-duration: 14s;
+  animation-delay: -6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-paper-column-track,
+  .cv-paper-column-track-fast {
+    animation: none;
+  }
+}
+
 @layer base {
   body {
     @apply bg-background text-foreground;

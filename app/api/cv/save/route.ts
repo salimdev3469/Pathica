@@ -1,8 +1,10 @@
 import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { flashModel } from '@/lib/gemini';
+import { ATS_ONTOLOGY } from '@/lib/ats-ontology';
+import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
 import { normalizeCvFont } from '@/lib/cv-fonts';
 import { createClient } from '@/lib/supabase-server';
+import { isCvTemplateSlug } from '@/lib/cv-templates';
 
 type SaveItem = {
     title?: string;
@@ -23,6 +25,7 @@ type SaveSection = {
 type SaveCvState = {
     id: string;
     title?: string;
+    templateSlug?: string | null;
     fontFamily?: string;
     personalInfo?: {
         fullName?: string;
@@ -53,7 +56,7 @@ type AtsMeta = {
     score: number;
     reason: string;
     signature: string;
-    source: 'ai' | 'heuristic' | 'cached';
+    source: 'ontology' | 'cached';
 };
 
 type CvFieldMetaRow = {
@@ -120,21 +123,13 @@ export async function POST(req: Request) {
                 source: 'cached',
             };
         } else {
-            const aiScore = await calculateAtsWithAi(cvState);
-            if (aiScore) {
-                atsMeta = {
-                    ...aiScore,
-                    signature: currentSignature,
-                    source: 'ai',
-                };
-            } else {
-                const fallback = calculateHeuristicAts(cvState);
-                atsMeta = {
-                    ...fallback,
-                    signature: currentSignature,
-                    source: 'heuristic',
-                };
-            }
+            const knowledgeScore = calculateKnowledgeBasedAts(cvState);
+            atsMeta = {
+                score: knowledgeScore.score,
+                reason: knowledgeScore.reason,
+                signature: currentSignature,
+                source: 'ontology',
+            };
         }
 
         // Update CV title
@@ -228,6 +223,16 @@ export async function POST(req: Request) {
                     value: String(cvState.letterSpacing),
                     field_type: 'number',
                     position: 5,
+                });
+            }
+
+            if (typeof cvState.templateSlug === 'string' && isCvTemplateSlug(cvState.templateSlug)) {
+                summaryFields.push({
+                    section_id: summarySection.id,
+                    label: 'template_slug',
+                    value: cvState.templateSlug,
+                    field_type: 'text',
+                    position: 6,
                 });
             }
 
@@ -360,6 +365,7 @@ function parsePreviousAtsMeta(section: PreviousAtsSectionRow | undefined) {
 
 function buildAtsSignature(cvState: SaveCvState): string {
     const normalized = {
+        ontologyVersion: ATS_ONTOLOGY.version,
         title: normalize(cvState.title),
         personalInfo: {
             fullName: normalize(cvState.personalInfo?.fullName),
@@ -397,162 +403,6 @@ function buildAtsSignature(cvState: SaveCvState): string {
     return crypto.createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
 }
 
-async function calculateAtsWithAi(cvState: SaveCvState): Promise<{ score: number; reason: string } | null> {
-    try {
-        if (!process.env.GEMINI_API_KEY) {
-            return null;
-        }
-
-        const compactCv = {
-            title: cvState.title || '',
-            summary: cvState.summary || '',
-            personalInfo: cvState.personalInfo || {},
-            sections: (Array.isArray(cvState.sections) ? cvState.sections : []).slice(0, 12).map((section) => ({
-                title: section.title || '',
-                items: (Array.isArray(section.items) ? section.items : []).slice(0, 12).map((item) => ({
-                    title: item.title || '',
-                    subtitle: item.subtitle || '',
-                    date: item.date || '',
-                    location: item.location || '',
-                    bullets: item.bullets || '',
-                })),
-            })),
-        };
-
-        const prompt = `You are an ATS resume evaluator.
-Score this resume from 0 to 100 for ATS readiness and baseline quality.
-Also provide one short reason sentence about why the score is what it is.
-Return ONLY valid JSON in this exact shape: {"score": number, "reason": string}
-- score must be integer 0-100
-- reason must be max 180 characters
-
-Resume JSON:
-${JSON.stringify(compactCv)}`;
-
-        const generationPromise = flashModel.generateContent(prompt);
-        const timeoutPromise = new Promise<null>((resolve) => {
-            setTimeout(() => resolve(null), 10000);
-        });
-
-        const result = await Promise.race([generationPromise, timeoutPromise]);
-        if (result === null) {
-            return null;
-        }
-
-        const rawResponse = result.response.text();
-        const cleaned = rawResponse
-            .replace(/```json\n?/g, '')
-            .replace(/```\n?/g, '')
-            .trim();
-
-        const parsed = JSON.parse(cleaned) as { score?: unknown; reason?: unknown };
-
-        if (typeof parsed.score !== 'number' || Number.isNaN(parsed.score)) {
-            return null;
-        }
-
-        const reason = typeof parsed.reason === 'string' ? normalize(parsed.reason) : '';
-        if (!reason) {
-            return null;
-        }
-
-        return {
-            score: Math.max(0, Math.min(100, Math.round(parsed.score))),
-            reason: reason.length > 180 ? `${reason.slice(0, 177)}...` : reason,
-        };
-    } catch (error) {
-        console.error('Failed to calculate ATS score with AI:', error);
-        return null;
-    }
-}
-
-function calculateHeuristicAts(cvState: SaveCvState): { score: number; reason: string } {
-    let score = 35;
-
-    const personalInfo = cvState.personalInfo || {};
-    const requiredContactCount = [
-        normalize(personalInfo.fullName),
-        normalize(personalInfo.email),
-        normalize(personalInfo.phone),
-        normalize(personalInfo.location),
-    ].filter(Boolean).length;
-
-    score += requiredContactCount * 4;
-
-    if (normalize(personalInfo.linkedin)) score += 4;
-    if (normalize(personalInfo.portfolio) || normalize(personalInfo.github)) score += 4;
-
-    const summaryWords = countWords(cvState.summary || '');
-    if (summaryWords >= 40) score += 10;
-    else if (summaryWords >= 20) score += 6;
-    else if (summaryWords > 0) score += 3;
-
-    const sections = Array.isArray(cvState.sections) ? cvState.sections : [];
-    if (sections.length >= 4) score += 12;
-    else if (sections.length >= 2) score += 8;
-    else if (sections.length >= 1) score += 4;
-
-    const normalizedTitles = new Set(sections.map((section) => normalize(section.title).toLowerCase()));
-    if (hasAny(normalizedTitles, ['experience', 'work experience', 'employment'])) score += 4;
-    if (hasAny(normalizedTitles, ['education'])) score += 4;
-    if (hasAny(normalizedTitles, ['skills', 'technical skills'])) score += 4;
-    if (hasAny(normalizedTitles, ['projects'])) score += 4;
-
-    let bulletLines = 0;
-    let quantifiedHits = 0;
-    let datedItems = 0;
-    let totalItems = 0;
-
-    for (const section of sections) {
-        for (const item of section.items || []) {
-            totalItems += 1;
-
-            const bullets = normalize(item.bullets)
-                .split('\n')
-                .map((line) => line.trim())
-                .filter(Boolean);
-            bulletLines += bullets.length;
-
-            const itemText = `${normalize(item.title)} ${normalize(item.subtitle)} ${normalize(item.bullets)}`;
-            const quantMatches = itemText.match(/(\d+%|\d+\+|\$\d+|\b\d{2,}\b)/g);
-            quantifiedHits += quantMatches ? quantMatches.length : 0;
-
-            if (normalize(item.date)) {
-                datedItems += 1;
-            }
-        }
-    }
-
-    if (bulletLines >= 20) score += 12;
-    else if (bulletLines >= 10) score += 8;
-    else if (bulletLines >= 4) score += 4;
-
-    if (quantifiedHits >= 6) score += 10;
-    else if (quantifiedHits >= 3) score += 6;
-    else if (quantifiedHits >= 1) score += 3;
-
-    if (totalItems > 0) {
-        const dateRatio = datedItems / totalItems;
-        if (dateRatio >= 0.7) score += 6;
-        else if (dateRatio >= 0.4) score += 3;
-    }
-
-    const boundedScore = Math.max(20, Math.min(100, Math.round(score)));
-
-    const reasonParts: string[] = [];
-    if (sections.length < 2) reasonParts.push('Add more standard sections (Experience, Education, Skills).');
-    if (summaryWords < 20) reasonParts.push('Improve your summary with concrete role keywords.');
-    if (quantifiedHits < 2) reasonParts.push('Use more measurable results (%, numbers, outcomes).');
-    if (reasonParts.length === 0) {
-        reasonParts.push('Good ATS structure; improve role-specific keywords and quantified impact to increase score.');
-    }
-
-    return {
-        score: boundedScore,
-        reason: reasonParts.join(' ').slice(0, 180),
-    };
-}
-
 function normalize(value: unknown): string {
     if (typeof value !== 'string') {
         return '';
@@ -560,15 +410,3 @@ function normalize(value: unknown): string {
 
     return value.replace(/\s+/g, ' ').trim();
 }
-
-function countWords(text: string): number {
-    return text
-        .trim()
-        .split(/\s+/)
-        .filter((token) => token.length > 0).length;
-}
-
-function hasAny(source: Set<string>, options: string[]): boolean {
-    return options.some((option) => source.has(option));
-}
-

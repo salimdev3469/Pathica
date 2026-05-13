@@ -39,6 +39,32 @@ const MIN_PHOTO_SIZE = 72;
 const MAX_PHOTO_SIZE = 200;
 const HEADER_HEIGHT = 82;
 const CONTENT_HEIGHT = PAGE_HEIGHT - PAGE_MARGIN * 2;
+const CV_LAYOUT_VARIANTS = ['classic-ats', 'entry-starter', 'technical-impact', 'career-switch'] as const;
+
+type CvLayoutVariant = (typeof CV_LAYOUT_VARIANTS)[number];
+type ListMarkerType = 'disc' | 'circle' | 'square';
+
+type CvLayoutTheme = {
+  headerAlign: 'center' | 'left';
+  nameTransform: 'uppercase' | 'none';
+  jobTransform: 'uppercase' | 'none';
+  contactSeparator: string;
+  summaryBulletType: ListMarkerType;
+  itemBulletType: ListMarkerType;
+  subtitleStyle: 'italic' | 'normal';
+  summaryContainerStyle: React.CSSProperties;
+  headingStyle: {
+    color: string;
+    borderBottom: string;
+    backgroundColor: string;
+    borderLeft: string;
+    borderRadius: string;
+    padding: string;
+    textTransform: 'uppercase' | 'none';
+    letterSpacing: string;
+  };
+  pageAccentStyle?: React.CSSProperties;
+};
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -134,6 +160,164 @@ function normalizeBulletLine(line: string): string {
   return line.replace(/^[\s*\-\u2022]+/, '').trim();
 }
 
+function isCvLayoutVariant(value: unknown): value is CvLayoutVariant {
+  return typeof value === 'string' && (CV_LAYOUT_VARIANTS as readonly string[]).includes(value);
+}
+
+function resolveLayoutVariant(cv: CVState): CvLayoutVariant {
+  if (isCvLayoutVariant(cv.templateSlug)) {
+    return cv.templateSlug;
+  }
+
+  const cvId = String(cv.id || '').toLowerCase();
+  const fromId = CV_LAYOUT_VARIANTS.find((variant) => cvId.includes(variant));
+  if (fromId) {
+    return fromId;
+  }
+
+  return 'classic-ats';
+}
+
+function getLayoutTheme(variant: CvLayoutVariant): CvLayoutTheme {
+  switch (variant) {
+    case 'entry-starter':
+      return {
+        headerAlign: 'left',
+        nameTransform: 'none',
+        jobTransform: 'none',
+        contactSeparator: ' · ',
+        summaryBulletType: 'circle',
+        itemBulletType: 'disc',
+        subtitleStyle: 'normal',
+        summaryContainerStyle: {
+          border: '1px solid #d1fae5',
+          backgroundColor: '#f0fdf4',
+          borderRadius: '6px',
+          padding: '8px 10px',
+        },
+        headingStyle: {
+          color: '#065f46',
+          borderBottom: 'none',
+          backgroundColor: '#ecfdf5',
+          borderLeft: '4px solid #10b981',
+          borderRadius: '6px',
+          padding: '4px 8px 4px 10px',
+          textTransform: 'none',
+          letterSpacing: '0.2px',
+        },
+        pageAccentStyle: {
+          position: 'absolute',
+          left: `${PAGE_MARGIN}px`,
+          right: `${PAGE_MARGIN}px`,
+          top: `${PAGE_MARGIN - 20}px`,
+          height: '6px',
+          borderRadius: '999px',
+          backgroundColor: '#10b981',
+          opacity: 0.9,
+        },
+      };
+    case 'technical-impact':
+      return {
+        headerAlign: 'left',
+        nameTransform: 'uppercase',
+        jobTransform: 'uppercase',
+        contactSeparator: ' | ',
+        summaryBulletType: 'square',
+        itemBulletType: 'square',
+        subtitleStyle: 'normal',
+        summaryContainerStyle: {
+          border: '1px solid #dbeafe',
+          backgroundColor: '#eff6ff',
+          borderRadius: '6px',
+          padding: '8px 10px',
+        },
+        headingStyle: {
+          color: '#1d4ed8',
+          borderBottom: 'none',
+          backgroundColor: '#eff6ff',
+          borderLeft: '4px solid #2563eb',
+          borderRadius: '6px',
+          padding: '4px 8px 4px 10px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.6px',
+        },
+        pageAccentStyle: {
+          position: 'absolute',
+          left: `${PAGE_MARGIN - 16}px`,
+          top: `${PAGE_MARGIN - 6}px`,
+          bottom: `${PAGE_MARGIN - 6}px`,
+          width: '6px',
+          borderRadius: '999px',
+          backgroundColor: '#2563eb',
+          opacity: 0.9,
+        },
+      };
+    case 'career-switch':
+      return {
+        headerAlign: 'left',
+        nameTransform: 'none',
+        jobTransform: 'uppercase',
+        contactSeparator: ' • ',
+        summaryBulletType: 'disc',
+        itemBulletType: 'circle',
+        subtitleStyle: 'normal',
+        summaryContainerStyle: {
+          border: '1px solid #fed7aa',
+          backgroundColor: '#fff7ed',
+          borderRadius: '6px',
+          padding: '8px 10px',
+        },
+        headingStyle: {
+          color: '#9a3412',
+          borderBottom: '1px solid #fdba74',
+          backgroundColor: '#fff7ed',
+          borderLeft: '4px solid #f97316',
+          borderRadius: '6px',
+          padding: '4px 8px 4px 10px',
+          textTransform: 'none',
+          letterSpacing: '0.4px',
+        },
+        pageAccentStyle: {
+          position: 'absolute',
+          right: `${PAGE_MARGIN - 16}px`,
+          top: `${PAGE_MARGIN - 6}px`,
+          bottom: `${PAGE_MARGIN - 6}px`,
+          width: '6px',
+          borderRadius: '999px',
+          backgroundColor: '#f97316',
+          opacity: 0.9,
+        },
+      };
+    case 'classic-ats':
+    default:
+      return {
+        headerAlign: 'center',
+        nameTransform: 'uppercase',
+        jobTransform: 'uppercase',
+        contactSeparator: ' | ',
+        summaryBulletType: 'disc',
+        itemBulletType: 'disc',
+        subtitleStyle: 'italic',
+        summaryContainerStyle: {
+          border: 'none',
+          backgroundColor: 'transparent',
+          borderRadius: 0,
+          padding: 0,
+        },
+        headingStyle: {
+          color: '#000000',
+          borderBottom: '1.5px solid #000000',
+          backgroundColor: 'transparent',
+          borderLeft: 'none',
+          borderRadius: 0,
+          padding: '0 0 3px 0',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+        },
+      };
+  }
+}
+
 function paginateSectionsByPage(
   sections: Section[],
   firstPageAvailable: number,
@@ -222,6 +406,8 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   previewMode = false,
 }) => {
   const { personalInfo, summaryTitle, summary, sections } = cv;
+  const layoutVariant = resolveLayoutVariant(cv);
+  const layoutTheme = getLayoutTheme(layoutVariant);
   const fontFamily = getCvFontStack(cv.fontFamily);
   const { fullName, email, phone, location, linkedin, portfolio, github, photoDataUrl } = personalInfo || {};
 
@@ -232,6 +418,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
     github?.replace(/^https?:\/\/(www\.)?/, ''),
     portfolio?.replace(/^https?:\/\/(www\.)?/, ''),
   ].filter(Boolean);
+  const contactLine = [location, ...contactItems].filter(Boolean).join(layoutTheme.contactSeparator);
 
   const hasPhoto = Boolean(photoDataUrl);
   const hasSummary = Boolean(summary?.trim());
@@ -239,6 +426,13 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
     .split(/\r?\n/)
     .map((line) => normalizeBulletLine(line))
     .filter(Boolean);
+  const mappedSummaryTitle = mapSectionTitle(summaryTitle || 'Profile Summary');
+  const resolvedSummaryTitle =
+    layoutTheme.headingStyle.textTransform === 'none'
+      ? mappedSummaryTitle
+          .toLowerCase()
+          .replace(/\b\w/g, (char) => char.toUpperCase())
+      : mappedSummaryTitle;
 
   const photoSize = clamp(personalInfo?.photoSize ?? DEFAULT_PHOTO_SIZE, MIN_PHOTO_SIZE, MAX_PHOTO_SIZE);
   const defaultPhotoX = PAGE_WIDTH - photoSize;
@@ -298,8 +492,9 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
             }}
           >
             <div style={{ height: '100%', overflow: previewMode ? 'visible' : 'hidden' }}>
+              {page.includeHeader && layoutTheme.pageAccentStyle && <div style={layoutTheme.pageAccentStyle} />}
               {page.includeHeader && (
-                <div style={{ marginBottom: '14px', minHeight: `${actualHeaderHeight}px`, textAlign: 'center' }}>
+                <div style={{ marginBottom: '14px', minHeight: `${actualHeaderHeight}px`, textAlign: layoutTheme.headerAlign }}>
                   <h1
                     style={{
                       fontFamily,
@@ -307,7 +502,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                       fontWeight: 'bold',
                       margin: '0 0 6px 0',
                       color: '#000000',
-                      textTransform: 'uppercase',
+                      textTransform: layoutTheme.nameTransform,
                       letterSpacing: '0.2px',
                     }}
                   >
@@ -322,7 +517,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                         fontWeight: '600',
                         margin: '-4px 0 8px 0',
                         color: '#000000',
-                        textTransform: 'uppercase',
+                        textTransform: layoutTheme.jobTransform,
                         letterSpacing: '0.5px',
                       }}
                     >
@@ -336,13 +531,10 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                       fontSize: `${personalInfo?.contactFontSize ?? 10}pt`,
                       color: '#000000',
                       lineHeight: '1.3',
-                      textAlign: 'center',
+                      textAlign: layoutTheme.headerAlign,
                     }}
                   >
-                    {(() => {
-                      const allItems = [location, ...contactItems].filter(Boolean);
-                      return allItems.join(' | ');
-                    })()}
+                    {contactLine}
                   </div>
                 </div>
               )}
@@ -377,7 +569,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               )}
 
               {page.includeSummary && hasSummary && (
-                <div style={{ marginBottom: '14px' }}>
+                <div style={{ marginBottom: '14px', ...layoutTheme.summaryContainerStyle }}>
                   <div style={{ marginTop: '6px', marginBottom: '6px' }}>
                     <h2
                       style={{
@@ -385,14 +577,17 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                         fontSize: `${cv.summaryTitleFontSize ?? 12}pt`,
                         fontWeight: 'bold',
                         margin: '0 0 3px 0',
-                        borderBottom: '1.5px solid #000000',
-                        paddingBottom: '3px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        color: '#000000',
+                        borderBottom: layoutTheme.headingStyle.borderBottom,
+                        backgroundColor: layoutTheme.headingStyle.backgroundColor,
+                        borderLeft: layoutTheme.headingStyle.borderLeft,
+                        borderRadius: layoutTheme.headingStyle.borderRadius,
+                        padding: layoutTheme.headingStyle.padding,
+                        textTransform: layoutTheme.headingStyle.textTransform,
+                        letterSpacing: layoutTheme.headingStyle.letterSpacing,
+                        color: layoutTheme.headingStyle.color,
                       }}
                     >
-                      {mapSectionTitle(summaryTitle || 'Profile Summary')}
+                      {resolvedSummaryTitle}
                     </h2>
                   </div>
 
@@ -404,7 +599,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                           marginBottom: '3px',
                           fontFamily,
                           fontSize: `${cv.summaryFontSize ?? 11}pt`,
-                          listStyleType: 'disc',
+                          listStyleType: layoutTheme.summaryBulletType,
                         }}
                       >
                         {line}
@@ -415,6 +610,12 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               )}
               {page.sections.map((section) => {
                 const standardTitle = mapSectionTitle(section.title);
+                const sectionTitle =
+                  layoutTheme.headingStyle.textTransform === 'none'
+                    ? standardTitle
+                        .toLowerCase()
+                        .replace(/\b\w/g, (char) => char.toUpperCase())
+                    : standardTitle;
 
                 return (
                   <SectionWrapper key={`${section.id}-${pageIndex}`} id={section.id} isContinuation={section.isContinuation}>
@@ -426,14 +627,17 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                             fontSize: `${section.titleFontSize ?? 12}pt`,
                             fontWeight: 'bold',
                             margin: '0 0 3px 0',
-                            borderBottom: '1.5px solid #000000',
-                            paddingBottom: '3px',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
-                            color: '#000000',
+                            borderBottom: layoutTheme.headingStyle.borderBottom,
+                            backgroundColor: layoutTheme.headingStyle.backgroundColor,
+                            borderLeft: layoutTheme.headingStyle.borderLeft,
+                            borderRadius: layoutTheme.headingStyle.borderRadius,
+                            padding: layoutTheme.headingStyle.padding,
+                            textTransform: layoutTheme.headingStyle.textTransform,
+                            letterSpacing: layoutTheme.headingStyle.letterSpacing,
+                            color: layoutTheme.headingStyle.color,
                           }}
                         >
-                          {standardTitle}
+                          {sectionTitle}
                         </h2>
                       </div>
                     )}
@@ -449,7 +653,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
 
                             {(item.subtitle || item.location) && (
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                <span style={{ fontFamily, fontSize: `${item.subtitleFontSize ?? 11}pt`, fontStyle: 'italic' }}>{item.subtitle}</span>
+                                <span style={{ fontFamily, fontSize: `${item.subtitleFontSize ?? 11}pt`, fontStyle: layoutTheme.subtitleStyle }}>{item.subtitle}</span>
                                 {item.location && <span style={{ fontFamily, fontSize: `${item.locationFontSize ?? 11}pt` }}>{item.location}</span>}
                               </div>
                             )}
@@ -467,7 +671,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                                         fontFamily,
                                         fontSize: `${item.bulletsFontSize ?? 11}pt`,
                                         marginBottom: '3px',
-                                        listStyleType: 'disc',
+                                        listStyleType: layoutTheme.itemBulletType,
                                       }}
                                     >
                                       {normalizeBulletLine(line)}

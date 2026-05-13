@@ -1,17 +1,57 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { Button } from '@/components/ui/button';
-import { FileText, Target, CheckCircle2, Zap, ArrowRight, ShieldCheck, Search, BarChart3, WandSparkles, BookOpen } from 'lucide-react';
+import { FileText, Target, CheckCircle2, Zap, ArrowRight, ShieldCheck, LayoutTemplate } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { createClient } from '@/lib/supabase-server';
 import { MouseEffect } from '@/components/mouse-effect';
 import { HeroIntro } from '@/components/home/HeroIntro';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import LanguageToggle from '@/components/language-toggle';
+import {
+  ADVANCED_AI_CREDIT_COST,
+  BILLING_PACKAGES,
+  FREE_SIGNUP_AI_CREDITS,
+  FREE_SIGNUP_EXPORTS,
+  PDF_EXPORT_CREDIT_COST,
+  formatUsd,
+} from '@/lib/billing-config';
+import { getBillingSummaryText } from '@/lib/billing';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
+import { cvTemplateSeeds, getLocalizedText, buildCvStateFromTemplate } from '@/lib/cv-templates';
+import { CVTemplate } from '@/components/pdf/CVTemplate';
 import fs from 'node:fs';
 import path from 'node:path';
+
+export const metadata: Metadata = {
+  title: 'AI Resume Builder and ATS Resume Tools',
+  description: 'Build an ATS-friendly resume, optimize keywords, and improve job application outcomes with Pathica.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Pathica | AI Resume Builder and ATS Resume Tools',
+    description: 'Create, optimize, and export ATS-friendly resumes with practical tools and templates.',
+    type: 'website',
+    url: '/',
+    images: [{ url: '/logo_pathica.png', alt: 'Pathica logo' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pathica | AI Resume Builder and ATS Resume Tools',
+    description: 'Create and optimize your resume with ATS-safe templates and AI tools.',
+    images: ['/logo_pathica.png'],
+  },
+  keywords: [
+    'ai resume builder',
+    'ats resume checker',
+    'resume keyword optimizer',
+    'resume analyzer',
+    'resume templates',
+  ],
+};
 
 export default async function Home() {
   const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
@@ -26,9 +66,103 @@ export default async function Home() {
   const heroPrimaryHref = isAuthenticated ? '/dashboard' : '/cv/new';
   const logoSrc = getLogoSrc();
   const footerLogoSrc = getFooterLogoSrc();
+  const billingSummaryText = getBillingSummaryText();
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const animatedColumnTemplatesLeft = cvTemplateSeeds;
+  const animatedColumnTemplatesRight = [...cvTemplateSeeds].reverse();
+  const paperTiltClasses = [
+    '-rotate-[1.6deg]',
+    'rotate-[1.3deg]',
+    '-rotate-[1deg]',
+    'rotate-[1.8deg]',
+    '-rotate-[1.4deg]',
+    'rotate-[1.1deg]',
+  ];
+  const sectionTitleClass = 'text-3xl md:text-5xl font-normal tracking-[-0.04em] text-slate-900';
+  const faqItems = [
+    {
+      question: t('Is Pathica free to start?', 'Pathica ücretsiz başlatılabiliyor mu?'),
+      answer: t(
+        'Yes. Build and preview are free. New accounts get 1 free PDF export and 10 AI credits.',
+        'Evet. CV oluşturma ve önizleme ücretsizdir. Yeni hesaplar 1 ücretsiz PDF export ve 10 AI kredi alır.',
+      ),
+    },
+    {
+      question: t('Can I tailor my resume to a job description?', 'CV’mi iş ilanına göre özelleştirebilir miyim?'),
+      answer: t(
+        'Yes. Paste the job description and use AI tools to align keywords and improve role relevance.',
+        'Evet. İlan metnini yapıştırıp AI araçlarıyla anahtar kelime uyumu ve rol uygunluğunu artırabilirsin.',
+      ),
+    },
+    {
+      question: t('Does Pathica support ATS optimization?', 'Pathica ATS optimizasyonunu destekliyor mu?'),
+      answer: t(
+        'Yes. Pathica provides ATS scoring, resume analysis, and keyword optimization workflows.',
+        'Evet. Pathica ATS skoru, CV analizi ve anahtar kelime optimizasyonu akışları sunar.',
+      ),
+    },
+    {
+      question: t('Can I use Pathica without design skills?', 'Pathica’yı tasarım bilgisi olmadan kullanabilir miyim?'),
+      answer: t(
+        'Yes. The builder uses structured sections and formatting defaults so you can focus on your content.',
+        'Evet. Oluşturucu, yapılandırılmış bölümler ve varsayılan formatlarla tasarımdan çok içeriğe odaklanmanı sağlar.',
+      ),
+    },
+  ];
+  const structuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Pathica',
+      url: baseUrl,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Pathica',
+      url: baseUrl,
+      logo: `${baseUrl}/logo_pathica.png`,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'Pathica',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+      description: t(
+        'Pathica helps job seekers build ATS-friendly resumes, optimize role keywords, and export professional PDF CVs.',
+        'Pathica, iş arayanların ATS uyumlu CV oluşturmasına, anahtar kelimeleri optimize etmesine ve profesyonel PDF CV dışa aktarmasına yardımcı olur.',
+      ),
+      featureList: [
+        t('ATS resume checker', 'ATS CV kontrolü'),
+        t('Resume keyword optimizer', 'CV anahtar kelime optimizasyonu'),
+        t('AI-assisted resume editing', 'AI destekli CV düzenleme'),
+      ],
+      url: baseUrl,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 font-sans cursor-none">
       <MouseEffect />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       {/* Navigation */}
       <header className="fixed top-4 left-0 right-0 z-50 mx-auto max-w-6xl px-4 sm:px-6 animate-in slide-in-from-top-4 duration-700 fade-in">
         <div className="bg-white/80 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full h-20 flex items-center justify-between px-2 pr-4 sm:px-6 transition-all duration-500 hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] hover:bg-white/90">
@@ -67,9 +201,6 @@ export default async function Home() {
           <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-blue-400 opacity-20 blur-[100px]"></div>
 
           <div className="container mx-auto px-6 relative z-10 text-center max-w-4xl">
-            <Badge className="mb-6 mx-auto rounded-full px-4 py-1.5 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors cursor-default">
-              {t('Powered by Google Gemini AI', 'Google Gemini AI ile güçlendirildi')}
-            </Badge>
             <HeroIntro headline={t('Land Your Dream Job with an AI-Optimized CV', 'Hayalindeki İşe AI Destekli CV ile Ulaş')} subtitle={t('Create ATS-friendly resumes that get past the bots. Tailor your applications to specific roles and track your success all in one powerful platform.', 'ATS dostu özgeçmişler oluştur, başvurularını role göre özelleştir ve tüm süreci tek bir platformdan yönet.')} />
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-lg font-semibold rounded-full shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-[#1a1a1a] text-white hover:bg-black border-0" asChild>
@@ -170,224 +301,331 @@ export default async function Home() {
 
           </div>
         </section>
-        {/* {t('Rejected', 'Eleniyor')} CV Showcase */}
-        <section className="relative overflow-hidden bg-slate-50/50 py-20 dark:bg-slate-950">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 left-1/2 h-px w-full -translate-x-1/2 bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700" />
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-slate-50 to-transparent dark:from-slate-900" />
 
+        {/* ATS Templates */}
+        <section className="relative overflow-hidden bg-slate-50/60 py-20">
+          <div className="absolute top-0 left-1/2 h-px w-full -translate-x-1/2 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
           <div className="container relative z-10 mx-auto px-6">
-            <div className="mb-16 text-center">
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-rose-500 mb-3 block">{t('ATS Failure Profile', 'ATS Başarısızlık Profili')}</span>
-              <h2 className="text-3xl md:text-5xl font-normal tracking-[-0.04em] text-slate-900 dark:text-slate-100 mb-4">
-                {t('Why 75% of CVs are', 'CV’lerin %75’i Neden')} <span className="text-red-600 font-extrabold drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">{t('Rejected', 'Eleniyor')}</span>
-              </h2>
-              <p className="mx-auto max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400"> {t("Creative layouts often confuse AI parsers. If the bot can't read it, your application never reaches a human desk.", 'Aşırı yaratıcı tasarımlar AI ayrıştırıcıları şaşırtır. Bot metni okuyamazsa başvurun bir insana ulaşmaz.')}
-              </p>
+            <div className="relative mb-12">
+              <div className="relative z-10 mx-auto max-w-3xl text-center">
+                <span className="mb-3 block text-[10px] font-bold uppercase tracking-[0.3em] text-blue-700">
+                  {t('ATS Template Library', 'ATS Şablon Kütüphanesi')}
+                </span>
+                <h2 className={`${sectionTitleClass} mb-4`}>
+                  {t('Pick a Template and Start Editing Instantly', 'Bir Şablon Seç ve Anında Düzenlemeye Başla')}
+                </h2>
+                <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-600">
+                  {t(
+                    'All templates use ATS-friendly section names and clean hierarchy. Choose one, make a few edits, then continue securely from login.',
+                    'Tüm şablonlar ATS uyumlu bölüm isimleri ve temiz hiyerarşi kullanır. Birini seç, birkaç düzenleme yap, sonra login ekranından güvenle devam et.',
+                  )}
+                </p>
+              </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
-              {[
-                {
-                  src: 'https://www.slideteam.net/media/catalog/product/cache/1280x720/b/u/business_professional_resume_sample_a4_cv_template_slide01.jpg',
-                  tag: t('Level 1: Unparseable', 'Seviye 1: Okunamıyor'),
-                  reason: t('Graphics Overflow', 'Görsel Ağırlık'),
-                  detail: t('Heavy images and decorative icons block text extraction.', 'Ağır görseller ve dekoratif ikonlar metin çıkarmayı bozar.')
-                },
-                {
-                  src: 'https://www.my-resume-templates.com/wp-content/uploads/2024/01/cv-template-online-252.jpg',
-                  tag: t('Level 2: Jumbled', 'Seviye 2: Karışık'),
-                  reason: t('Multi-Column Mess', 'Çoklu Sütun Sorunu'),
-                  detail: t('Non-standard columns cause text to merge in the wrong order.', 'Standart dışı sütunlar metin sırasını bozup anlamı dağıtır.')
-                },
-                {
-                  src: 'https://www.my-resume-templates.com/wp-content/uploads/2023/05/college-resume-template-example-1-350x495.jpg',
-                  tag: t('Level 3: Filtered', 'Seviye 3: Filtrelendi'),
-                  reason: t('Keyword Deficit', 'Anahtar Kelime Eksiği'),
-                  detail: t('Style-over-substance leads to zero matching role keywords.', 'İçerik zayıf kalınca role uyumlu anahtar kelimeler yakalanmaz.')
-                },
-              ].map((cv, index) => (
-                <div
-                  key={index}
-                  className="group relative aspect-[1/1.41] w-full overflow-hidden border border-slate-200 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:border-slate-700 dark:bg-slate-900"
-                >
-                  {/* Subtle Scan Overlay */}
-                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.02)_50%)] bg-[length:100%_4px] pointer-events-none z-10 opacity-30 group-hover:opacity-50 transition-opacity" />
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              {cvTemplateSeeds.map((template) => {
+                const cvPreviewState = buildCvStateFromTemplate(template, locale);
+                const previewSkin =
+                  template.slug === 'entry-starter'
+                    ? {
+                      frameBg: 'bg-[linear-gradient(180deg,#ecfff5_0%,#e3f7ed_100%)]',
+                      accent: 'bg-emerald-500',
+                      frameBorder: 'border-emerald-100',
+                    }
+                    : template.slug === 'technical-impact'
+                      ? {
+                        frameBg: 'bg-[linear-gradient(180deg,#ecf3ff_0%,#e4edff_100%)]',
+                        accent: 'bg-blue-600',
+                        frameBorder: 'border-blue-100',
+                      }
+                      : template.slug === 'career-switch'
+                        ? {
+                          frameBg: 'bg-[linear-gradient(180deg,#fff3e9_0%,#ffead9_100%)]',
+                          accent: 'bg-orange-500',
+                          frameBorder: 'border-orange-100',
+                        }
+                        : {
+                          frameBg: 'bg-[linear-gradient(180deg,#f4f6ff_0%,#e9eeff_100%)]',
+                          accent: 'bg-indigo-500',
+                          frameBorder: 'border-indigo-100',
+                        };
 
-                  {/* CV Image */}
-                  <img
-                    src={cv.src}
-                    alt={cv.reason}
-                    className="h-full w-full object-cover object-top grayscale-[30%] group-hover:grayscale-0 transition-all duration-700 opacity-60 group-hover:opacity-90"
-                    loading="lazy"
-                  />
-
-                  {/* Stamp Design */}
-                  <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="border-[3px] border-rose-600 px-3 py-1.5 rotate-[-12deg] bg-rose-50/10 backdrop-blur-[1px] shadow-[0_0_15px_rgba(225,29,72,0.1)] group-hover:scale-110 transition-transform duration-500">
-                      <span className="text-xl font-black tracking-[0.2em] text-rose-600">
-                        {t('DENIED', 'REDDEDİLDİ')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Info Panel - Sliding Up on Hover */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 z-30 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                    <div className="bg-slate-900/90 backdrop-blur-md p-4 border-t border-white/10 shadow-2xl">
-                      <span className="text-[9px] font-bold text-rose-400 uppercase tracking-widest block mb-1">{cv.tag}</span>
-                      <h3 className="text-base font-bold text-white mb-1">{cv.reason}</h3>
-                      <p className="text-[11px] text-slate-300 leading-normal font-medium">{cv.detail}</p>
-                    </div>
-                  </div>
-
-                  {/* Top Badge */}
-                  <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 border border-slate-200 bg-white/80 px-2 py-1 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
-                    <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                    <span className="text-[9px] font-bold tracking-tight text-slate-600 dark:text-slate-300">{t('FAILED SCAN', 'TARAMA BAŞARISIZ')}</span>
-                  </div>
-                </div>
-              ))}
+                return (
+                  <Card key={template.slug} className="border-slate-200 bg-white transition-all hover:-translate-y-1 hover:shadow-md">
+                    <CardHeader>
+                      <div className={`relative mb-4 overflow-hidden rounded-xl border p-3 ${previewSkin.frameBorder} ${previewSkin.frameBg}`}>
+                        <div className={`absolute inset-x-3 top-3 h-1 rounded-full ${previewSkin.accent}`} />
+                        <div className="mx-auto mt-3 h-[272px] w-[192px] overflow-hidden rounded-[4px] border border-slate-300 bg-white shadow-[0_14px_28px_rgba(15,23,42,0.22)]">
+                          <div
+                            style={{
+                              width: '794px',
+                              height: '1123px',
+                              transform: 'scale(0.242)',
+                              transformOrigin: 'top left',
+                            }}
+                          >
+                            <CVTemplate cv={cvPreviewState} />
+                          </div>
+                        </div>
+                        <div className="absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-blue-100 bg-white/90 text-blue-700">
+                          <LayoutTemplate className="h-4 w-4" />
+                        </div>
+                      </div>
+                      <CardTitle>{getLocalizedText(template.name, locale)}</CardTitle>
+                      <CardDescription>{getLocalizedText(template.target, locale)}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-slate-600">{getLocalizedText(template.headline, locale)}</p>
+                      <ul className="list-disc space-y-1 pl-5 text-xs text-slate-500">
+                        {template.sections.slice(0, 3).map((section) => (
+                          <li key={section.title.en}>{getLocalizedText(section.title, locale)}</li>
+                        ))}
+                      </ul>
+                      <Button asChild className="w-full">
+                        <Link href={`/cv/new?template=${template.slug}`}>{t('Use This Template', 'Bu Şablonu Kullan')}</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
 
-            <div className="mt-12 text-center">
-              <p className="mb-6 text-[12px] font-medium italic text-slate-400 dark:text-slate-500">{t("Don't risk your career on a bad template.", 'Kariyerini kötü bir şablona emanet etme.')}</p>
-              <Button size="lg" className="h-12 px-8 text-sm font-semibold rounded-full shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-[#1a1a1a] text-white hover:bg-black border-0" asChild>
-                <Link href={heroPrimaryHref}>{t('Create Compliant CV', 'Uyumlu CV Oluştur')}</Link>
-              </Button>
-            </div>
+            <p className="mt-8 text-center text-xs text-slate-500">
+              {t(
+                'Guest mode is temporary. If you leave before signing in, your changes are discarded.',
+                'Misafir modu geçicidir. Giriş yapmadan ayrılırsan değişikliklerin silinir.',
+              )}
+            </p>
           </div>
-          <div className="absolute bottom-0 left-1/2 h-px w-full -translate-x-1/2 bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700" />
+          <div className="absolute bottom-0 left-1/2 h-px w-full -translate-x-1/2 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
         </section>
 
         {/* {t('How It Works', 'Nasıl Çalışır')} */}
-        <section className="py-24 bg-slate-50" id="how-it-works">
-          <div className="container mx-auto px-6 text-center max-w-5xl">
-            <h2 className="text-3xl font-medium tracking-[-0.04em] text-slate-900 dark:text-slate-100 mb-4">{t('How It Works', 'Nasıl Çalışır')}</h2>
-            <p className="text-slate-500 mb-16 max-w-2xl mx-auto">{t('From an empty page to a confirmed interview in three simple steps.', 'Boş bir sayfadan görüşmeye uzanan süreç üç net adımda.')}</p>
+        <section className="relative overflow-hidden border-y border-slate-200 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.08),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(16,185,129,0.08),transparent_40%),#ffffff] py-24" id="how-it-works">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+          <div className="pointer-events-none absolute right-2 top-1/2 hidden h-[420px] w-[240px] -translate-y-1/2 opacity-25 xl:block">
+            <div className="absolute inset-0 rounded-[24px] bg-gradient-to-l from-slate-200/65 via-slate-200/20 to-transparent blur-xl" />
+            <div className="relative ml-auto h-full w-[190px] overflow-hidden rounded-2xl">
+              <div className="grid h-full grid-cols-2 gap-2">
+                <div className="overflow-hidden rounded-xl border border-slate-200/60 bg-white/35 p-1">
+                  <div className="cv-paper-column-track space-y-2">
+                    {[...animatedColumnTemplatesLeft, ...animatedColumnTemplatesLeft].map((template, index) => {
+                      const cvPreviewState = buildCvStateFromTemplate(template, locale);
+                      const tiltClass = paperTiltClasses[index % paperTiltClasses.length];
 
-            <div className="grid md:grid-cols-3 gap-10">
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 shadow-sm">
-                  <FileText className="w-8 h-8" />
+                      return (
+                        <div key={`how-left-${template.slug}-${index}`} className={`mx-auto ${tiltClass}`}>
+                          <div className="h-[164px] w-[116px] overflow-hidden rounded-md border border-slate-300/70 bg-white shadow-[0_12px_20px_-15px_rgba(15,23,42,0.75)]">
+                            <div
+                              style={{
+                                width: '794px',
+                                height: '1123px',
+                                transform: 'scale(0.146)',
+                                transformOrigin: 'top left',
+                              }}
+                            >
+                              <CVTemplate cv={cvPreviewState} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold mb-3">{t('1. Build Your Base CV', '1. Temel CV’ni Hazırla')}</h3>
-                <p className="text-slate-600">{t('Enter your details into our beautiful, intuitive builder. Our templates are guaranteed to be 100% readable by Applicant Tracking Systems.', 'Bilgilerini sezgisel editöre gir. Şablonlarımız ATS tarafından %100 okunabilir olacak şekilde tasarlanmıştır.')}</p>
+
+                <div className="overflow-hidden rounded-xl border border-slate-200/60 bg-white/35 p-1">
+                  <div className="cv-paper-column-track cv-paper-column-track-fast space-y-2">
+                    {[...animatedColumnTemplatesRight, ...animatedColumnTemplatesRight].map((template, index) => {
+                      const cvPreviewState = buildCvStateFromTemplate(template, locale);
+                      const tiltClass = paperTiltClasses[(index + 2) % paperTiltClasses.length];
+
+                      return (
+                        <div key={`how-right-${template.slug}-${index}`} className={`mx-auto ${tiltClass}`}>
+                          <div className="h-[164px] w-[116px] overflow-hidden rounded-md border border-slate-300/70 bg-white shadow-[0_12px_20px_-15px_rgba(15,23,42,0.75)]">
+                            <div
+                              style={{
+                                width: '794px',
+                                height: '1123px',
+                                transform: 'scale(0.146)',
+                                transformOrigin: 'top left',
+                              }}
+                            >
+                              <CVTemplate cv={cvPreviewState} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 mb-6 shadow-sm">
-                  <Target className="w-8 h-8" />
+            </div>
+          </div>
+          <div className="container mx-auto max-w-6xl px-6">
+            <div className="mx-auto mb-14 max-w-3xl text-center">
+              <span className="mb-3 block text-[10px] font-bold uppercase tracking-[0.3em] text-blue-700">
+                {t('Guided Workflow', 'Yönlendirilmiş Akış')}
+              </span>
+              <h2 className={`${sectionTitleClass} mb-4`}>
+                {t('How It Works', 'Nasıl Çalışır')}
+              </h2>
+              <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-600">
+                {t('From an empty page to a confirmed interview in three simple steps.', 'Boş bir sayfadan görüşmeye uzanan süreç üç net adımda.')}
+              </p>
+            </div>
+
+            <div className="relative grid gap-6 md:grid-cols-3">
+              <div className="pointer-events-none absolute left-[16.5%] right-[16.5%] top-10 hidden h-px bg-gradient-to-r from-blue-200 via-indigo-200 to-emerald-200 md:block" />
+
+              <div className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 p-7 shadow-[0_16px_40px_-26px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_50px_-25px_rgba(37,99,235,0.45)]">
+                <span className="absolute right-5 top-5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">01</span>
+                <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 text-slate-900 ring-1 ring-slate-200/70">
+                  <FileText className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-bold mb-3">{t('2. Tailor with AI', '2. AI ile Özelleştir')}</h3>
-                <p className="text-slate-600">{t("Find a job you love? Paste the description and let Gemini AI rewrite your achievements to perfectly match the role's keywords.", 'İlan metnini yapıştır, AI başarılarını role uygun anahtar kelimelerle güçlendirsin.')}</p>
+                <h3 className="mb-3 text-2xl font-semibold tracking-[-0.02em] text-slate-900">{t('Build Your Base CV', 'Temel CV’ni Hazırla')}</h3>
+                <p className="text-[15px] leading-7 text-slate-600">
+                  {t('Enter your details into our builder with ATS-safe structure and instant A4 formatting.', 'Bilgilerini ATS güvenli yapıyla editöre gir, A4 formatını anında hazırla.')}
+                </p>
+                <div className="mt-6 h-px w-full bg-gradient-to-r from-blue-100 via-slate-200 to-transparent" />
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t('Foundation', 'Temel Kurulum')}</p>
               </div>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center text-green-600 mb-6 shadow-sm">
-                  <CheckCircle2 className="w-8 h-8" />
+
+              <div className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 p-7 shadow-[0_16px_40px_-26px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_50px_-25px_rgba(37,99,235,0.45)]">
+                <span className="absolute right-5 top-5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">02</span>
+                <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-700 ring-1 ring-blue-100/70">
+                  <Target className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-bold mb-3">{t('3. Apply & Track', '3. Başvur ve Takip Et')}</h3>
-                <p className="text-slate-600">{t('Generate a custom cover letter, refine your resume with AI, and apply with confidence.', 'Özel ön yazı oluştur, CV’ni geliştir ve başvurularını güvenle yönet.')}</p>
+                <h3 className="mb-3 text-2xl font-semibold tracking-[-0.02em] text-slate-900">{t('Tailor with AI', 'AI ile Özelleştir')}</h3>
+                <p className="text-[15px] leading-7 text-slate-600">
+                  {t("Paste your target job and let AI sharpen your bullets for role-matched keywords.", 'Hedef ilanını yapıştır, AI madde içeriklerini role uygun anahtar kelimelerle güçlendirsin.')}
+                </p>
+                <div className="mt-6 h-px w-full bg-gradient-to-r from-indigo-100 via-slate-200 to-transparent" />
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t('Optimization', 'Optimizasyon')}</p>
+              </div>
+
+              <div className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 p-7 shadow-[0_16px_40px_-26px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_50px_-25px_rgba(16,185,129,0.45)]">
+                <span className="absolute right-5 top-5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">03</span>
+                <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 to-green-100 text-emerald-700 ring-1 ring-emerald-100/70">
+                  <CheckCircle2 className="h-7 w-7" />
+                </div>
+                <h3 className="mb-3 text-2xl font-semibold tracking-[-0.02em] text-slate-900">{t('Apply & Track', 'Başvur ve Takip Et')}</h3>
+                <p className="text-[15px] leading-7 text-slate-600">
+                  {t('Export your polished CV, apply confidently, and track outcomes in one workflow.', 'Güçlendirilmiş CV’ni dışa aktar, güvenle başvur ve sonuçlarını tek akışta takip et.')}
+                </p>
+                <div className="mt-6 h-px w-full bg-gradient-to-r from-emerald-100 via-slate-200 to-transparent" />
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t('Delivery', 'Teslimat')}</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Free Plan */}
-        <section className="py-24 bg-white border-t" >
-          <div className="container mx-auto px-6 max-w-5xl">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-medium tracking-[-0.04em] text-slate-900 dark:text-slate-100 mb-4">{t('Start Free', 'Ücretsiz Başla')}</h2>
-              <p className="text-slate-500">{t('Everything you need to build an ATS-friendly CV and export it.', 'ATS uyumlu CV hazırlayıp dışa aktarmak için gereken her şey burada.')}</p>
+        {/* Pricing */}
+        <section className="border-t bg-white py-24">
+          <div className="container mx-auto max-w-6xl px-6">
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <h2 className={sectionTitleClass}>{t('Simple Fixed-USD Pricing', 'Sabit USD Fiyatlandırma')}</h2>
+              <p className="mt-3 text-slate-600">
+                {t('Build free. Preview free. Pay only when you export or need advanced tools.', 'Ücretsiz oluştur. Ücretsiz önizle. Sadece export veya gelişmiş araç gerektiğinde öde.')}
+              </p>
+              <p className="mt-2 text-sm text-slate-500">{billingSummaryText}</p>
             </div>
 
-            <div className="grid grid-cols-1 max-w-2xl mx-auto">
-              <Card className="border-2 border-slate-100 hover:border-slate-200 transition-colors">
+            <div className="mb-6 grid gap-5 md:grid-cols-2">
+              <Card className="border-slate-200">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Standard</CardTitle>
-                  <CardDescription>{t('Perfect for creating a basic, ATS-compliant resume.', 'Temel ve ATS uyumlu bir özgeçmiş oluşturmak için ideal.')}</CardDescription>
-                  <div className="mt-4 flex items-baseline text-5xl font-extrabold">
-                    $0
-                    <span className="ml-1 text-xl font-medium text-slate-500">{t('/ forever', '/ sonsuza dek')}</span>
-                  </div>
+                  <CardTitle className="text-2xl">{t('Free Access', 'Ücretsiz Erişim')}</CardTitle>
+                  <CardDescription>{t('For new registered users', 'Yeni kayıt olan kullanıcılar için')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ul className="mt-6 space-y-4">
-                    {['1 Free ATS-Compliant PDF Export', 'Intuitive Drag & Drop Builder', 'Real-time A4 Preview', 'Unlimited Resume Editing'].map((feature) => (
-                      <li key={feature} className="flex">
-                        <CheckCircle2 className="mr-3 h-5 w-5 text-green-500 shrink-0" />
-                        <span className="text-slate-600">{feature}</span>
-                      </li>
-                    ))}
+                  <ul className="space-y-3 text-sm text-slate-700">
+                    <li className="flex">
+                      <CheckCircle2 className="mr-2 h-4 w-4 shrink-0 text-emerald-600" />
+                      {t('CV builder, editing, and A4 preview stay free.', 'CV oluşturma, düzenleme ve A4 önizleme ücretsiz kalır.')}
+                    </li>
+                    <li className="flex">
+                      <CheckCircle2 className="mr-2 h-4 w-4 shrink-0 text-emerald-600" />
+                      <strong className="mr-1">{FREE_SIGNUP_EXPORTS}</strong>
+                      {t('free PDF export on your account.', 'ücretsiz PDF export hakkı.')}
+                    </li>
+                    <li className="flex">
+                      <CheckCircle2 className="mr-2 h-4 w-4 shrink-0 text-emerald-600" />
+                      {FREE_SIGNUP_AI_CREDITS} {t('free AI credits for advanced tools.', 'gelişmiş araçlar için ücretsiz AI kredi.')}
+                    </li>
                   </ul>
-                  <Button className="w-full mt-8 h-12 font-semibold rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-primary/30 hover:text-primary" variant="outline" asChild>
-                    <Link href="/cv/new">{t('Get Started Free', 'Ücretsiz Başla')}</Link>
+                  <p className="mt-4 text-xs text-slate-500">
+                    {t('After free usage: PDF export costs', 'Ücretsiz hak sonrası: PDF export maliyeti')}{' '}
+                    <strong>{PDF_EXPORT_CREDIT_COST}</strong> {t('credits, advanced AI call costs', 'kredi, gelişmiş AI çağrısı maliyeti')}{' '}
+                    <strong>{ADVANCED_AI_CREDIT_COST}</strong> {t('credit.', 'kredi.')}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-slate-200">
+                <CardHeader>
+                  <CardTitle className="text-2xl">{t('Paid Scope', 'Ücretli Kapsam')}</CardTitle>
+                  <CardDescription>{t('What credits are used for', 'Kredilerin kullanıldığı özellikler')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3 text-sm text-slate-700">
+                    <li className="flex">
+                      <CheckCircle2 className="mr-2 h-4 w-4 shrink-0 text-slate-700" />
+                      {t('PDF export (after first free export)', 'PDF export (ilk ücretsiz export sonrası)')}
+                    </li>
+                    <li className="flex">
+                      <CheckCircle2 className="mr-2 h-4 w-4 shrink-0 text-slate-700" />
+                      {t('Advanced AI: generate-from-job, match-job, tailor, cover-letter', 'Gelişmiş AI: generate-from-job, match-job, tailor, cover-letter')}
+                    </li>
+                  </ul>
+                  <Button className="mt-6 w-full" asChild>
+                    <Link href={isAuthenticated ? '/billing' : '/register'}>{t('Open Billing', 'Ödeme Sayfasını Aç')}</Link>
                   </Button>
                 </CardContent>
               </Card>
             </div>
-          </div>
-        </section>
 
-        {/* Tools and Guides */}
-        <section className="border-t bg-slate-50 py-20">
-          <div className="container mx-auto max-w-6xl px-6">
-            <div className="mx-auto mb-12 max-w-3xl text-center">
-              <h2 className="text-3xl font-medium tracking-[-0.03em] text-slate-900">{t('Free Tools for Smarter Applications', 'Daha Akıllı Başvurular İçin Ücretsiz Araçlar')}</h2>
-              <p className="mt-3 text-slate-600">{t('Use Pathica tools to improve ATS match, strengthen wording, and apply with more confidence.', 'Pathica araçlarıyla ATS uyumunu artır, dili güçlendir ve daha güvenli başvur.')}</p>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-              <Link href="/ats-resume-checker" className="group rounded-2xl border bg-white p-5 transition hover:-translate-y-1 hover:shadow-md">
-                <Search className="mb-3 h-6 w-6 text-blue-600" />
-                <h3 className="font-semibold text-slate-900">{t('ATS Resume Checker', 'ATS CV Kontrolü')}</h3>
-                <p className="mt-2 text-sm text-slate-600">{t('Get a quick ATS-style score and fix parsing issues.', 'Hızlı bir ATS puanı al ve ayrıştırma hatalarını düzelt.')}</p>
-              </Link>
-              <Link href="/resume-analyzer" className="group rounded-2xl border bg-white p-5 transition hover:-translate-y-1 hover:shadow-md">
-                <BarChart3 className="mb-3 h-6 w-6 text-emerald-600" />
-                <h3 className="font-semibold text-slate-900">{t('Resume Analyzer', 'CV Analizörü')}</h3>
-                <p className="mt-2 text-sm text-slate-600">{t('See readability, structure, and keyword gaps in one view.', 'Okunabilirlik, yapı ve anahtar kelime boşluklarını tek ekranda gör.')}</p>
-              </Link>
-              <Link href="/resume-score" className="group rounded-2xl border bg-white p-5 transition hover:-translate-y-1 hover:shadow-md">
-                <Target className="mb-3 h-6 w-6 text-amber-600" />
-                <h3 className="font-semibold text-slate-900">{t('Resume Score', 'CV Skoru')}</h3>
-                <p className="mt-2 text-sm text-slate-600">{t('Track your resume quality with a practical 0-100 score.', 'Özgeçmiş kaliteni pratik bir 0-100 skorla takip et.')}</p>
-              </Link>
-              <Link href="/resume-keyword-optimizer" className="group rounded-2xl border bg-white p-5 transition hover:-translate-y-1 hover:shadow-md">
-                <WandSparkles className="mb-3 h-6 w-6 text-violet-600" />
-                <h3 className="font-semibold text-slate-900">{t('Keyword Optimizer', 'Anahtar Kelime Optimizörü')}</h3>
-                <p className="mt-2 text-sm text-slate-600">{t('Match role-specific terms from any job description.', 'İlan metninden role özel terimleri eşleştir.')}</p>
-              </Link>
-            </div>
-
-            <div className="mt-12 flex justify-center">
-              <Button asChild variant="outline" className="rounded-full px-7">
-                <Link href="/template-gallery">{t('Explore Public Templates', 'Açık Şablonları Keşfet')}</Link>
-              </Button>
+            <div className="grid gap-5 md:grid-cols-3">
+              {BILLING_PACKAGES.map((pkg) => (
+                <Card key={pkg.code} className={`border ${pkg.highlight ? 'border-slate-900 shadow-sm' : 'border-slate-200'}`}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>{pkg.name}</span>
+                      {pkg.highlight ? (
+                        <span className="rounded-full bg-slate-900 px-2 py-1 text-xs font-semibold text-white">{t('Most Popular', 'En Popüler')}</span>
+                      ) : null}
+                    </CardTitle>
+                    <CardDescription>
+                      {pkg.credits} {t('credits', 'kredi')}
+                    </CardDescription>
+                    <div className="text-4xl font-bold text-slate-900">{formatUsd(pkg.priceUsd)}</div>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant={pkg.highlight ? 'default' : 'outline'} className="w-full" asChild>
+                      <Link href={isAuthenticated ? '/billing' : '/register'}>{t('Buy Credits', 'Kredi Satın Al')}</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* SEO Guide Hub */}
+        {/* FAQ */}
         <section className="border-t bg-white py-20">
           <div className="container mx-auto max-w-6xl px-6">
-            <div className="mx-auto mb-10 max-w-3xl text-center">
-              <h2 className="text-3xl font-medium tracking-[-0.03em] text-slate-900">{t('Resume Guides and Examples', 'Özgeçmiş Rehberleri ve Örnekler')}</h2>
-              <p className="mt-3 text-slate-600">{t('Read focused guides, copy practical patterns, and convert them into your resume draft.', 'Odaklı rehberleri oku, pratik kalıpları kopyala ve CV taslağına dönüştür.')}</p>
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <h2 className={sectionTitleClass}>{t('Frequently Asked Questions', 'Sık Sorulan Sorular')}</h2>
+              <p className="mt-3 text-slate-600">{t('Key answers about pricing, ATS compatibility, and resume optimization workflows.', 'Fiyatlandırma, ATS uyumluluğu ve CV optimizasyon akışları hakkında temel yanıtlar.')}</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {[
-                { href: '/resume-examples', title: t('Resume Examples', 'Özgeçmiş Örnekleri'), text: t('Role-based examples you can adapt quickly.', 'Role göre hızla uyarlayabileceğin örnekler.') },
-                { href: '/how-to-write-a-resume', title: t('How to Write a Resume', 'Özgeçmiş Nasıl Yazılır'), text: t('A step-by-step writing framework.', 'Adım adım yazım çerçevesi.') },
-                { href: '/ats-friendly-resume', title: t('ATS-Friendly Resume Guide', 'ATS Uyumlu Özgeçmiş Rehberi'), text: t('Checklist to improve ATS compatibility.', 'ATS uyumunu artıran kontrol listesi.') },
-                { href: '/resume-summary-examples', title: t('Summary Examples', 'Özet Örnekleri'), text: t('Fast templates for stronger profile summaries.', 'Daha güçlü profil özetleri için hızlı kalıplar.') },
-                { href: '/resume-skills-examples', title: t('Skills Examples', 'Beceri Örnekleri'), text: t('Role-relevant skills lists and usage tips.', 'Role uygun beceri listeleri ve kullanım ipuçları.') },
-                { href: '/blog', title: t('Career Blog', 'Kariyer Blogu'), text: t('60+ SEO guides on resumes, interviews, and careers.', 'Özgeçmiş, mülakat ve kariyer için 60+ rehber.') },
-              ].map((item) => (
-                <Link key={item.href} href={item.href} className="rounded-2xl border bg-slate-50 p-5 transition hover:bg-slate-100">
-                  <BookOpen className="mb-3 h-5 w-5 text-slate-600" />
-                  <h3 className="font-semibold text-slate-900">{item.title}</h3>
-                  <p className="mt-2 text-sm text-slate-600">{item.text}</p>
-                </Link>
+            <div className="mx-auto grid max-w-4xl gap-4">
+              {faqItems.map((item) => (
+                <Card key={item.question} className="border-slate-200">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">{item.question}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-slate-600">{item.answer}</CardContent>
+                </Card>
               ))}
             </div>
           </div>
@@ -412,15 +650,6 @@ export default async function Home() {
   );
 }
 
-// Inline Badge component for simpler layout
-function Badge({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`inline-flex items-center justify-center font-medium ${className}`}>
-      {children}
-    </div>
-  );
-}
-
 function getLogoSrc() {
   try {
     const mtime = fs.statSync(path.join(process.cwd(), 'public', 'logo_pathica.png')).mtimeMs;
@@ -438,17 +667,3 @@ function getFooterLogoSrc() {
     return '/logo_pathica_footer.png';
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
