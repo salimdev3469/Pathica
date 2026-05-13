@@ -31,7 +31,7 @@ export default function RegisterPage() {
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get('next') || '/welcome';
+  const next = searchParams.get('next') || '/dashboard';
   const supabase = createBrowserClient();
   const isBusy = isLoading || isGoogleLoading;
 
@@ -45,11 +45,12 @@ export default function RegisterPage() {
     setStatusMessage({ type: 'info', text: t('Creating your account...', 'Hesabınız oluşturuluyor...') });
 
     try {
+      const signupCallbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&welcome=1`;
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+          emailRedirectTo: signupCallbackUrl,
         },
       });
 
@@ -65,7 +66,12 @@ export default function RegisterPage() {
             : t('Account created. Check your email to verify your account.', 'Hesap oluşturuldu. Doğrulama için e-postanı kontrol et.'),
         });
         toast.success(t('Registration successful', 'Kayıt başarılı'));
-        router.push(hasSession ? next : '/welcome');
+        if (hasSession) {
+          document.cookie = 'pathica_welcome_pending=1; Path=/; Max-Age=600; SameSite=Lax';
+          router.push(`/welcome?next=${encodeURIComponent(next)}`);
+        } else {
+          router.push(`/login?registered=1&next=${encodeURIComponent(next)}`);
+        }
       }
     } catch (error) {
       const message = getErrorMessage(error);
@@ -81,10 +87,11 @@ export default function RegisterPage() {
     setStatusMessage({ type: 'info', text: t('Redirecting to Google sign-up...', 'Google kaydına yönlendiriliyor...') });
 
     try {
+      const signupCallbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&welcome=1`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+          redirectTo: signupCallbackUrl,
         },
       });
 
