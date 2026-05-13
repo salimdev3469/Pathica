@@ -8,6 +8,7 @@ import {
   listPendingPaymentsByEmailAndPackage,
   markPaymentPaid,
   markWebhookEventProcessed,
+  resolveUserIdForBillingEmail,
   upsertWebhookEvent,
 } from '@/lib/billing';
 import { PENDING_MATCH_WINDOW_MINUTES, getBillingPackageByProductId } from '@/lib/billing-config';
@@ -133,6 +134,7 @@ export async function POST(req: Request) {
 
     const orderId = resolveOrderId(canonicalOrder);
     const buyerEmail = resolveOrderEmail(canonicalOrder);
+    const mappedUserIdFromEmail = buyerEmail ? await resolveUserIdForBillingEmail(buyerEmail) : null;
     const productIds = resolveOrderProductIds(canonicalOrder);
     const orderCreatedAt = resolveOrderCreatedAt(canonicalOrder);
 
@@ -154,7 +156,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ received: true, paymentId: existingOrderPayment.id, ignored: true });
       }
 
-      if (!existingOrderPayment.user_id) {
+      const existingPaymentUserId = existingOrderPayment.user_id || mappedUserIdFromEmail || null;
+      if (!existingPaymentUserId) {
         await markWebhookEventProcessed(trackedWebhookId, 'processed');
         return NextResponse.json({ received: true, paymentId: existingOrderPayment.id, manualReview: true });
       }
@@ -164,6 +167,7 @@ export async function POST(req: Request) {
           paymentId: existingOrderPayment.id,
           shopierOrderId: orderId,
           shopierProductId: productIds[0] || '',
+          userId: existingPaymentUserId,
         });
 
         const grant = await grantCreditsForPayment(existingOrderPayment.id, 'shopier_webhook_credit_grant');
@@ -197,7 +201,8 @@ export async function POST(req: Request) {
     const pendingPayment = pendingSelection.candidate;
 
     if (pendingPayment) {
-      if (!pendingPayment.user_id) {
+      const pendingPaymentUserId = pendingPayment.user_id || mappedUserIdFromEmail || null;
+      if (!pendingPaymentUserId) {
         await markWebhookEventProcessed(trackedWebhookId, 'processed');
         return NextResponse.json({ received: true, paymentId: pendingPayment.id, manualReview: true });
       }
@@ -206,6 +211,7 @@ export async function POST(req: Request) {
         paymentId: pendingPayment.id,
         shopierOrderId: orderId,
         shopierProductId: productIds[0] || '',
+        userId: pendingPaymentUserId,
       });
 
       const grant = await grantCreditsForPayment(pendingPayment.id, 'shopier_webhook_credit_grant');
@@ -221,6 +227,7 @@ export async function POST(req: Request) {
 
     try {
       const reviewPayment = await createReviewPaymentFromWebhook({
+        userId: mappedUserIdFromEmail || undefined,
         buyerEmail,
         packageCode: matchedPackage.code,
         packagePriceUsd: matchedPackage.priceUsd,

@@ -265,6 +265,51 @@ export async function getBillingPaymentById(paymentId: string): Promise<BillingP
   return (data as BillingPayment | null) || null;
 }
 
+export async function resolveUserIdForBillingEmail(email: string | null | undefined): Promise<string | null> {
+  const normalized = normalizeEmail(email);
+  if (!normalized) {
+    return null;
+  }
+
+  const { data: fromPayments, error: paymentsError } = await supabaseAdmin
+    .from('shopier_payments')
+    .select('user_id')
+    .eq('buyer_email', normalized)
+    .not('user_id', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (paymentsError) {
+    throw paymentsError;
+  }
+
+  const mappedFromPayments = String(fromPayments?.user_id || '').trim();
+  if (mappedFromPayments) {
+    return mappedFromPayments;
+  }
+
+  const findInAuthUsers = async (caseInsensitive: boolean) => {
+    const query = supabaseAdmin.schema('auth').from('users').select('id').limit(1);
+    const { data, error } = caseInsensitive
+      ? await query.ilike('email', normalized).maybeSingle()
+      : await query.eq('email', normalized).maybeSingle();
+
+    if (error) {
+      return null;
+    }
+
+    return String(data?.id || '').trim() || null;
+  };
+
+  const exact = await findInAuthUsers(false);
+  if (exact) {
+    return exact;
+  }
+
+  return findInAuthUsers(true);
+}
+
 export async function getUserBillingPayments(userId: string, limit = 10): Promise<BillingPayment[]> {
   const { data, error } = await supabaseAdmin
     .from('shopier_payments')
@@ -370,17 +415,24 @@ export async function markPaymentPaid(input: {
   shopierOrderId: string;
   shopierProductId: string;
   failureReason?: string | null;
+  userId?: string | null;
 }) {
+  const payload: Record<string, unknown> = {
+    status: 'paid',
+    shopier_order_id: input.shopierOrderId,
+    shopier_product_id: input.shopierProductId,
+    paid_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    failure_reason: input.failureReason ?? null,
+  };
+
+  if (input.userId) {
+    payload.user_id = input.userId;
+  }
+
   const { data, error } = await supabaseAdmin
     .from('shopier_payments')
-    .update({
-      status: 'paid',
-      shopier_order_id: input.shopierOrderId,
-      shopier_product_id: input.shopierProductId,
-      paid_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      failure_reason: input.failureReason ?? null,
-    })
+    .update(payload)
     .eq('id', input.paymentId)
     .neq('status', 'credited')
     .select('*')

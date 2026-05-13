@@ -5,8 +5,8 @@ import {
   grantCreditsForPayment,
   isBillingAdminEmail,
   markPaymentManualApproved,
+  resolveUserIdForBillingEmail,
 } from '@/lib/billing';
-import { supabaseAdmin } from '@/lib/supabase';
 import { createClient } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
@@ -47,16 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       let resolvedUserId = payload.userId || existing.user_id || undefined;
 
       if (!resolvedUserId && existing.buyer_email) {
-        const { data: authUser } = await supabaseAdmin
-          .schema('auth')
-          .from('users')
-          .select('id,email')
-          .eq('email', existing.buyer_email)
-          .maybeSingle();
-
-        if (authUser?.id) {
-          resolvedUserId = authUser.id;
-        }
+        resolvedUserId = (await resolveUserIdForBillingEmail(existing.buyer_email)) || undefined;
       }
 
       await markPaymentManualApproved({
