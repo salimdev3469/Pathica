@@ -40,7 +40,7 @@ function getSiteUrl() {
   const protocol = h.get('x-forwarded-proto') || 'https';
 
   if (host) return `${protocol}://${host}`;
-  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  return process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech';
 }
 
 export const dynamic = 'force-dynamic';

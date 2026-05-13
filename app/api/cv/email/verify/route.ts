@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 function getAppUrl(req: Request) {
   const origin = new URL(req.url).origin;
-  return process.env.NEXT_PUBLIC_APP_URL || origin;
+  return (process.env.NEXT_PUBLIC_APP_URL || origin || 'https://www.pathica.tech').replace(/\/$/, '');
 }
 
 function toSafeErrorMessage(error: unknown) {
@@ -119,4 +119,3 @@ export async function GET(req: Request) {
     return redirectTo('failed');
   }
 }
-

@@ -67,7 +67,7 @@ export default async function Home() {
   const logoSrc = getLogoSrc();
   const footerLogoSrc = getFooterLogoSrc();
   const billingSummaryText = getBillingSummaryText();
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
   const animatedColumnTemplatesLeft = cvTemplateSeeds;
   const animatedColumnTemplatesRight = [...cvTemplateSeeds].reverse();
   const paperTiltClasses = [

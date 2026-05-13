@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     }
 
     const origin = new URL(req.url).origin;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || origin || 'https://www.pathica.tech').replace(/\/$/, '');
     const verificationUrl = `${appUrl}/api/cv/email/verify?token=${encodeURIComponent(token)}`;
 
     try {
@@ -97,4 +97,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to process email request.' }, { status: 500 });
   }
 }
-

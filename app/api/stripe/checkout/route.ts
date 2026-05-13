@@ -6,11 +6,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     try {
+        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
-            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login?next=/dashboard`);
+            return NextResponse.redirect(`${appUrl}/login?next=/dashboard`);
         }
 
         const url = new URL(req.url);
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
         if (!priceId) {
             // Graceful fallback for local dev if keys not set
             console.warn('STRIPE_PRO_MONTHLY_PRICE_ID is not configured');
-            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=stripe_not_configured`);
+            return NextResponse.redirect(`${appUrl}/dashboard?error=stripe_not_configured`);
         }
 
         const checkoutSession = await stripe.checkout.sessions.create({
@@ -35,8 +36,8 @@ export async function GET(req: Request) {
                     quantity: 1,
                 },
             ],
-            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
-            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=cancelled`,
+            success_url: `${appUrl}/dashboard?payment=success`,
+            cancel_url: `${appUrl}/dashboard?payment=cancelled`,
         });
 
         if (checkoutSession.url) {
@@ -46,7 +47,7 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: 'Failed to create session URL' }, { status: 500 });
     } catch (error: any) {
         console.error('Stripe checkout error:', error);
-        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=checkout_failed`);
+        const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
+        return NextResponse.redirect(`${appUrl}/dashboard?error=checkout_failed`);
     }
 }
-
