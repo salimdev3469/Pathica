@@ -86,7 +86,7 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
     slug: 'classic-ats',
     name: { en: 'Classic ATS', tr: 'Klasik ATS' },
     target: { en: 'General professional roles', tr: 'Genel profesyonel roller' },
-    previewImage: '/template-previews/classic-ats.svg',
+    previewImage: '/template-previews/classic-ats.png?v=20260515d',
     previewAlt: { en: 'Classic ATS resume preview', tr: 'Klasik ATS ozgecmis onizlemesi' },
     headline: {
       en: 'Balanced structure for most office and business jobs.',
@@ -157,18 +157,18 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
   },
   {
     slug: 'entry-starter',
-    name: { en: 'Entry Starter', tr: 'Yeni Mezun Başlangıç' },
-    target: { en: 'Internship and entry-level roles', tr: 'Staj ve giriş seviyesi roller' },
-    previewImage: '/template-previews/entry-starter.svg',
+    name: { en: 'Entry Starter ATS', tr: 'Yeni Mezun ATS' },
+    target: { en: 'Internship, graduate, and junior roles', tr: 'Staj, yeni mezun ve junior roller' },
+    previewImage: '/template-previews/entry-starter.png?v=20260515d',
     previewAlt: { en: 'Entry Starter resume preview', tr: 'Yeni Mezun Baslangic ozgecmis onizlemesi' },
     headline: {
-      en: 'Project-first template for candidates with limited experience.',
-      tr: 'Deneyimi sınırlı adaylar için proje odaklı şablon.',
+      en: 'Education + internship-forward ATS layout for early-career applications.',
+      tr: 'Erken kariyer başvuruları için eğitim ve staj odaklı ATS düzeni.',
     },
-    summaryTitle: { en: 'Profile Summary', tr: 'Profil Özeti' },
+    summaryTitle: { en: 'Professional Summary', tr: 'Profesyonel Özet' },
     summary: {
-      en: 'Early-career candidate with strong learning agility, hands-on project experience, and practical problem-solving mindset.',
-      tr: 'Öğrenme çevikliği yüksek, uygulamalı proje deneyimi olan ve pratik problem çözme yaklaşımıyla öne çıkan erken kariyer adayı.',
+      en: 'Early-career analyst with internship execution, KPI reporting, and project delivery experience. Strong foundation in SQL, dashboarding, and data storytelling.',
+      tr: 'Staj deneyimi, KPI raporlama ve proje teslimi tecrübesine sahip erken kariyer analist. SQL, dashboard ve veri hikayeleştirme alanlarında güçlü temel.',
     },
     personalInfo: {
       fullName: 'Jordan Lee',
@@ -182,31 +182,46 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
     },
     sections: [
       {
-        title: { en: 'Projects', tr: 'Projeler' },
-        items: [
-          {
-            title: { en: 'Sales Forecast Dashboard', tr: 'Satış Tahmin Dashboardu' },
-            subtitle: { en: 'Power BI, SQL', tr: 'Power BI, SQL' },
-            date: '2024',
-            location: { en: '', tr: '' },
-            bullets: {
-              en: '- Designed dashboard tracking 12 monthly KPIs and trend alerts.\n- Cleaned and modeled raw data from 3 sources for analysis readiness.',
-              tr: '- 12 aylık KPI ve trend uyarıları içeren dashboard tasarladı.\n- 3 kaynaktan gelen ham veriyi temizleyip analize hazır hale getirdi.',
-            },
-          },
-        ],
-      },
-      {
         title: { en: 'Education', tr: 'Eğitim' },
         items: [
           {
             title: { en: 'Metro University', tr: 'Metro University' },
             subtitle: { en: 'B.Sc. Statistics', tr: 'İstatistik Lisans' },
             date: '2020 - 2024',
+            location: { en: 'Boston, MA', tr: 'Ankara, TR' },
+            bullets: {
+              en: '- Relevant coursework: Data Analysis, Probability, A/B Testing, Business Analytics.\n- Capstone project awarded for practical retail forecasting methodology.',
+              tr: '- İlgili dersler: Veri Analizi, Olasılık, A/B Testi, İş Analitiği.\n- Perakende tahmin metodolojisiyle bitirme projesi ödüllendirildi.',
+            },
+          },
+        ],
+      },
+      {
+        title: { en: 'Experience', tr: 'Deneyim' },
+        items: [
+          {
+            title: { en: 'Nexa Insights', tr: 'Nexa Insights' },
+            subtitle: { en: 'Data Analytics Intern', tr: 'Veri Analitiği Stajyeri' },
+            date: '2023 - 2024',
+            location: { en: 'Boston, MA', tr: 'Ankara, TR' },
+            bullets: {
+              en: '- Automated weekly reporting template, reducing manual prep time by 35%.\n- Built SQL queries for campaign performance tracking and quality checks.\n- Prepared slide-ready insights for manager and stakeholder meetings.',
+              tr: '- Haftalık raporlama şablonunu otomatikleştirerek manuel hazırlık süresini %35 azalttı.\n- Kampanya performans takibi ve kalite kontrolleri için SQL sorguları geliştirdi.\n- Yönetici ve paydaş toplantıları için sunuma hazır içgörüler hazırladı.',
+            },
+          },
+        ],
+      },
+      {
+        title: { en: 'Projects', tr: 'Projeler' },
+        items: [
+          {
+            title: { en: 'Sales Forecast Dashboard', tr: 'Satış Tahmin Dashboardu' },
+            subtitle: { en: 'Power BI, SQL, Excel', tr: 'Power BI, SQL, Excel' },
+            date: '2024',
             location: { en: '', tr: '' },
             bullets: {
-              en: '- Relevant coursework: Data Analysis, Probability, Machine Learning Fundamentals.',
-              tr: '- İlgili dersler: Veri Analizi, Olasılık, Makine Öğrenmesi Temelleri.',
+              en: '- Designed dashboard tracking 12 monthly KPIs and trend alerts.\n- Modeled data from 3 sources and documented assumptions for reproducibility.\n- Presented insights that improved weekly planning decisions.',
+              tr: '- 12 aylık KPI ve trend uyarıları içeren dashboard tasarladı.\n- 3 kaynaktan veriyi modelleyip tekrar üretilebilirlik için varsayımları dokümante etti.\n- Haftalık planlama kararlarını iyileştiren içgörüler sundu.',
             },
           },
         ],
@@ -220,8 +235,8 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
             date: '',
             location: { en: '', tr: '' },
             bullets: {
-              en: 'SQL, Python, Power BI, Excel, Tableau, Data Cleaning, A/B Testing',
-              tr: 'SQL, Python, Power BI, Excel, Tableau, Veri Temizleme, A/B Testi',
+              en: 'SQL, Python, Power BI, Excel, Tableau, Data Cleaning, A/B Testing, Presentation Skills',
+              tr: 'SQL, Python, Power BI, Excel, Tableau, Veri Temizleme, A/B Testi, Sunum Yetkinliği',
             },
           },
         ],
@@ -230,18 +245,18 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
   },
   {
     slug: 'technical-impact',
-    name: { en: 'Technical Impact', tr: 'Teknik Etki' },
-    target: { en: 'Software and data roles', tr: 'Yazılım ve veri rolleri' },
-    previewImage: '/template-previews/technical-impact.svg',
+    name: { en: 'Technical Impact ATS', tr: 'Teknik Etki ATS' },
+    target: { en: 'Software engineering and platform roles', tr: 'Yazılım mühendisliği ve platform rolleri' },
+    previewImage: '/template-previews/technical-impact.png?v=20260515d',
     previewAlt: { en: 'Technical Impact resume preview', tr: 'Teknik Etki ozgecmis onizlemesi' },
     headline: {
-      en: 'Emphasizes shipped work, metrics, and engineering ownership.',
-      tr: 'Yayınlanan işler, metrikler ve mühendislik sahipliğini öne çıkarır.',
+      en: 'Metric-heavy engineering format highlighting system reliability and shipped impact.',
+      tr: 'Sistem güvenilirliği ve yayınlanan etkileri öne çıkaran metrik yoğun mühendislik formatı.',
     },
     summaryTitle: { en: 'Professional Summary', tr: 'Profesyonel Özet' },
     summary: {
-      en: 'Engineer focused on building reliable products with measurable impact through clean architecture, experimentation, and collaboration.',
-      tr: 'Temiz mimari, deneysel yaklaşım ve ekip iş birliğiyle ölçülebilir etki üreten güvenilir ürünler geliştirmeye odaklı mühendis.',
+      en: 'Software engineer experienced in full-stack delivery, API performance optimization, and production observability. Delivers maintainable systems with measurable reliability improvements.',
+      tr: 'Full-stack teslim, API performans optimizasyonu ve production gözlemlenebilirliği deneyimli yazılım mühendisi. Ölçülebilir güvenilirlik artışı sağlayan sürdürülebilir sistemler geliştirir.',
     },
     personalInfo: {
       fullName: 'Taylor Chen',
@@ -263,8 +278,18 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
             date: '2021 - Present',
             location: { en: 'Seattle, WA', tr: 'Uzaktan' },
             bullets: {
-              en: '- Shipped a Next.js + Node feature set used by 35k monthly active users.\n- Cut API response latency by 41% via query optimization and caching.\n- Introduced CI checks that reduced release regressions by 32%.',
-              tr: '- Aylık 35 bin aktif kullanıcıya hizmet veren Next.js + Node özellik seti yayınladı.\n- Sorgu optimizasyonu ve cache ile API gecikmesini %41 düşürdü.\n- CI kontrolleri ekleyerek sürüm regresyonlarını %32 azalttı.',
+              en: '- Shipped a Next.js + Node feature set used by 35k monthly active users.\n- Cut API response latency by 41% via query optimization and Redis caching.\n- Introduced CI quality gates reducing release regressions by 32%.',
+              tr: '- Aylık 35 bin aktif kullanıcıya hizmet veren Next.js + Node özellik seti yayınladı.\n- Sorgu optimizasyonu ve Redis cache ile API gecikmesini %41 düşürdü.\n- CI kalite kontrolleriyle sürüm regresyonlarını %32 azalttı.',
+            },
+          },
+          {
+            title: { en: 'Polar Stack', tr: 'Polar Stack' },
+            subtitle: { en: 'Backend Engineer', tr: 'Backend Mühendisi' },
+            date: '2019 - 2021',
+            location: { en: 'Seattle, WA', tr: 'Uzaktan' },
+            bullets: {
+              en: '- Scaled event ingestion pipeline to process 2.4x higher peak traffic.\n- Designed idempotent payment-webhook handlers reducing duplicate transactions.\n- Partnered with product to define SLA and incident-response playbooks.',
+              tr: '- Event ingestion pipeline’ını 2.4 kat daha yüksek pik trafiğe ölçekledi.\n- Duplicate işlemleri azaltan idempotent ödeme webhook işleyicileri tasarladı.\n- Ürün ekibiyle SLA ve incident response playbook’ları tanımladı.',
             },
           },
         ],
@@ -278,8 +303,23 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
             date: '2023',
             location: { en: '', tr: '' },
             bullets: {
-              en: '- Built internal tracing toolkit adopted by 4 product squads.\n- Reduced MTTR by creating standardized incident dashboards.',
-              tr: '- 4 ürün ekibinin kullandığı iç tracing toolkit geliştirdi.\n- Standart incident dashboardlarıyla MTTR süresini düşürdü.',
+              en: '- Built internal tracing toolkit adopted by 4 product squads.\n- Reduced MTTR by standardizing incident dashboards and alert routing.',
+              tr: '- 4 ürün ekibinin kullandığı iç tracing toolkit geliştirdi.\n- Incident dashboard ve alarm yönlendirmesini standartlaştırarak MTTR süresini düşürdü.',
+            },
+          },
+        ],
+      },
+      {
+        title: { en: 'Certifications', tr: 'Sertifikalar' },
+        items: [
+          {
+            title: { en: 'AWS Certified Developer – Associate', tr: 'AWS Certified Developer – Associate' },
+            subtitle: { en: '', tr: '' },
+            date: '2023',
+            location: { en: '', tr: '' },
+            bullets: {
+              en: '- Focused on cloud architecture, serverless services, and secure deployment practices.',
+              tr: '- Cloud mimari, serverless servisler ve güvenli deployment pratiklerine odaklandı.',
             },
           },
         ],
@@ -303,18 +343,18 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
   },
   {
     slug: 'career-switch',
-    name: { en: 'Career Switch', tr: 'Kariyer Geçişi' },
+    name: { en: 'Career Switch ATS', tr: 'Kariyer Geçişi ATS' },
     target: { en: 'Candidates transitioning into a new field', tr: 'Yeni alana geçiş yapan adaylar' },
-    previewImage: '/template-previews/career-switch.svg',
+    previewImage: '/template-previews/career-switch.png?v=20260515d',
     previewAlt: { en: 'Career Switch resume preview', tr: 'Kariyer Gecisi ozgecmis onizlemesi' },
     headline: {
-      en: 'Highlights transferable skills and transition story clearly.',
-      tr: 'Aktarılabilir yetenekleri ve geçiş hikayesini net vurgular.',
+      en: 'Transition-focused ATS template with transferable outcomes and relevant projects.',
+      tr: 'Aktarılabilir çıktıları ve ilgili projeleri öne çıkaran geçiş odaklı ATS şablonu.',
     },
-    summaryTitle: { en: 'Transition Summary', tr: 'Geçiş Özeti' },
+    summaryTitle: { en: 'Professional Summary', tr: 'Profesyonel Özet' },
     summary: {
-      en: 'Professional transitioning into product and analytics roles, combining domain expertise with structured problem-solving and stakeholder communication.',
-      tr: 'Ürün ve analitik rollerine geçiş yapan, alan tecrübesini yapılandırılmış problem çözme ve paydaş iletişimiyle birleştiren profesyonel.',
+      en: 'Operations leader transitioning into product analytics with strong stakeholder management, prioritization, and KPI design experience. Converts customer and process signals into actionable product improvements.',
+      tr: 'Paydaş yönetimi, önceliklendirme ve KPI tasarımı tecrübesiyle ürün analitiğine geçiş yapan operasyon lideri. Müşteri ve süreç sinyallerini uygulanabilir ürün iyileştirmelerine dönüştürür.',
     },
     personalInfo: {
       fullName: 'Sam Rivera',
@@ -328,7 +368,22 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
     },
     sections: [
       {
-        title: { en: 'Transferable Experience', tr: 'Aktarılabilir Deneyim' },
+        title: { en: 'Skills', tr: 'Yetenekler' },
+        items: [
+          {
+            title: { en: 'Core Transition Skills', tr: 'Geçişte Öne Çıkan Yetkinlikler' },
+            subtitle: { en: '', tr: '' },
+            date: '',
+            location: { en: '', tr: '' },
+            bullets: {
+              en: 'Product Thinking, SQL, KPI Design, Data Storytelling, Stakeholder Management, Backlog Prioritization, Experiment Readouts',
+              tr: 'Ürün Düşüncesi, SQL, KPI Tasarımı, Veri Hikayeleştirme, Paydaş Yönetimi, Backlog Önceliklendirme, Deney Çıktısı Yorumlama',
+            },
+          },
+        ],
+      },
+      {
+        title: { en: 'Experience', tr: 'Deneyim' },
         items: [
           {
             title: { en: 'Lumen Retail Group', tr: 'Lumen Retail Group' },
@@ -336,14 +391,14 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
             date: '2019 - Present',
             location: { en: 'Denver, CO', tr: 'Bursa, TR' },
             bullets: {
-              en: '- Managed planning process for 20+ store initiatives with measurable outcomes.\n- Led customer-feedback analysis and converted findings into product backlog items.\n- Facilitated cross-team delivery cadence and stakeholder reporting.',
-              tr: '- 20+ mağaza inisiyatifi için planlama süreçlerini ölçülebilir çıktılarla yönetti.\n- Müşteri geri bildirim analizini ürün backlog maddelerine dönüştürdü.\n- Ekipler arası teslim ritmi ve paydaş raporlamasını yönetti.',
+              en: '- Managed planning process for 20+ store initiatives with measurable outcomes.\n- Led customer-feedback analysis and converted findings into product backlog items.\n- Facilitated cross-team delivery cadence and executive reporting.',
+              tr: '- 20+ mağaza inisiyatifi için planlama süreçlerini ölçülebilir çıktılarla yönetti.\n- Müşteri geri bildirim analizini ürün backlog maddelerine dönüştürdü.\n- Ekipler arası teslim ritmi ve yönetici raporlamasını yönetti.',
             },
           },
         ],
       },
       {
-        title: { en: 'Relevant Projects', tr: 'İlgili Projeler' },
+        title: { en: 'Projects', tr: 'Projeler' },
         items: [
           {
             title: { en: 'Product Metrics Revamp', tr: 'Ürün Metrik Yenileme' },
@@ -351,23 +406,23 @@ export const cvTemplateSeeds: CvTemplateSeed[] = [
             date: '2024',
             location: { en: '', tr: '' },
             bullets: {
-              en: '- Built KPI framework and reporting templates for weekly product reviews.\n- Improved decision speed by standardizing experiment readouts.',
-              tr: '- Haftalık ürün değerlendirmeleri için KPI çerçevesi ve rapor şablonları oluşturdu.\n- Deney çıktılarını standartlaştırarak karar hızını artırdı.',
+              en: '- Built KPI framework and reporting templates for weekly product reviews.\n- Improved decision speed by standardizing experiment readouts.\n- Created a common insight format used by product, ops, and leadership.',
+              tr: '- Haftalık ürün değerlendirmeleri için KPI çerçevesi ve rapor şablonları oluşturdu.\n- Deney çıktıları standardizasyonuyla karar hızını artırdı.\n- Ürün, operasyon ve yönetimin kullandığı ortak içgörü formatı oluşturdu.',
             },
           },
         ],
       },
       {
-        title: { en: 'Skills', tr: 'Yetenekler' },
+        title: { en: 'Education', tr: 'Eğitim' },
         items: [
           {
-            title: { en: 'Core Skills', tr: 'Temel Yetenekler' },
-            subtitle: { en: '', tr: '' },
-            date: '',
-            location: { en: '', tr: '' },
+            title: { en: 'Frontier University', tr: 'Frontier University' },
+            subtitle: { en: 'B.A. Business Management', tr: 'İşletme Lisans' },
+            date: '2014 - 2018',
+            location: { en: 'United States', tr: 'Türkiye' },
             bullets: {
-              en: 'Product Thinking, SQL, Data Storytelling, Stakeholder Management, Roadmap Planning',
-              tr: 'Ürün Düşüncesi, SQL, Veri Hikayeleştirme, Paydaş Yönetimi, Yol Haritası Planlama',
+              en: '- Focus areas: business operations, customer analytics, and decision frameworks.',
+              tr: '- Odak alanları: iş operasyonları, müşteri analitiği ve karar çerçeveleri.',
             },
           },
         ],

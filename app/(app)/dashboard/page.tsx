@@ -265,9 +265,9 @@ export default async function DashboardPage() {
                                     className="group rounded-2xl border-slate-200 bg-white/95 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
                                 >
                                     <CardHeader>
-                                        <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="min-w-0 flex-1 text-xl text-slate-900 dark:text-slate-100">
-                                                <span className="block truncate pr-2">{cv.title}</span>
+                                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                            <CardTitle className="min-w-0 flex-1 text-xl leading-tight text-slate-900 dark:text-slate-100">
+                                                <span className="block break-words pr-1 [overflow-wrap:anywhere]">{cv.title}</span>
                                             </CardTitle>
                                             <CvShareActions cvId={cv.id} cvTitle={cv.title} atsScore={ats.score} />
                                         </div>

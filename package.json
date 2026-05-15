@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "template-previews:generate": "node scripts/generate-template-previews.mjs",
     "shopier:webhooks:sync": "node scripts/shopier-webhook-sync.mjs"
   },
   "dependencies": {

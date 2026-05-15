@@ -103,9 +103,29 @@
   animation-delay: -6s;
 }
 
+@keyframes reviews-scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.reviews-marquee-track {
+  animation: reviews-scroll-right 36s linear infinite;
+  will-change: transform;
+}
+
+.reviews-marquee:hover .reviews-marquee-track {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cv-paper-column-track,
-  .cv-paper-column-track-fast {
+  .cv-paper-column-track-fast,
+  .reviews-marquee-track {
     animation: none;
   }
 }
@@ -124,9 +144,21 @@
     background-color: rgb(30 41 59) !important;
   }
 
+  .dark [class*='bg-slate-50/'],
+  .dark [class*='bg-slate-100/'],
+  .dark [class*='bg-slate-200/'] {
+    background-color: rgb(15 23 42 / 0.85) !important;
+  }
+
   .dark .border-slate-100,
   .dark .border-slate-200 {
     border-color: rgb(51 65 85) !important;
+  }
+
+  .dark [class*='border-slate-100/'],
+  .dark [class*='border-slate-200/'],
+  .dark [class*='border-slate-300/'] {
+    border-color: rgb(51 65 85 / 0.65) !important;
   }
 
   .dark .text-slate-900,
@@ -147,6 +179,15 @@
 
   .dark [class*='border-white/'] {
     border-color: rgb(51 65 85 / 0.6) !important;
+  }
+
+  .dark [class*='from-slate-50/'] {
+    --tw-gradient-from: rgb(15 23 42 / 0.95) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgb(15 23 42 / 0) var(--tw-gradient-to-position) !important;
+  }
+
+  .dark [class*='to-slate-50/'] {
+    --tw-gradient-to: rgb(15 23 42 / 0) var(--tw-gradient-to-position) !important;
   }
 
   .dark [class*='text-[#1a1a1a]'] {

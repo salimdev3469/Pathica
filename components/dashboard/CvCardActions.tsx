@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Download, Eye, Loader2, Edit2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Download, Eye, Loader2, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ReadOnlyViewer } from '@/components/cv-builder/ReadOnlyViewer';
 import type { CVState } from '@/context/CVContext';
 import { toast } from 'sonner';
@@ -16,9 +17,12 @@ interface CvCardActionsProps {
 }
 
 export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsProps) {
+    const router = useRouter();
     const [isDownloading, setIsDownloading] = useState(false);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [previewError, setPreviewError] = useState<string | null>(null);
     const [previewState, setPreviewState] = useState<CVState | null>(null);
     const isTr = locale === 'tr';
@@ -102,6 +106,34 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
         }
     };
 
+    const openDeleteDialog = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleDelete = async () => {
+        setIsDeleting(true);
+
+        try {
+            const response = await fetch(`/api/cv/${cvId}`, { method: 'DELETE' });
+            const data = await response.json().catch(() => null) as { error?: string } | null;
+
+            if (!response.ok) {
+                throw new Error(data?.error || t('Failed to delete CV', 'CV silinemedi'));
+            }
+
+            toast.success(t('CV deleted successfully.', 'CV başarıyla silindi.'));
+            setIsDeleteDialogOpen(false);
+            router.refresh();
+        } catch (error) {
+            const message = error instanceof Error ? error.message : t('Failed to delete CV', 'CV silinemedi');
+            toast.error(message);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <>
             <div className="flex flex-col gap-2 mt-4">
@@ -115,11 +147,11 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                     </Link>
                 </Button>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 rounded-lg border-slate-200 bg-slate-50 text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800 text-xs font-medium"
+                        className="h-9 rounded-lg border-slate-200 bg-slate-50 px-2 text-xs font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800"
                         onClick={handleDownload}
                         disabled={isDownloading}
                     >
@@ -134,7 +166,7 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 rounded-lg border-slate-200 bg-slate-50 text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800 text-xs font-medium"
+                        className="h-9 rounded-lg border-slate-200 bg-slate-50 px-2 text-xs font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800"
                         onClick={openPreview}
                         disabled={isPreviewLoading}
                     >
@@ -144,6 +176,21 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                             <Eye className="mr-1.5 h-3.5 w-3.5" />
                         )}
                         {t('Preview', 'Önizle')}
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-9 rounded-lg border-rose-200 bg-rose-50 px-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-900/40"
+                        onClick={openDeleteDialog}
+                        disabled={isDeleting}
+                    >
+                        {isDeleting ? (
+                            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                            <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                        )}
+                        {t('Delete CV', 'CV Sil')}
                     </Button>
                 </div>
             </div>
@@ -171,6 +218,43 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
 
                         {!isPreviewLoading && !previewError && previewState ? <ReadOnlyViewer cvState={previewState} /> : null}
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => !isDeleting && setIsDeleteDialogOpen(open)}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>{t('Delete this CV?', 'Bu CV silinsin mi?')}</DialogTitle>
+                        <DialogDescription>
+                            {t(
+                                'This action is permanent. The CV and its sections will be removed.',
+                                'Bu işlem kalıcıdır. CV ve içindeki bölümler tamamen silinecek.',
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                        {cvTitle}
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="border-slate-200 dark:border-slate-700"
+                            onClick={() => setIsDeleteDialogOpen(false)}
+                            disabled={isDeleting}
+                        >
+                            {t('Cancel', 'Vazgeç')}
+                        </Button>
+                        <Button
+                            type="button"
+                            className="bg-rose-600 text-white hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                            {t('Delete Permanently', 'Kalıcı Olarak Sil')}
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </>
