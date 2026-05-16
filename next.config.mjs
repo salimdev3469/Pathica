@@ -6,6 +6,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    unoptimized: true,
+  },
   async redirects() {
     return [
       { source: '/resume-builder', destination: '/en/resume-builder', permanent: true },

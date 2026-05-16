@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 function isRecentlyCreated(createdAt: string | null | undefined): boolean {
@@ -12,11 +12,52 @@ function isRecentlyCreated(createdAt: string | null | undefined): boolean {
     return ageMs >= 0 && ageMs <= 15 * 60 * 1000;
 }
 
+function resolveSafeNextPath(nextParam: string | null, origin: string): string {
+    if (!nextParam) return '/dashboard';
+
+    if (nextParam.startsWith('/') && !nextParam.startsWith('//')) {
+        return nextParam;
+    }
+
+    try {
+        const nextUrl = new URL(nextParam);
+        if (nextUrl.origin === origin) {
+            return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
+        }
+    } catch {
+        // Ignore invalid URL values and fall back to dashboard.
+    }
+
+    return '/dashboard';
+}
+
+function buildLoginErrorRedirect(origin: string, errorText: string): string {
+    const loginUrl = new URL('/login', origin);
+    loginUrl.searchParams.set('error', errorText);
+    return loginUrl.toString();
+}
+
+function clearSupabaseCookies(response: NextResponse, request: Request) {
+    const cookieHeader = request.headers.get('cookie');
+    if (!cookieHeader) return;
+
+    const cookieNames = cookieHeader
+        .split(';')
+        .map((part) => part.trim().split('=')[0])
+        .filter((name) => name.startsWith('sb-') || name.includes('-auth-token'));
+
+    cookieNames.forEach((name) => {
+        response.cookies.set(name, '', {
+            path: '/',
+            maxAge: 0,
+        });
+    });
+}
+
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url);
     const code = searchParams.get('code');
-    // if "next" is in param, use it as the redirect URL
-    const next = searchParams.get('next') ?? '/dashboard';
+    const next = resolveSafeNextPath(searchParams.get('next'), origin);
     const shouldShowWelcome = searchParams.get('welcome') === '1';
 
     if (code) {
@@ -26,14 +67,13 @@ export async function GET(request: Request) {
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
             {
                 cookies: {
-                    get(name: string) {
-                        return cookieStore.get(name)?.value;
+                    getAll() {
+                        return cookieStore.getAll();
                     },
-                    set(name: string, value: string, options: CookieOptions) {
-                        cookieStore.set({ name, value, ...options });
-                    },
-                    remove(name: string, options: CookieOptions) {
-                        cookieStore.delete({ name, ...options });
+                    setAll(cookiesToSet) {
+                        cookiesToSet.forEach(({ name, value, options }) => {
+                            cookieStore.set(name, value, options);
+                        });
                     },
                 },
             }
@@ -60,9 +100,17 @@ export async function GET(request: Request) {
             const redirectUrl = new URL(next, origin);
             return NextResponse.redirect(redirectUrl.toString());
         }
-        console.error('Auth error:', error);
+        const response = NextResponse.redirect(
+            buildLoginErrorRedirect(origin, 'Session expired. Please sign in again.'),
+        );
+        clearSupabaseCookies(response, request);
+        return response;
     }
 
-    // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/login?error=Could not authenticate user`);
+    const fallbackError =
+        searchParams.get('error_description') ||
+        searchParams.get('error') ||
+        'Could not authenticate user';
+
+    return NextResponse.redirect(buildLoginErrorRedirect(origin, fallbackError));
 }

@@ -397,7 +397,7 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
   };
 
   return (
-    <div className="custom-scrollbar mx-auto w-full max-w-2xl flex-1 px-4 py-6 md:overflow-y-auto md:p-8 relative">
+    <div className="custom-scrollbar relative mx-auto w-full max-w-2xl flex-1 px-4 py-6 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:p-8">
       <div className="md:hidden fixed bottom-6 right-6 z-50">
         <Button onClick={() => document.getElementById('preview-section')?.scrollIntoView({ behavior: 'smooth' })} className="rounded-full shadow-2xl h-14 px-6 text-lg">
            <FileText className="mr-2" /> {t('Preview PDF', 'PDF Önizle')}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { useCV, CVState } from '@/context/CVContext';
+import { useCV } from '@/context/CVContext';
 import { CVTemplate } from '@/components/pdf/CVTemplate';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2, GripVertical } from 'lucide-react';
@@ -422,8 +422,8 @@ export function CVPreview() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen md:h-screen sticky top-0">
-            <div className="flex items-center justify-between p-4 bg-white border-b shadow-sm z-10 sticky top-0">
+        <div className="flex min-h-screen flex-col md:h-full md:min-h-0">
+            <div className="z-10 flex items-center justify-between border-b bg-white p-4 shadow-sm">
                 <h2 className="font-semibold text-lg text-slate-800">Preview</h2>
                 <div className="flex gap-2">
 
@@ -436,7 +436,7 @@ export function CVPreview() {
 
             <div
                 ref={containerRef}
-                className="flex-1 bg-slate-200 p-4 pt-12 md:p-8 md:pt-16 overflow-y-auto flex justify-center items-start custom-scrollbar"
+                className="custom-scrollbar flex flex-1 items-start justify-center overflow-y-auto overscroll-y-contain bg-slate-200 p-4 pt-12 md:min-h-0 md:p-8 md:pt-16"
             >
                 {/* Wrapper to handle scaling */}
                 <div style={{
@@ -475,7 +475,5 @@ export function CVPreview() {
         </div>
     );
 }
-
-
 
 

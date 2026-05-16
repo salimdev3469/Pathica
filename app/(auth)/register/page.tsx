@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createBrowserClient } from '@/lib/supabase';
+import { buildAuthCallbackUrl } from '@/lib/auth-redirect';
 import { getClientLocale, type Locale } from '@/lib/locale';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ export default function RegisterPage() {
     setStatusMessage({ type: 'info', text: t('Creating your account...', 'Hesabınız oluşturuluyor...') });
 
     try {
-      const signupCallbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&welcome=1`;
+      const signupCallbackUrl = buildAuthCallbackUrl(next, true);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -87,7 +88,7 @@ export default function RegisterPage() {
     setStatusMessage({ type: 'info', text: t('Redirecting to Google sign-up...', 'Google kaydına yönlendiriliyor...') });
 
     try {
-      const signupCallbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&welcome=1`;
+      const signupCallbackUrl = buildAuthCallbackUrl(next, true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

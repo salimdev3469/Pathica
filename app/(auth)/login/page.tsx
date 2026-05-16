@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createBrowserClient } from '@/lib/supabase';
+import { buildAuthCallbackUrl } from '@/lib/auth-redirect';
 import { getClientLocale, type Locale } from '@/lib/locale';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import { Button } from '@/components/ui/button';
@@ -72,7 +73,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+          redirectTo: buildAuthCallbackUrl(next),
         },
       });
 

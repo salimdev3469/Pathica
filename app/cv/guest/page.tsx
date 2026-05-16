@@ -69,15 +69,15 @@ export default function GuestCVPage({ searchParams }: GuestCVPageProps) {
 
     return (
         <CVProvider initialState={initialState}>
-            <div className="flex flex-col bg-slate-50 md:h-screen md:flex-row md:overflow-hidden">
+            <div className="flex flex-col bg-slate-50 md:h-[100dvh] md:flex-row md:overflow-hidden">
                 {/* Left side: Builder */}
-                <div className="relative flex w-full flex-col border-b md:h-full md:w-1/2 md:border-b-0 md:border-r bg-slate-50">
+                <div className="relative flex w-full flex-col border-b bg-slate-50 md:h-full md:min-h-0 md:w-1/2 md:border-b-0 md:border-r">
                     <div className="absolute left-0 top-0 z-50 h-1 w-full bg-gradient-to-r from-primary to-blue-500 md:rounded-none"></div>
                     <CVBuilder locale={locale} />
                 </div>
 
                 {/* Right side: Preview */}
-                <div id="preview-section" className="relative z-0 min-h-screen w-full bg-slate-200 shadow-inner md:h-full md:w-1/2">
+                <div id="preview-section" className="relative z-0 min-h-screen w-full bg-slate-200 shadow-inner md:h-full md:min-h-0 md:w-1/2">
                     <CVPreview />
                 </div>
             </div>

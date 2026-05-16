@@ -3,6 +3,8 @@ import { consumePdfExportCredit, refundConsumption } from '@/lib/billing';
 import { generateCvPdfBuffer } from '@/lib/cv-pdf';
 import { createClient } from '@/lib/supabase-server';
 
+let pdfGenerationInProgress = false;
+
 function buildContentDisposition(title: unknown) {
   const baseName = typeof title === 'string' && title.trim() ? title.trim() : 'cv';
   const sanitized = baseName.replace(/[\r\n"]/g, '').trim() || 'cv';
@@ -27,6 +29,14 @@ export async function POST(req: Request) {
   let consumption: Awaited<ReturnType<typeof consumePdfExportCredit>> | null = null;
 
   try {
+    if (pdfGenerationInProgress) {
+      return NextResponse.json(
+        { error: 'PDF generation is busy. Please retry in a few seconds.' },
+        { status: 429 },
+      );
+    }
+    pdfGenerationInProgress = true;
+
     const supabase = createClient();
     const {
       data: { user },
@@ -93,5 +103,7 @@ export async function POST(req: Request) {
 
     console.error('Error generating PDF:', error);
     return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 });
+  } finally {
+    pdfGenerationInProgress = false;
   }
 }

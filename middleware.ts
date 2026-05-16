@@ -1,65 +1,71 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
+    const pathname = request.nextUrl.pathname;
+    const hasOAuthCode = request.nextUrl.searchParams.has('code');
+
+    if (pathname === '/' && hasOAuthCode) {
+        const callbackUrl = request.nextUrl.clone();
+        callbackUrl.pathname = '/auth/callback';
+        return NextResponse.redirect(callbackUrl);
+    }
+
+    const protectedPaths = ['/dashboard', '/applications', '/billing', '/admin'];
+    const isProtectedPath =
+        protectedPaths.some((path) => pathname.startsWith(path)) ||
+        (pathname.startsWith('/cv/') && pathname !== '/cv/new');
+
     let response = NextResponse.next({
         request: {
             headers: request.headers,
         },
     });
 
+    if (!isProtectedPath) {
+        return response;
+    }
+
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder',
         {
             cookies: {
-                get(name: string) {
-                    return request.cookies.get(name)?.value;
+                getAll() {
+                    return request.cookies.getAll();
                 },
-                set(name: string, value: string, options: CookieOptions) {
-                    request.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    });
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
                     response = NextResponse.next({
                         request: {
                             headers: request.headers,
                         },
                     });
-                    response.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    });
-                },
-                remove(name: string, options: CookieOptions) {
-                    request.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    });
-                    response = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
-                    });
-                    response.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    });
+                    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
                 },
             },
         }
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    const protectedPaths = ['/dashboard', '/applications', '/billing', '/admin'];
-    const isProtectedPath =
-        protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path)) ||
-        (request.nextUrl.pathname.startsWith('/cv/') && request.nextUrl.pathname !== '/cv/new');
+    let user = null;
+    try {
+        const {
+            data: { user: currentUser },
+        } = await supabase.auth.getUser();
+        user = currentUser;
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'unknown_error';
+        console.warn(`Supabase auth read failed in middleware: ${message}`);
+        request.cookies
+            .getAll()
+            .filter(({ name }) => name.startsWith('sb-') || name.includes('-auth-token'))
+            .forEach(({ name }) => {
+                response.cookies.set(name, '', {
+                    path: '/',
+                    maxAge: 0,
+                });
+            });
+    }
 
     if (isProtectedPath && !user) {
         const url = request.nextUrl.clone();

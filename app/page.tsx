@@ -22,8 +22,6 @@ import {
 } from '@/lib/billing-config';
 import { getBillingSummaryText } from '@/lib/billing';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
-import { cvTemplateSeeds, buildCvStateFromTemplate } from '@/lib/cv-templates';
-import { CVTemplate } from '@/components/pdf/CVTemplate';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -76,7 +74,15 @@ export default async function Home() {
   const t = (en: string, tr: string) => (isTr ? tr : en);
 
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let user: { id: string } | null = null;
+  try {
+    const {
+      data: { user: currentUser },
+    } = await supabase.auth.getUser();
+    user = currentUser ? { id: currentUser.id } : null;
+  } catch {
+    user = null;
+  }
   const isAuthenticated = Boolean(user);
   const navCtaHref = isAuthenticated ? '/dashboard' : '/register';
   const navCtaLabel = isAuthenticated ? t('Dashboard', 'Panel') : t('Get Started', 'Başla');
@@ -85,43 +91,7 @@ export default async function Home() {
   const footerLogoSrc = getFooterLogoSrc();
   const billingSummaryText = getBillingSummaryText(locale);
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
-  const animatedColumnTemplatesLeft = cvTemplateSeeds;
-  const animatedColumnTemplatesRight = [...cvTemplateSeeds].reverse();
-  const paperTiltClasses = [
-    '-rotate-[1.6deg]',
-    'rotate-[1.3deg]',
-    '-rotate-[1deg]',
-    'rotate-[1.8deg]',
-    '-rotate-[1.4deg]',
-    'rotate-[1.1deg]',
-  ];
   const sectionTitleClass = 'text-3xl md:text-5xl font-normal tracking-[-0.04em] text-slate-900 dark:text-slate-100';
-  const seoQuickLinks = [
-    {
-      href: isTr ? '/tr/cv-olusturucu' : '/en/resume-builder',
-      label: t('Resume Builder', 'CV Oluşturucu'),
-    },
-    {
-      href: isTr ? '/tr/ai-cv-olusturucu' : '/en/ai-resume-builder',
-      label: t('AI Resume Builder', 'AI CV Oluşturucu'),
-    },
-    {
-      href: isTr ? '/tr/on-yazi-olusturucu' : '/en/cover-letter-generator',
-      label: t('Cover Letter Generator', 'Ön Yazı Oluşturucu'),
-    },
-    {
-      href: isTr ? '/tr/on-yazi-nasil-yazilir' : '/en/cover-letter-writing-guide',
-      label: t('How to Write a Cover Letter', 'Ön Yazı Nasıl Yazılır'),
-    },
-    {
-      href: isTr ? '/tr/ats-cv-olusturucu' : '/en/ats-resume-builder',
-      label: t('ATS Resume Builder', 'ATS CV Oluşturucu'),
-    },
-    {
-      href: isTr ? '/tr/cv-sablonlari' : '/en/resume-templates',
-      label: t('Resume Templates', 'CV Şablonları'),
-    },
-  ];
   const faqItems = [
     {
       question: t('Is Pathica free to start?', 'Pathica ücretsiz başlatılabiliyor mu?'),
@@ -408,33 +378,6 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="border-b border-slate-200 bg-slate-100/80 py-10 dark:border-slate-800 dark:bg-slate-900/60">
-          <div className="container mx-auto max-w-6xl px-6">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-6 dark:border-slate-700 dark:bg-slate-950/80">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                {t('Popular Resume & Cover Letter Searches', 'Popüler CV ve Ön Yazı Aramaları')}
-              </h2>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                {t(
-                  'Go directly to intent-focused pages for resume builder, AI CV creation, ATS optimization, and cover letter writing.',
-                  'CV oluşturucu, AI CV üretimi, ATS optimizasyonu ve ön yazı yazma niyeti için hazırlanmış sayfalara doğrudan git.',
-                )}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {seoQuickLinks.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-300"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* ATS Templates */}
         <section className="relative overflow-hidden bg-slate-50/60 py-20 dark:bg-slate-900/70">
           <div className="absolute top-0 left-1/2 h-px w-full -translate-x-1/2 bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700" />
@@ -473,58 +416,31 @@ export default async function Home() {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent dark:via-slate-700" />
           <div className="pointer-events-none absolute right-2 top-1/2 hidden h-[420px] w-[240px] -translate-y-1/2 opacity-25 xl:block">
             <div className="absolute inset-0 rounded-[24px] bg-gradient-to-l from-slate-200/65 via-slate-200/20 to-transparent blur-xl dark:from-slate-700/40 dark:via-slate-800/20" />
-            <div className="relative ml-auto h-full w-[190px] overflow-hidden rounded-2xl">
-              <div className="grid h-full grid-cols-2 gap-2">
-                <div className="overflow-hidden rounded-xl border border-slate-200/60 bg-white/35 p-1 dark:border-slate-700/60 dark:bg-slate-900/35">
-                  <div className="cv-paper-column-track space-y-2">
-                    {[...animatedColumnTemplatesLeft, ...animatedColumnTemplatesLeft].map((template, index) => {
-                      const cvPreviewState = buildCvStateFromTemplate(template, locale);
-                      const tiltClass = paperTiltClasses[index % paperTiltClasses.length];
-
-                      return (
-                        <div key={`how-left-${template.slug}-${index}`} className={`mx-auto ${tiltClass}`}>
-                          <div className="h-[164px] w-[116px] overflow-hidden rounded-md border border-slate-300/70 bg-white shadow-[0_12px_20px_-15px_rgba(15,23,42,0.75)]">
-                            <div
-                              style={{
-                                width: '794px',
-                                height: '1123px',
-                                transform: 'scale(0.146)',
-                                transformOrigin: 'top left',
-                              }}
-                            >
-                              <CVTemplate cv={cvPreviewState} />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+            <div className="relative ml-auto grid h-full w-[190px] grid-cols-2 gap-2 overflow-hidden rounded-2xl">
+              <div className="overflow-hidden rounded-xl border border-slate-200/60 bg-white/35 p-1 dark:border-slate-700/60 dark:bg-slate-900/35">
+                <div className="h-full w-full overflow-hidden rounded-lg">
+                  <Image
+                    src="/template-previews/classic-ats-legacy.png?v=20260516a"
+                    alt={t('Classic ATS preview', 'Klasik ATS önizleme')}
+                    width={1592}
+                    height={2250}
+                    className="h-full w-full object-cover object-top"
+                    unoptimized
+                    sizes="190px"
+                  />
                 </div>
-
-                <div className="overflow-hidden rounded-xl border border-slate-200/60 bg-white/35 p-1 dark:border-slate-700/60 dark:bg-slate-900/35">
-                  <div className="cv-paper-column-track cv-paper-column-track-fast space-y-2">
-                    {[...animatedColumnTemplatesRight, ...animatedColumnTemplatesRight].map((template, index) => {
-                      const cvPreviewState = buildCvStateFromTemplate(template, locale);
-                      const tiltClass = paperTiltClasses[(index + 2) % paperTiltClasses.length];
-
-                      return (
-                        <div key={`how-right-${template.slug}-${index}`} className={`mx-auto ${tiltClass}`}>
-                          <div className="h-[164px] w-[116px] overflow-hidden rounded-md border border-slate-300/70 bg-white shadow-[0_12px_20px_-15px_rgba(15,23,42,0.75)]">
-                            <div
-                              style={{
-                                width: '794px',
-                                height: '1123px',
-                                transform: 'scale(0.146)',
-                                transformOrigin: 'top left',
-                              }}
-                            >
-                              <CVTemplate cv={cvPreviewState} />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+              </div>
+              <div className="overflow-hidden rounded-xl border border-slate-200/60 bg-white/35 p-1 dark:border-slate-700/60 dark:bg-slate-900/35">
+                <div className="h-full w-full overflow-hidden rounded-lg">
+                  <Image
+                    src="/template-previews/classic-ats-legacy.png?v=20260516a"
+                    alt={t('Classic ATS preview', 'Klasik ATS önizleme')}
+                    width={1592}
+                    height={2250}
+                    className="h-full w-full object-cover object-top"
+                    unoptimized
+                    sizes="190px"
+                  />
                 </div>
               </div>
             </div>
