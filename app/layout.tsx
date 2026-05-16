@@ -25,11 +25,23 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseUrl()),
   title: {
-    default: 'Pathica | ATS-Friendly Resume Builder',
+    default: 'Pathica | AI Resume Builder, CV Oluşturucu & Cover Letter Generator',
     template: '%s | Pathica',
   },
-  description: 'Build an ATS-friendly resume online, optimize keywords, and improve your job application outcomes with Pathica.',
-  keywords: ['resume builder', 'cv builder', 'ats resume builder', 'online cv oluştur', 'cv oluşturucu'],
+  description:
+    'Pathica ile AI resume builder, cv oluşturucu ve cover letter generator araçlarını kullanarak ATS uyumlu başvuru dosyaları hazırla.',
+  keywords: [
+    'ai resume builder',
+    'resume builder',
+    'cv builder',
+    'cv oluşturucu',
+    'online cv oluştur',
+    'ai cv oluşturucu',
+    'cover letter generator',
+    'ön yazı oluşturucu',
+    'ön yazı nasıl yazılır',
+    'ats resume builder',
+  ],
   alternates: {
     canonical: '/',
     languages: {
@@ -39,14 +51,14 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Pathica | ATS-Friendly Resume Builder',
-    description: 'Create, optimize, and export ATS-friendly resumes with practical tools and examples.',
+    title: 'Pathica | AI Resume Builder, CV Oluşturucu & Cover Letter Generator',
+    description: 'ATS uyumlu CV, resume ve ön yazı üretmek için AI destekli builder ve optimizasyon araçları.',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pathica | ATS-Friendly Resume Builder',
-    description: 'Create and optimize your resume with ATS-safe templates and tools.',
+    title: 'Pathica | AI Resume Builder ve CV Oluşturucu',
+    description: 'CV oluşturucu, resume builder ve cover letter generator araçlarıyla başvurularını güçlendir.',
   },
   icons: {
     icon: '/tab_icon.png',

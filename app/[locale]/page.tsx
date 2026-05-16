@@ -24,10 +24,27 @@ export function generateMetadata({ params }: LocaleHubPageProps): Metadata {
   const isTr = locale === 'tr';
 
   return {
-    title: isTr ? 'CV Oluşturma Merkezi' : 'Resume Builder Hub',
+    title: isTr ? 'CV Oluşturucu ve Ön Yazı Merkezi' : 'AI Resume Builder and Cover Letter Hub',
     description: isTr
-      ? 'CV oluşturma, ATS uyumu, şablonlar ve meslek bazlı örnekler için içerik merkezi.'
-      : 'Content hub for resume building, ATS optimization, templates, and role-based examples.',
+      ? 'CV oluşturucu, AI CV oluşturucu, ön yazı oluşturucu ve ATS uyumlu başvuru sayfaları için içerik merkezi.'
+      : 'Content hub for AI resume builder, cover letter generator, ATS optimization, and role-based examples.',
+    keywords: isTr
+      ? [
+          'cv oluşturucu',
+          'ai cv oluşturucu',
+          'online cv oluştur',
+          'ön yazı oluşturucu',
+          'ön yazı nasıl yazılır',
+          'ats cv oluşturucu',
+        ]
+      : [
+          'ai resume builder',
+          'resume builder',
+          'cover letter generator',
+          'how to write a cover letter',
+          'ats resume builder',
+          'resume templates',
+        ],
     alternates: localeAlternates({
       en: localizedPath('en'),
       tr: localizedPath('tr'),
@@ -35,10 +52,17 @@ export function generateMetadata({ params }: LocaleHubPageProps): Metadata {
     openGraph: {
       type: 'website',
       url: localizedPath(locale),
-      title: isTr ? 'CV Oluşturma Merkezi | Pathica' : 'Resume Builder Hub | Pathica',
+      title: isTr ? 'CV Oluşturucu ve Ön Yazı Merkezi | Pathica' : 'AI Resume Builder and Cover Letter Hub | Pathica',
       description: isTr
-        ? 'CV ve ATS odaklı içerik merkezinden doğru sayfaya hızlıca ulaşın.'
-        : 'Find the right resume and ATS-focused page quickly from a structured content hub.',
+        ? 'CV oluşturucu, ön yazı oluşturucu ve ATS odaklı sayfalara tek merkezden hızlıca erişin.'
+        : 'Access intent-focused pages for resume builder, cover letter writing, and ATS optimization in one hub.',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: isTr ? 'Pathica CV Oluşturucu Merkezi' : 'Pathica Resume Builder Hub',
+      description: isTr
+        ? 'CV oluşturucu ve ön yazı sayfalarını tek merkezde keşfedin.'
+        : 'Discover resume builder and cover letter pages in one structured hub.',
     },
   };
 }

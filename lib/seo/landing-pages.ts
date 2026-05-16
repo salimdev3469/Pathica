@@ -7,10 +7,12 @@ export type SeoLandingKey =
   | 'free-builder'
   | 'online-builder'
   | 'ats-builder'
+  | 'ai-builder'
   | 'maker'
   | 'preparation'
   | 'templates'
-  | 'cover-letter';
+  | 'cover-letter'
+  | 'cover-letter-writing';
 
 export interface SeoLandingSection {
   title: string;
@@ -466,6 +468,92 @@ export const seoLandingPages: SeoLandingPage[] = [
     ],
   },
   {
+    key: 'ai-builder',
+    locale: 'en',
+    slug: 'ai-resume-builder',
+    title: 'AI Resume Builder for ATS-Friendly Job Applications',
+    description: 'Use an AI resume builder to draft, optimize, and export ATS-friendly resumes for role-specific applications.',
+    h1: 'AI Resume Builder That Focuses on Real Job Relevance',
+    intro:
+      'Start with AI-assisted drafting, then refine your resume for recruiter clarity and ATS keyword alignment before export.',
+    primaryKeyword: 'ai resume builder',
+    secondaryKeywords: ['ai cv builder', 'resume ai tool', 'ats resume builder'],
+    searchIntent: 'Create a stronger resume faster with AI guidance and ATS-safe structure.',
+    ctaLabel: 'Start AI Resume Builder',
+    ctaHref: '/cv/new',
+    sections: [
+      {
+        title: 'AI Drafting With Human Control',
+        body: 'Generate a strong first version quickly, then edit wording and priorities based on the exact role you target.',
+      },
+      {
+        title: 'Keyword Alignment Without Keyword Stuffing',
+        body: 'Use AI suggestions to match job-description terms naturally, keeping your resume readable and specific.',
+      },
+      {
+        title: 'Export Only When Ready',
+        body: 'Iterate your content for free, then finalize and export when your application narrative is complete.',
+      },
+    ],
+    faq: [
+      {
+        question: 'Is AI resume builder output enough without editing?',
+        answer: 'Not fully. AI gives a strong draft, but role-specific edits improve credibility and outcomes.',
+      },
+      {
+        question: 'Can AI help with ATS keywords?',
+        answer: 'Yes. It can surface relevant terms and help you place them in context.',
+      },
+      {
+        question: 'Does AI replace resume strategy?',
+        answer: 'No. Your final results still depend on clear achievements and role alignment.',
+      },
+    ],
+  },
+  {
+    key: 'ai-builder',
+    locale: 'tr',
+    slug: 'ai-cv-olusturucu',
+    title: 'AI CV Oluşturucu ile ATS Uyumlu CV Hazırla',
+    description: 'AI CV oluşturucu ile hızlı taslak çıkar, ilan anahtar kelimelerine göre optimize et ve ATS uyumlu CV hazırla.',
+    h1: 'AI CV Oluşturucu ile Daha Hızlı ve Uyumlu Başvuru',
+    intro:
+      'Yapay zeka destekli taslakla başla, ardından rol beklentisine göre metni netleştirerek CV kalitesini yükselt.',
+    primaryKeyword: 'ai cv oluşturucu',
+    secondaryKeywords: ['yapay zeka cv oluşturucu', 'cv oluşturucu', 'ats uyumlu cv'],
+    searchIntent: 'Yapay zeka desteğiyle hızlı ve ATS uyumlu CV oluşturmak.',
+    ctaLabel: 'AI CV Oluştur',
+    ctaHref: '/cv/new',
+    sections: [
+      {
+        title: 'Hızlı İlk Taslak',
+        body: 'Sıfırdan başlamak yerine AI ile ilk sürümü hızlıca oluşturup düzenleme süresini kısaltabilirsin.',
+      },
+      {
+        title: 'İlan Bazlı Anahtar Kelime Uyumu',
+        body: 'İlan metnindeki kritik terimleri doğal cümlelerle kullanarak ATS uyumunu ve okunabilirliği birlikte koruyabilirsin.',
+      },
+      {
+        title: 'Son Karar Sende',
+        body: 'AI önerileri başlangıç sağlar; son metin ve ton kontrolüyle CV’ni pozisyona göre güçlendirebilirsin.',
+      },
+    ],
+    faq: [
+      {
+        question: 'AI CV oluşturucu tamamen otomatik mi?',
+        answer: 'Taslak üretimi hızlıdır ancak en iyi sonuç için manuel düzenleme önerilir.',
+      },
+      {
+        question: 'ATS için anahtar kelime desteği verir mi?',
+        answer: 'Evet. İlanla uyumlu terimlerin metne doğal şekilde yerleşmesine yardımcı olur.',
+      },
+      {
+        question: 'Yeni mezunlar için uygun mu?',
+        answer: 'Evet. Özellikle yapı kurma ve ifade netliği açısından faydalıdır.',
+      },
+    ],
+  },
+  {
     key: 'maker',
     locale: 'en',
     slug: 'resume-maker',
@@ -798,6 +886,90 @@ export const seoLandingPages: SeoLandingPage[] = [
       {
         question: 'Tek ön yazıyı tüm başvurularda kullanabilir miyim?',
         answer: 'Önerilmez. Rol ve şirket bazlı kişiselleştirme daha etkilidir.',
+      },
+    ],
+  },
+  {
+    key: 'cover-letter-writing',
+    locale: 'en',
+    slug: 'cover-letter-writing-guide',
+    title: 'How to Write a Cover Letter for Job Applications',
+    description: 'Learn how to write a cover letter with a practical structure, role-specific messaging, and clear closing.',
+    h1: 'Cover Letter Writing Guide for Better Job Applications',
+    intro: 'Use a simple writing framework to avoid generic text and deliver a focused, role-matched cover letter.',
+    primaryKeyword: 'how to write a cover letter',
+    secondaryKeywords: ['cover letter writing', 'cover letter format', 'job application cover letter'],
+    searchIntent: 'Understand cover letter writing steps and create stronger application letters.',
+    ctaLabel: 'Create Cover Letter Draft',
+    ctaHref: '/cv/new',
+    sections: [
+      {
+        title: 'Open With Role and Motivation',
+        body: 'State the role, the company, and why your background matches this opportunity in the first paragraph.',
+      },
+      {
+        title: 'Show 2-3 Relevant Proof Points',
+        body: 'Use measurable achievements connected to the job requirements instead of repeating your full resume.',
+      },
+      {
+        title: 'Close With Clear Next Step',
+        body: 'End with concise motivation and a call for conversation, keeping the tone professional and direct.',
+      },
+    ],
+    faq: [
+      {
+        question: 'Should I use the same cover letter for every application?',
+        answer: 'No. Relevance improves when you customize by role and company context.',
+      },
+      {
+        question: 'Can I keep it under one page?',
+        answer: 'Yes. Most effective cover letters are concise and usually below one page.',
+      },
+      {
+        question: 'What is the most common writing mistake?',
+        answer: 'Using generic claims without job-specific evidence.',
+      },
+    ],
+  },
+  {
+    key: 'cover-letter-writing',
+    locale: 'tr',
+    slug: 'on-yazi-nasil-yazilir',
+    title: 'Ön Yazı Nasıl Yazılır? İş Başvurusu İçin Pratik Rehber',
+    description: 'Ön yazı nasıl yazılır sorusuna adım adım cevap veren pratik rehber: doğru yapı, somut kanıt ve güçlü kapanış.',
+    h1: 'Ön Yazı Yazmak İçin Pratik ve Etkili Yol',
+    intro: 'Ön yazı yazmayı zorlaştıran genel ifadeleri bırak, role odaklı ve kısa bir metin kurgusuyla ilerle.',
+    primaryKeyword: 'ön yazı nasıl yazılır',
+    secondaryKeywords: ['ön yazı yazmak', 'cover letter yazmak', 'iş başvuru ön yazısı'],
+    searchIntent: 'İş başvurusu için etkili ön yazı yazım adımlarını öğrenmek.',
+    ctaLabel: 'Ön Yazı Taslağı Oluştur',
+    ctaHref: '/cv/new',
+    sections: [
+      {
+        title: 'İlk Paragrafta Rol ve Niyet',
+        body: 'Başvurduğun pozisyonu ve neden ilgini çektiğini net söyleyerek metni güçlü başlat.',
+      },
+      {
+        title: '2-3 Somut Başarıyla Destekle',
+        body: 'CV’nin tamamını tekrar etmek yerine, ilanın ihtiyacına doğrudan bağlanan kısa ve ölçülebilir örnekler kullan.',
+      },
+      {
+        title: 'Net ve Kısa Kapanış Yap',
+        body: 'Uygunluğunu özetleyen bir kapanış ve görüşme talebiyle ön yazıyı profesyonel biçimde tamamla.',
+      },
+    ],
+    faq: [
+      {
+        question: 'Ön yazı her başvuruda gerekli mi?',
+        answer: 'Her zaman zorunlu değil; ancak iyi yazılmış bir ön yazı başvurunu güçlendirebilir.',
+      },
+      {
+        question: 'Ön yazı uzunluğu ne kadar olmalı?',
+        answer: 'Genellikle bir sayfayı geçmeyen kısa ve odaklı metinler daha etkilidir.',
+      },
+      {
+        question: 'En sık yapılan hata nedir?',
+        answer: 'İlanla ilgisiz, genel cümlelerle dolu metin kullanmaktır.',
       },
     ],
   },

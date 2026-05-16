@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Locale } from '@/lib/locale';
 import { LEGAL_PAGE_LINKS } from '@/lib/legal-pages';
+import { localizedPath } from '@/lib/seo/config';
 
 type SiteFooterProps = {
   locale: Locale;
@@ -22,6 +23,28 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
   const isTr = locale === 'tr';
   const t = (en: string, tr: string) => (isTr ? tr : en);
   const footerLogoSrc = getFooterLogoSrc();
+  const seoLinks = [
+    {
+      href: localizedPath(locale, isTr ? 'cv-olusturucu' : 'resume-builder'),
+      label: t('Resume Builder', 'CV Oluşturucu'),
+    },
+    {
+      href: localizedPath(locale, isTr ? 'ai-cv-olusturucu' : 'ai-resume-builder'),
+      label: t('AI Resume Builder', 'AI CV Oluşturucu'),
+    },
+    {
+      href: localizedPath(locale, isTr ? 'on-yazi-olusturucu' : 'cover-letter-generator'),
+      label: t('Cover Letter Generator', 'Ön Yazı Oluşturucu'),
+    },
+    {
+      href: localizedPath(locale, isTr ? 'on-yazi-nasil-yazilir' : 'cover-letter-writing-guide'),
+      label: t('Cover Letter Writing', 'Ön Yazı Yazmak'),
+    },
+    {
+      href: localizedPath(locale, isTr ? 'ats-cv-olusturucu' : 'ats-resume-builder'),
+      label: t('ATS Resume Builder', 'ATS CV Oluşturucu'),
+    },
+  ];
 
   return (
     <footer className="border-t border-slate-800 bg-slate-900 py-12 text-slate-400">
@@ -46,6 +69,21 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
         <nav aria-label="Yasal ve kurumsal bağlantılar" className="w-full">
           <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center text-sm">
             {LEGAL_PAGE_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <nav aria-label={t('Popular SEO pages', 'Popüler SEO sayfaları')} className="mt-4 w-full">
+          <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center text-sm">
+            {seoLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
