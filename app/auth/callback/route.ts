@@ -2,6 +2,59 @@ import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+const LOCALHOST_HOSTNAMES = new Set(['localhost', '127.0.0.1', '0.0.0.0', '::1']);
+
+function parseUrlOrigin(value: string | null | undefined): string | null {
+    if (!value) return null;
+
+    try {
+        return new URL(value).origin;
+    } catch {
+        return null;
+    }
+}
+
+function isLocalhostOrigin(value: string | null | undefined): boolean {
+    if (!value) return false;
+
+    try {
+        return LOCALHOST_HOSTNAMES.has(new URL(value).hostname);
+    } catch {
+        return false;
+    }
+}
+
+function getFirstForwardedValue(value: string | null): string | null {
+    if (!value) return null;
+    const [first = ''] = value.split(',');
+    const normalized = first.trim();
+    return normalized || null;
+}
+
+function resolveRequestOrigin(request: Request): string {
+    const requestUrl = new URL(request.url);
+    const requestOrigin = requestUrl.origin;
+    const isProduction = process.env.NODE_ENV === 'production';
+    const configuredOrigin = parseUrlOrigin(
+        process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || process.env.PUBLIC_APP_URL || null
+    );
+
+    const forwardedHost = getFirstForwardedValue(request.headers.get('x-forwarded-host'));
+    const forwardedProtoRaw = getFirstForwardedValue(request.headers.get('x-forwarded-proto'));
+    const forwardedProto = forwardedProtoRaw ? forwardedProtoRaw.replace(/:$/, '') : requestUrl.protocol.replace(/:$/, '');
+    const forwardedOrigin = forwardedHost ? parseUrlOrigin(`${forwardedProto}://${forwardedHost}`) : null;
+
+    if (forwardedOrigin && !isLocalhostOrigin(forwardedOrigin)) {
+        return forwardedOrigin;
+    }
+
+    if (isProduction && isLocalhostOrigin(requestOrigin) && configuredOrigin && !isLocalhostOrigin(configuredOrigin)) {
+        return configuredOrigin;
+    }
+
+    return forwardedOrigin || requestOrigin;
+}
+
 function isRecentlyCreated(createdAt: string | null | undefined): boolean {
     if (!createdAt) return false;
 
@@ -55,7 +108,8 @@ function clearSupabaseCookies(response: NextResponse, request: Request) {
 }
 
 export async function GET(request: Request) {
-    const { searchParams, origin } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
+    const origin = resolveRequestOrigin(request);
     const code = searchParams.get('code');
     const next = resolveSafeNextPath(searchParams.get('next'), origin);
     const shouldShowWelcome = searchParams.get('welcome') === '1';
