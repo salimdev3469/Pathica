@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { Locale } from '@/lib/locale';
 
 export type LegalPageSlug =
   | 'gizlilik-politikasi'
@@ -24,7 +25,7 @@ export type LegalPageContent = {
   sections: LegalPageSection[];
 };
 
-export const LEGAL_PAGE_LINKS: Array<{ href: `/${LegalPageSlug}`; label: string }> = [
+const LEGAL_PAGE_LINKS_TR: Array<{ href: `/${LegalPageSlug}`; label: string }> = [
   { href: '/gizlilik-politikasi', label: 'Gizlilik Politikası' },
   { href: '/cerez-politikasi', label: 'Çerez Politikası' },
   { href: '/kvkk-aydinlatma-metni', label: 'KVKK Aydınlatma Metni' },
@@ -35,6 +36,23 @@ export const LEGAL_PAGE_LINKS: Array<{ href: `/${LegalPageSlug}`; label: string 
   { href: '/iletisim', label: 'İletişim' },
 ];
 
+const LEGAL_PAGE_LINKS_EN: Array<{ href: `/${LegalPageSlug}`; label: string }> = [
+  { href: '/gizlilik-politikasi', label: 'Privacy Policy' },
+  { href: '/cerez-politikasi', label: 'Cookie Policy' },
+  { href: '/kvkk-aydinlatma-metni', label: 'KVKK Disclosure Notice' },
+  { href: '/kullanim-kosullari', label: 'Terms and Conditions' },
+  { href: '/mesafeli-satis-sozlesmesi', label: 'Distance Sales Agreement' },
+  { href: '/on-bilgilendirme-formu', label: 'Pre-Information Form' },
+  { href: '/iptal-iade-politikasi', label: 'Cancellation and Refund Policy' },
+  { href: '/iletisim', label: 'Contact' },
+];
+
+export function getLegalPageLinks(locale: Locale): Array<{ href: `/${LegalPageSlug}`; label: string }> {
+  return locale === 'tr' ? LEGAL_PAGE_LINKS_TR : LEGAL_PAGE_LINKS_EN;
+}
+
+export const LEGAL_PAGE_LINKS = LEGAL_PAGE_LINKS_TR;
+
 export const CHECKOUT_CONSENT_DOCUMENTS: Array<{ href: string; label: string; suffix: string }> = [
   { href: '/on-bilgilendirme-formu', label: 'Ön Bilgilendirme Formu', suffix: "'nu" },
   { href: '/mesafeli-satis-sozlesmesi', label: 'Mesafeli Satış Sözleşmesi', suffix: "'ni" },
@@ -44,13 +62,13 @@ export const CHECKOUT_CONSENT_DOCUMENTS: Array<{ href: string; label: string; su
   { href: '/kvkk-aydinlatma-metni', label: 'KVKK Aydınlatma Metni', suffix: "'ni" },
 ];
 
-const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
+const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
   'gizlilik-politikasi': {
     slug: 'gizlilik-politikasi',
     title: 'Gizlilik Politikası',
     description: 'Kişisel verilerin nasıl toplandığı, işlendiği, saklandığı ve korunduğuna ilişkin genel bilgilendirme metni.',
     intro: [
-      'Bu metin, [MARKA/FIRMA ADI] tarafından sunulan dijital hizmetlerde kişisel verilerin korunmasına ilişkin genel çerçeveyi açıklar.',
+      'Bu metin, AKA YAZILIM tarafından sunulan dijital hizmetlerde kişisel verilerin korunmasına ilişkin genel çerçeveyi açıklar.',
       'Metin taslak bilgilendirme niteliğindedir; faaliyet yapınıza uygun nihai metin için hukuki danışmanlık almanız önerilir.',
     ],
     sections: [
@@ -118,8 +136,8 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '9. İletişim',
         paragraphs: [
-          'Gizlilik talepleriniz için: [DESTEK_EPOSTA] / [KEP_ADRESI]',
-          'Veri sorumlusu iletişim bilgileri: [FIRMA_UNVAN], [ADRES], [TELEFON]',
+          'Gizlilik talepleriniz için: akasalimserhat@gmail.com',
+          'Veri sorumlusu: AKA YAZILIM',
         ],
       },
     ],
@@ -183,8 +201,8 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '7. İletişim',
         paragraphs: [
-          'Çerez kullanımı ve kişisel verilerin işlenmesi hakkında talepleriniz için: [DESTEK_EPOSTA]',
-          'Veri sorumlusu bilgileri: [FIRMA_UNVAN], [ADRES], [KEP_ADRESI]',
+          'Çerez kullanımı ve kişisel verilerin işlenmesi hakkında talepleriniz için: akasalimserhat@gmail.com',
+          'Veri sorumlusu: AKA YAZILIM',
         ],
       },
     ],
@@ -201,9 +219,9 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '1. Veri Sorumlusu',
         paragraphs: [
-          'Veri sorumlusu: [FIRMA_UNVAN]',
+          'Veri sorumlusu: AKA YAZILIM',
           'MERSİS No: [MERSIS_NO] | Vergi Dairesi/No: [VERGI_DAIRESI] / [VERGI_NO]',
-          'Adres: [ADRES] | E-posta: [DESTEK_EPOSTA] | KEP: [KEP_ADRESI]',
+          'E-posta: akasalimserhat@gmail.com',
         ],
       },
       {
@@ -259,7 +277,7 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '8. Başvuru ve İletişim Yöntemi',
         paragraphs: [
-          'KVKK başvurularınızı [DESTEK_EPOSTA] adresine veya [KEP_ADRESI] üzerinden iletebilirsiniz.',
+          'KVKK başvurularınızı akasalimserhat@gmail.com adresine iletebilirsiniz.',
           'Başvurularda ad-soyad, iletişim bilgisi, talep konusu ve kimlik doğrulama bilgileri açık şekilde belirtilmelidir.',
         ],
       },
@@ -270,7 +288,7 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
     title: 'Kullanım Koşulları',
     description: 'Platformun kullanım şartları, kullanıcı sorumlulukları ve hizmete ilişkin genel koşullar.',
     intro: [
-      'Bu koşullar, [MARKA/FIRMA ADI] tarafından sunulan dijital hizmetlerin kullanım esaslarını düzenler.',
+      'Bu koşullar, AKA YAZILIM tarafından sunulan dijital hizmetlerin kullanım esaslarını düzenler.',
       'Hizmeti kullanarak bu koşulları kabul etmiş sayılırsınız.',
     ],
     sections: [
@@ -327,14 +345,14 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '8. Fikri Mülkiyet',
         paragraphs: [
-          'Platformun yazılımı, tasarımı, içerikleri, marka unsurları ve dokümantasyonu üzerindeki tüm haklar [FIRMA_UNVAN] ve/veya lisans sağlayıcılarına aittir.',
+          'Platformun yazılımı, tasarımı, içerikleri, marka unsurları ve dokümantasyonu üzerindeki tüm haklar AKA YAZILIM ve/veya lisans sağlayıcılarına aittir.',
         ],
       },
       {
         title: '9. Uyuşmazlık ve İletişim',
         paragraphs: [
           'Uyuşmazlıklarda öncelikle iyi niyetli çözüm ve destek kanalları işletilir.',
-          'İletişim: [DESTEK_EPOSTA] | [ADRES] | [TELEFON]',
+          'İletişim: akasalimserhat@gmail.com',
         ],
       },
     ],
@@ -351,7 +369,7 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '1. Taraflar',
         paragraphs: [
-          'Satıcı: [FIRMA_UNVAN], [ADRES], [VERGI_DAIRESI], [VERGI_NO], [DESTEK_EPOSTA]',
+          'Satıcı: AKA YAZILIM, [VERGI_DAIRESI], [VERGI_NO], akasalimserhat@gmail.com',
           'Alıcı: [ALICI_AD_SOYAD], [ALICI_EPOSTA], [ALICI_ADRES] (ödeme ve hesap kayıtlarından alınır).',
         ],
       },
@@ -416,9 +434,8 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '1. Satıcı Bilgileri',
         paragraphs: [
-          'Unvan: [FIRMA_UNVAN]',
-          'Adres: [ADRES]',
-          'E-posta: [DESTEK_EPOSTA] | Telefon: [TELEFON]',
+          'Unvan: AKA YAZILIM',
+          'E-posta: akasalimserhat@gmail.com',
           'Vergi Dairesi/No: [VERGI_DAIRESI] / [VERGI_NO]',
         ],
       },
@@ -456,7 +473,7 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '7. İletişim ve Destek',
         paragraphs: [
-          'Ödeme, kullanım, iptal/iade ve teknik destek talepleriniz için: [DESTEK_EPOSTA]',
+          'Ödeme, kullanım, iptal/iade ve teknik destek talepleriniz için: akasalimserhat@gmail.com',
           'İş günlerinde geri dönüş hedef süresi: [X] saat.',
         ],
       },
@@ -498,7 +515,7 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '5. İade Talebi İçin İletişim',
         paragraphs: [
-          'İade talebinizi [DESTEK_EPOSTA] üzerinden, sipariş bilgileri ve açıklamanızla birlikte iletebilirsiniz.',
+          'İade talebinizi akasalimserhat@gmail.com üzerinden, sipariş bilgileri ve açıklamanızla birlikte iletebilirsiniz.',
         ],
       },
       {
@@ -516,27 +533,19 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
     description: 'Ödeme, iade, hesap ve teknik destek konularında firma iletişim bilgileri ve başvuru kanalları.',
     intro: [
       'Ödeme, iade, hesap yönetimi ve teknik destek talepleriniz için aşağıdaki kanallardan bize ulaşabilirsiniz.',
-      'Aşağıdaki alanlar placeholder olarak hazırlanmıştır; canlıya çıkmadan önce kurum bilgilerinizle güncelleyiniz.',
+      'İletişim ve destek için aşağıdaki resmi kanalları kullanabilirsiniz.',
     ],
     sections: [
       {
         title: '1. Destek E-posta Adresi',
-        paragraphs: ['[DESTEK_EPOSTA]'],
+        paragraphs: ['akasalimserhat@gmail.com'],
       },
       {
         title: '2. Firma / Marka Bilgisi',
-        paragraphs: ['[MARKA_ADI] / [FIRMA_UNVAN]'],
+        paragraphs: ['AKA YAZILIM'],
       },
       {
-        title: '3. Adres Bilgisi',
-        paragraphs: ['[ADRES]'],
-      },
-      {
-        title: '4. Vergi Bilgileri',
-        paragraphs: ['Vergi Dairesi: [VERGI_DAIRESI]', 'Vergi No: [VERGI_NO]', 'MERSİS No: [MERSIS_NO]'],
-      },
-      {
-        title: '5. Destek Süreci',
+        title: '3. Destek Süreci',
         bullets: [
           'Ödeme ve faturalama: Sipariş numarası/e-posta ile başvuru yapınız.',
           'İptal ve iade: İade nedeni ve işlem tarihini ekleyerek talep iletiniz.',
@@ -548,12 +557,487 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
   },
 };
 
-export function getLegalPage(slug: LegalPageSlug): LegalPageContent {
-  return LEGAL_PAGES[slug];
+const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
+  'gizlilik-politikasi': {
+    slug: 'gizlilik-politikasi',
+    title: 'Privacy Policy',
+    description: 'General information about how personal data is collected, processed, stored, and protected.',
+    intro: [
+      'This policy explains the general framework for personal data protection in digital services provided by AKA YAZILIM.',
+      'This text is a general template and may require legal review before final publication.',
+    ],
+    sections: [
+      {
+        title: '1. Data We Collect',
+        bullets: [
+          'Identity and contact data: full name, email, and account details.',
+          'Transaction data: purchase requests, package details, payment verification status, and timestamps.',
+          'Technical data: IP address, device information, browser details, session logs, and security records.',
+        ],
+      },
+      {
+        title: '2. User Account and Data Security',
+        paragraphs: [
+          'Account-related information is processed only for service delivery, account management, and security operations.',
+          'Reasonable technical and administrative safeguards are applied, but no online transmission method is fully risk-free.',
+        ],
+      },
+      {
+        title: '3. Payment Processing (Shopier)',
+        paragraphs: [
+          'Payments are processed via Shopier. Card details such as card number, expiry date, and CVV are not stored by us.',
+          'Limited payment-related transaction data may be processed for order verification and accounting obligations.',
+        ],
+      },
+      {
+        title: '4. Cookies and Analytics',
+        paragraphs: [
+          'Cookies and similar technologies may be used to improve service performance, usability, and security.',
+          'If analytics tools are used, collected data is generally evaluated in aggregated or non-directly identifiable formats.',
+        ],
+      },
+      {
+        title: '5. Purposes of Processing',
+        bullets: [
+          'Account creation, session management, and access control.',
+          'Purchase processing, payment verification, and invoicing.',
+          'Support handling, service quality improvement, and abuse prevention.',
+          'Compliance with legal retention, reporting, and audit obligations.',
+        ],
+      },
+      {
+        title: '6. Third-Party Services',
+        paragraphs: [
+          'Third-party providers may be used for payments, infrastructure, email delivery, analytics, and hosting.',
+          'Data sharing with such providers is limited to what is necessary for service setup and operations.',
+        ],
+      },
+      {
+        title: '7. Data Retention',
+        paragraphs: [
+          'Personal data is retained for as long as required by the processing purpose and applicable legal periods.',
+          'At the end of retention periods, data is deleted, destroyed, or anonymized.',
+        ],
+      },
+      {
+        title: '8. User Rights',
+        bullets: [
+          'Learn whether your personal data is processed.',
+          'Request information, correction, or updates regarding processed data.',
+          'Request deletion/destruction when legal conditions are met.',
+          'Exercise objection, complaint, and other rights under applicable law.',
+        ],
+      },
+      {
+        title: '9. Contact',
+        paragraphs: ['Privacy requests: akasalimserhat@gmail.com', 'Data controller: AKA YAZILIM'],
+      },
+    ],
+  },
+  'cerez-politikasi': {
+    slug: 'cerez-politikasi',
+    title: 'Cookie Policy',
+    description: 'Information on cookie types, purposes, retention periods, and preference management.',
+    intro: [
+      'This policy provides information about cookies and similar technologies used on our website.',
+      'You can manage your cookie preferences from the cookie panel and the footer link at any time.',
+    ],
+    sections: [
+      {
+        title: '1. What Is a Cookie?',
+        paragraphs: [
+          'Cookies are small text files stored on your device through your browser when you visit a website.',
+          'Cookies can be used for session continuity, security, remembering preferences, and service performance measurement.',
+        ],
+      },
+      {
+        title: '2. Cookie Categories',
+        bullets: [
+          'Strictly Necessary Cookies: required for core site functionality and authentication.',
+          'Analytics Cookies: used to measure performance and generate usage statistics.',
+          'Marketing Cookies: may be used for campaign measurement and personalized content processes.',
+        ],
+      },
+      {
+        title: '3. Legal Basis and Consent',
+        paragraphs: [
+          'Strictly necessary cookies may be used based on legal exemptions where technically required for service delivery.',
+          'Non-essential analytics and marketing cookies are activated only after explicit consent.',
+          'The cookie panel provides options such as accept all, strictly necessary only, and custom preferences.',
+        ],
+      },
+      {
+        title: '4. Retention Periods',
+        bullets: [
+          'Session cookies: deleted when the browser session ends.',
+          'Persistent cookies: stored for a defined period and then automatically deleted.',
+          'Preference cookies: stored for a limited period to remember your consent choices.',
+        ],
+      },
+      {
+        title: '5. First-Party and Third-Party Cookies',
+        paragraphs: [
+          'First-party cookies are set directly by our website.',
+          'Third-party cookies may be set by integrated analytics or service providers.',
+          'When third-party cookies are used, technical and administrative controls are applied in line with applicable law.',
+        ],
+      },
+      {
+        title: '6. Managing Cookie Preferences',
+        bullets: [
+          'You can accept, reject, or customize categories from the cookie panel.',
+          'You can update preferences later via the footer cookie settings link.',
+          'You may also delete or block cookies in your browser settings; some features may then not function properly.',
+        ],
+      },
+      {
+        title: '7. Contact',
+        paragraphs: ['For cookie and personal data requests: akasalimserhat@gmail.com', 'Data controller: AKA YAZILIM'],
+      },
+    ],
+  },
+  'kvkk-aydinlatma-metni': {
+    slug: 'kvkk-aydinlatma-metni',
+    title: 'KVKK Disclosure Notice',
+    description: 'General disclosure notice on personal data processing under Law No. 6698 (KVKK).',
+    intro: [
+      'This notice has been prepared to fulfill the data controller disclosure obligation under the Turkish Personal Data Protection Law (KVKK).',
+      'This is a general template and may require organization-specific updates.',
+    ],
+    sections: [
+      {
+        title: '1. Data Controller',
+        paragraphs: [
+          'Data controller: AKA YAZILIM',
+          'MERSIS No: [MERSIS_NO] | Tax Office/No: [VERGI_DAIRESI] / [VERGI_NO]',
+          'Email: akasalimserhat@gmail.com',
+        ],
+      },
+      {
+        title: '2. Personal Data Processed',
+        bullets: [
+          'Identity and contact information (name, email, phone, etc.).',
+          'Usage and transaction records (account activity, purchases, support requests).',
+          'Technical data (IP, device details, sessions, and logs).',
+          'Financial transaction data (payment amount, order code, timestamps).',
+        ],
+      },
+      {
+        title: '3. Processing Purposes',
+        bullets: [
+          'Service delivery, account management, and technical support operations.',
+          'Payment processing and financial/accounting operations.',
+          'Security, error detection, fraud prevention, and audit activities.',
+          'Compliance with statutory obligations.',
+        ],
+      },
+      {
+        title: '4. Legal Grounds',
+        paragraphs: [
+          'Personal data may be processed based on contract necessity, legal obligations, legitimate interests of the controller, and explicit consent where required.',
+        ],
+      },
+      {
+        title: '5. Potential Data Recipients',
+        bullets: [
+          'Payment infrastructure providers (e.g., Shopier) and financial operations parties.',
+          'Hosting, software, security, analytics, and email service providers.',
+          'Legally authorized public authorities and judicial bodies.',
+        ],
+      },
+      {
+        title: '6. Data Collection Methods',
+        paragraphs: [
+          'Personal data may be collected electronically via website forms, account creation flows, payment steps, support channels, cookies, and logs.',
+        ],
+      },
+      {
+        title: '7. Rights Under KVKK',
+        bullets: [
+          'Learn whether personal data is being processed.',
+          'Request information if personal data has been processed.',
+          'Learn the purpose of processing and whether data is used accordingly.',
+          'Know third parties to whom data is transferred domestically/abroad.',
+          'Request correction of incomplete or inaccurate data.',
+          'Request deletion/destruction under Article 7 of KVKK.',
+          'Claim compensation for damages caused by unlawful processing.',
+        ],
+      },
+      {
+        title: '8. Application and Contact Method',
+        paragraphs: [
+          'You can submit KVKK requests to akasalimserhat@gmail.com.',
+          'Applications should clearly include full name, contact details, request subject, and identity verification details.',
+        ],
+      },
+    ],
+  },
+  'kullanim-kosullari': {
+    slug: 'kullanim-kosullari',
+    title: 'Terms and Conditions',
+    description: 'General terms governing platform use, user responsibilities, and service conditions.',
+    intro: [
+      'These terms govern the use of digital services provided by AKA YAZILIM.',
+      'By using the service, you agree to these terms.',
+    ],
+    sections: [
+      {
+        title: '1. Service Description',
+        paragraphs: [
+          'The platform is a web service that enables users to access digital content/tools, manage accounts, and complete purchases.',
+        ],
+      },
+      {
+        title: '2. User Account and Responsibilities',
+        bullets: [
+          'Users are responsible for keeping account information accurate and up to date.',
+          'Users must maintain account security, including password confidentiality and reporting unauthorized access.',
+          'Users agree to use the platform in compliance with applicable laws and good-faith principles.',
+        ],
+      },
+      {
+        title: '3. Prohibited Use',
+        bullets: [
+          'Unauthorized access attempts, abuse of security testing, or attempts to block or disrupt the service.',
+          'Unauthorized sharing of third-party personal data, copyright infringement, or unlawful content creation.',
+          'Using the service for spam, fraud, illegal promotion, or unfair commercial gain.',
+        ],
+      },
+      {
+        title: '4. Use of Digital Services/Products',
+        paragraphs: [
+          'Purchased digital rights and features may only be used within the relevant user account.',
+          'Usage rights are personal, non-transferable, and may not be resold commercially.',
+        ],
+      },
+      {
+        title: '5. Pricing',
+        paragraphs: [
+          'Paid packages are offered at the prices listed on the pricing page.',
+          'Payments are processed via Shopier infrastructure, and paid rights may remain inactive until payment is completed.',
+        ],
+      },
+      {
+        title: '6. Service Changes or Termination',
+        paragraphs: [
+          'Platform features, pricing, or scope of use may be updated with prior notice.',
+          'Account access may be temporarily or permanently restricted in cases of unlawful use or security risk.',
+        ],
+      },
+      {
+        title: '7. Limitation of Liability',
+        paragraphs: [
+          'The service is provided at the best technically feasible level, but uninterrupted or error-free operation is not guaranteed.',
+          'To the extent permitted by law, liability limits apply to indirect damages, data loss, and interruptions caused by third-party services.',
+        ],
+      },
+      {
+        title: '8. Intellectual Property',
+        paragraphs: [
+          'All rights related to the platform software, design, content, brand assets, and documentation belong to AKA YAZILIM and/or its licensors.',
+        ],
+      },
+      {
+        title: '9. Disputes and Contact',
+        paragraphs: [
+          'In case of disputes, the parties will first seek a good-faith resolution through support channels.',
+          'Contact: akasalimserhat@gmail.com',
+        ],
+      },
+    ],
+  },
+  'mesafeli-satis-sozlesmesi': {
+    slug: 'mesafeli-satis-sozlesmesi',
+    title: 'Distance Sales Agreement',
+    description: 'General agreement template defining rights and obligations in digital service/product sales.',
+    intro: [
+      'This agreement is a template governing seller and buyer rights/obligations for online purchases.',
+      'You should adapt the final agreement text to your specific business model and legal obligations.',
+    ],
+    sections: [
+      {
+        title: '1. Parties',
+        paragraphs: [
+          'Seller: AKA YAZILIM, [VERGI_DAIRESI], [VERGI_NO], akasalimserhat@gmail.com',
+          'Buyer: [ALICI_AD_SOYAD], [ALICI_EPOSTA], [ALICI_ADRES] (based on order and account records).',
+        ],
+      },
+      {
+        title: '2. Service/Product Information',
+        paragraphs: [
+          'Purchased digital service/product is limited to the package name, scope, usage rights, and any defined usage period.',
+        ],
+      },
+      {
+        title: '3. Pricing and Payment',
+        paragraphs: [
+          'The sale price is the total amount displayed in the order summary.',
+          'Payments are collected via Shopier. Card data is not stored in the seller system.',
+        ],
+      },
+      {
+        title: '4. Delivery / Provision of Digital Service',
+        paragraphs: [
+          'Digital services are made accessible via the account after payment confirmation.',
+          'In case of technical delays, support is provided within a reasonable period.',
+        ],
+      },
+      {
+        title: '5. Right of Withdrawal and Exceptions',
+        paragraphs: [
+          'The right of withdrawal in distance sales is evaluated under applicable consumer law.',
+          'For digital content/services, legal exceptions may apply once performance starts or usage begins.',
+        ],
+      },
+      {
+        title: '6. Refund Conditions',
+        paragraphs: [
+          'Refund requests are assessed based on usage status, technical error conditions, and transaction logs.',
+          'Approved refunds are completed according to payment provider and bank processing times.',
+        ],
+      },
+      {
+        title: '7. Dispute Resolution',
+        paragraphs: [
+          'Parties first seek resolution through support channels.',
+          'For legal proceedings, applicable law, consumer arbitration committees, and competent courts apply.',
+        ],
+      },
+      {
+        title: '8. Entry into Force',
+        paragraphs: ['This agreement enters into force electronically when the buyer approves it during payment.'],
+      },
+    ],
+  },
+  'on-bilgilendirme-formu': {
+    slug: 'on-bilgilendirme-formu',
+    title: 'Pre-Information Form',
+    description: 'Pre-purchase information on sale, payment, delivery, and withdrawal rights.',
+    intro: [
+      'This form is provided to inform consumers before completing a purchase.',
+      'The following content is a general template and should be adapted to your operation model.',
+    ],
+    sections: [
+      {
+        title: '1. Seller Information',
+        paragraphs: [
+          'Company: AKA YAZILIM',
+          'Email: akasalimserhat@gmail.com',
+          'Tax Office/No: [VERGI_DAIRESI] / [VERGI_NO]',
+        ],
+      },
+      {
+        title: '2. Main Characteristics of the Service',
+        paragraphs: [
+          'Purchased package may include digital features, credits/limits, or platform usage rights defined in the selected plan.',
+        ],
+      },
+      {
+        title: '3. Total Price',
+        paragraphs: ['The total sales amount is clearly shown on the purchase screen and submitted for user approval before payment.'],
+      },
+      {
+        title: '4. Payment Method',
+        paragraphs: ['Payments are completed via Shopier secure checkout. Card information is not stored in the seller system.'],
+      },
+      {
+        title: '5. Use of Digital Service',
+        paragraphs: [
+          'Digital rights are assigned to the user account after payment confirmation.',
+          'Technical requirements and account responsibilities are additionally defined in the Terms and Conditions.',
+        ],
+      },
+      {
+        title: '6. Right of Withdrawal Information',
+        paragraphs: ['Withdrawal rights and exceptions are evaluated based on distance sales law and the execution status of digital services.'],
+      },
+      {
+        title: '7. Contact and Support',
+        paragraphs: [
+          'For payment, usage, cancellation/refund, and technical support requests: akasalimserhat@gmail.com',
+          'Target response time on business days: [X] hours.',
+        ],
+      },
+    ],
+  },
+  'iptal-iade-politikasi': {
+    slug: 'iptal-iade-politikasi',
+    title: 'Cancellation and Refund Policy',
+    description: 'General policy for cancellation, refund, and support flows in digital services/products.',
+    intro: [
+      'This policy explains cancellation and refund practices for digital services/products in a transparent way.',
+      'Final practices are evaluated together with legal obligations, payment provider rules, and technical records.',
+    ],
+    sections: [
+      {
+        title: '1. General Approach for Digital Service/Product Purchases',
+        paragraphs: ['Refund requests are reviewed case by case according to service nature and usage status.'],
+      },
+      {
+        title: '2. Refund Request Before Service Use',
+        paragraphs: ['If the purchased service/product has not been used, requests submitted within a reasonable period are evaluated.'],
+      },
+      {
+        title: '3. Refund Status After Service Use',
+        paragraphs: [
+          'If the service has been partially/fully used, refund eligibility is determined by usage level, delivered value, and technical records.',
+        ],
+      },
+      {
+        title: '4. Faulty or Technically Problematic Transactions',
+        paragraphs: [
+          'For duplicate charges, failed delivery, or technical errors, remediation is prioritized and refund processes are started when necessary.',
+        ],
+      },
+      {
+        title: '5. Contact for Refund Requests',
+        paragraphs: ['You can submit your refund request to akasalimserhat@gmail.com with order details and your explanation.'],
+      },
+      {
+        title: '6. Refund Process for Shopier Payments',
+        paragraphs: [
+          'For Shopier payments, requests are first received by support and then verified against transaction logs.',
+          'Once approved, refund completion depends on Shopier and the related bank/payment institution processing times.',
+        ],
+      },
+    ],
+  },
+  iletisim: {
+    slug: 'iletisim',
+    title: 'Contact',
+    description: 'Official contact channels for payment, refund, account, and technical support requests.',
+    intro: [
+      'For payment, refund, account management, and technical support requests, please use the channels below.',
+      'Only official support channels listed here should be used for legal and operational requests.',
+    ],
+    sections: [
+      {
+        title: '1. Support Email Address',
+        paragraphs: ['akasalimserhat@gmail.com'],
+      },
+      {
+        title: '2. Company Information',
+        paragraphs: ['AKA YAZILIM'],
+      },
+      {
+        title: '3. Support Process',
+        bullets: [
+          'Payments and billing: include order number and account email in your request.',
+          'Cancellation and refunds: include refund reason and transaction date.',
+          'Account issues: share account email and issue details clearly.',
+          'Technical support: include error screen, device/browser details, and reproduction steps.',
+        ],
+      },
+    ],
+  },
+};
+
+export function getLegalPage(slug: LegalPageSlug, locale: Locale = 'tr'): LegalPageContent {
+  return locale === 'tr' ? LEGAL_PAGES_TR[slug] : LEGAL_PAGES_EN[slug];
 }
 
-export function getLegalPageMetadata(slug: LegalPageSlug): Metadata {
-  const page = getLegalPage(slug);
+export function getLegalPageMetadata(slug: LegalPageSlug, locale: Locale = 'tr'): Metadata {
+  const page = getLegalPage(slug, locale);
   return {
     title: page.title,
     description: page.description,

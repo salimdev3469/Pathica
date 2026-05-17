@@ -332,18 +332,33 @@ export function CVPreview() {
     }, [dispatch, state.personalInfo?.photoDataUrl, state.personalInfo?.photoSize]);
     // Auto-scale the A4 preview to fit its container
     useEffect(() => {
-        const handleResize = () => {
-            if (containerRef.current) {
-                const containerWidth = containerRef.current.clientWidth;
-                // A4 width in px is 794
-                const newScale = containerWidth / 794;
-                setScale(newScale < 1 ? newScale : 1);
-            }
+        const updateScale = () => {
+            const container = containerRef.current;
+            if (!container) return;
+
+            const containerWidth = container.clientWidth;
+            if (containerWidth <= 0) return;
+
+            // A4 width in px is 794
+            const newScale = containerWidth / PAGE_WIDTH;
+            setScale(newScale < 1 ? newScale : 1);
         };
 
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        updateScale();
+
+        const container = containerRef.current;
+        let resizeObserver: ResizeObserver | null = null;
+
+        if (container && typeof ResizeObserver !== 'undefined') {
+            resizeObserver = new ResizeObserver(() => updateScale());
+            resizeObserver.observe(container);
+        }
+
+        window.addEventListener('resize', updateScale);
+        return () => {
+            window.removeEventListener('resize', updateScale);
+            resizeObserver?.disconnect();
+        };
     }, []);
 
 

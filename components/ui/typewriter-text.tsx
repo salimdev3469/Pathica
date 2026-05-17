@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react"
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export interface TypewriterProps {
     text: string | string[];
@@ -32,9 +32,17 @@ export function Typewriter({
     const [textArrayIndex, setTextArrayIndex] = useState(0);
     const [isCompleted, setIsCompleted] = useState(false);
 
-    // Validate and process input text
-    const textArray = Array.isArray(text) ? text : [text];
+    const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
+    const resetKey = useMemo(() => textArray.join("\u0001"), [textArray]);
     const currentText = textArray[textArrayIndex] || "";
+
+    useEffect(() => {
+        setDisplayText("");
+        setCurrentIndex(0);
+        setIsDeleting(false);
+        setTextArrayIndex(0);
+        setIsCompleted(false);
+    }, [resetKey]);
 
     useEffect(() => {
         if (!currentText) return;
@@ -69,12 +77,12 @@ export function Typewriter({
         currentIndex,
         isDeleting,
         currentText,
+        textArray.length,
         loop,
         speed,
         deleteSpeed,
         delay,
         displayText,
-        text,
         isCompleted,
         onComplete,
     ]);

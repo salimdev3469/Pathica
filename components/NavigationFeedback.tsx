@@ -45,6 +45,11 @@ export default function NavigationFeedback() {
         return;
       }
 
+      // Ignore file download links (including blob/data URLs).
+      if (anchor.hasAttribute('download') || href.startsWith('blob:') || href.startsWith('data:')) {
+        return;
+      }
+
       if (
         href.startsWith('#') ||
         href.startsWith('mailto:') ||

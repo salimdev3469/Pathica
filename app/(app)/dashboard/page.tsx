@@ -412,13 +412,19 @@ function getAtsScoreStyles(score: number) {
 }
 
 function localizeAtsReason(reason: string, locale: Locale): string {
-    if (locale !== 'tr' || !reason) {
+    if (!reason) {
         return reason;
     }
 
+    const normalizedReason = normalizeAtsReasonText(reason);
+
+    if (locale !== 'tr') {
+        return normalizedReason;
+    }
+
     const translatedSectionsPrefix = 'Eksik temel bölümler:';
-    const missingSectionsMatch = reason.match(/^Missing core sections:\s*([^.]*)\.?/i);
-    let localized = reason.trim();
+    const missingSectionsMatch = normalizedReason.match(/^Missing core sections:\s*([^.]*)\.?/i);
+    let localized = normalizedReason.trim();
 
     if (missingSectionsMatch) {
         const rawLabels = missingSectionsMatch[1]?.trim() || '';
@@ -436,7 +442,10 @@ function localizeAtsReason(reason: string, locale: Locale): string {
     const replacements: Array<[RegExp, string]> = [
         [/Expand summary with role-specific keywords\.?/i, 'Özeti role özel anahtar kelimelerle genişlet.'],
         [/Add more concise bullet points for recent roles\.?/i, 'Son roller için daha öz ve net madde işaretleri ekle.'],
-        [/Include measurable outcomes \(%\/numbers\) in achievements\.?/i, 'Başarılara ölçülebilir çıktılar (%/sayılar) ekle.'],
+        [
+            /Include measurable outcomes \([^)]*\) in achievements\.?/i,
+            'Başarılara yüzdeler veya somut sayılarla ölçülebilir çıktılar ekle.',
+        ],
         [/Start bullet points with stronger[^.]*\.?/i, 'Madde işaretlerine daha güçlü aksiyon fiilleriyle başla.'],
         [/Add clear dates for experience and education entries\.?/i, 'Deneyim ve eğitim girdilerine net tarih ekle.'],
         [
@@ -454,6 +463,10 @@ function localizeAtsReason(reason: string, locale: Locale): string {
     }
 
     return localized.replace(/\s+/g, ' ').trim();
+}
+
+function normalizeAtsReasonText(reason: string): string {
+    return reason.replace(/\(%\s*\/?\s*numbers?\)/gi, '(percentages or concrete numbers)');
 }
 
 function translateAtsSectionLabels(labels: string): string {

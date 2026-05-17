@@ -20,7 +20,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
     const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
     const router = useRouter();
 
-    const [selectedCvId, setSelectedCvId] = useState(cvs[0]?.id || '');
+    const [selectedCvId, setSelectedCvId] = useState('');
     const [jobTitle, setJobTitle] = useState('');
     const [company, setCompany] = useState('');
     const [jobDescription, setJobDescription] = useState('');
@@ -34,17 +34,18 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
 
     const handleGenerate = async () => {
         setError('');
-        if (!selectedCvId) {
-            setError(t('Please select a CV first.', 'Lütfen önce bir CV seçin.'));
-            return;
-        }
 
         setIsGenerating(true);
         try {
-            const cvStateRes = await fetch(`/api/cv/${selectedCvId}/state`);
-            const cvStateData = await cvStateRes.json();
-            if (!cvStateRes.ok) {
-                throw new Error(cvStateData.error || t('Failed to load selected CV.', 'Seçilen CV yüklenemedi.'));
+            let cvStateData: unknown = null;
+
+            if (selectedCvId) {
+                const cvStateRes = await fetch(`/api/cv/${selectedCvId}/state`);
+                const cvStatePayload = await cvStateRes.json();
+                if (!cvStateRes.ok) {
+                    throw new Error(cvStatePayload.error || t('Failed to load selected CV.', 'Seçilen CV yüklenemedi.'));
+                }
+                cvStateData = cvStatePayload;
             }
 
             const res = await fetch('/api/cv/cover-letter', {
@@ -61,13 +62,22 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                 })
             });
 
-            const data = await res.json();
+            const data = (await res.json().catch(() => ({}))) as {
+                coverLetter?: string;
+                id?: string;
+                error?: string;
+                code?: string;
+            };
 
             if (!res.ok) {
+                if (res.status === 402 || data.code === 'INSUFFICIENT_CREDITS') {
+                    router.push('/billing?reason=insufficient_credits&feature=cover_letter');
+                    return;
+                }
                 throw new Error(data.error || t('Failed to generate cover letter.', 'Ön yazı oluşturulamadı.'));
             }
 
-            setGeneratedText(data.coverLetter);
+            setGeneratedText(data.coverLetter || '');
             // Optionally, we could redirect to the saved cover letter ID.
             if (data.id) {
                 router.push(`/cover-letter/${data.id}`);
@@ -92,7 +102,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                         {t('Cover Letter Builder', 'Ön Yazı Oluşturucu')}
                     </h1>
                     <p className="text-sm text-slate-500">
-                        {t('Generate a tailored cover letter using your CV and job details.', 'CV ve iş ilanı detaylarını kullanarak kişiselleştirilmiş bir ön yazı oluşturun.')}
+                        {t('Generate a tailored cover letter using your job details, with CV as optional context.', 'İş ilanı detaylarını kullanarak kişiselleştirilmiş bir ön yazı oluşturun; CV eklemek opsiyoneldir.')}
                     </p>
                 </div>
             </div>
@@ -105,18 +115,23 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="cv-select">{t('Select Base CV', 'Temel CV Seçimi')}</Label>
+                            <Label htmlFor="cv-select">{t('Select Base CV (Optional)', 'Temel CV Seçimi (Opsiyonel)')}</Label>
                             <select 
                                 id="cv-select"
                                 value={selectedCvId} 
                                 onChange={e => setSelectedCvId(e.target.value)}
                                 className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300"
                             >
-                                {cvs.length === 0 && <option value="">{t('No CVs found', 'CV bulunamadı')}</option>}
+                                <option value="">{t('Continue without CV', 'CV olmadan devam et')}</option>
                                 {cvs.map(cv => (
                                     <option key={cv.id} value={cv.id}>{cv.title}</option>
                                 ))}
                             </select>
+                            {cvs.length === 0 && (
+                                <p className="text-xs text-slate-500">
+                                    {t('No saved CV found. You can still generate a cover letter.', 'Kayıtlı CV bulunamadı. Yine de ön yazı oluşturabilirsiniz.')}
+                                </p>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -203,7 +218,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                     <CardFooter>
                         <Button 
                             onClick={handleGenerate} 
-                            disabled={isGenerating || cvs.length === 0} 
+                            disabled={isGenerating} 
                             className="w-full gap-2 bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
                         >
                             {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}

@@ -21,17 +21,29 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  const [pendingLocale, setPendingLocale] = useState<Locale | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const effectiveLocale = pendingLocale ?? locale;
 
-  const current = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0];
+  const current = LANGUAGES.find((l) => l.code === effectiveLocale) ?? LANGUAGES[0];
 
   const handleChange = (nextLocale: Locale) => {
     setOpen(false);
-    if (nextLocale === locale) return;
+    if (nextLocale === effectiveLocale) return;
+
+    setPendingLocale(nextLocale);
     setClientLocale(nextLocale);
-    startTransition(() => {
-      router.refresh();
-    });
+
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+    }
+
+    refreshTimerRef.current = setTimeout(() => {
+      startTransition(() => {
+        router.refresh();
+      });
+    }, 120);
   };
 
   // Close dropdown on outside click
@@ -44,6 +56,20 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
     if (open) document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
+
+  useEffect(() => {
+    if (pendingLocale && pendingLocale === locale) {
+      setPendingLocale(null);
+    }
+  }, [locale, pendingLocale]);
+
+  useEffect(() => {
+    return () => {
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div ref={ref} className={cn('relative', className)}>
@@ -94,15 +120,17 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
             <button
               key={lang.code}
               role="option"
-              aria-selected={lang.code === locale}
+              aria-selected={lang.code === effectiveLocale}
               type="button"
+              disabled={isPending}
               onClick={() => handleChange(lang.code)}
               className={cn(
                 'flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition',
                 'hover:bg-slate-50 dark:hover:bg-slate-800',
-                lang.code === locale
+                lang.code === effectiveLocale
                   ? 'bg-slate-100 font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100'
                   : 'text-slate-700 dark:text-slate-300',
+                isPending && 'cursor-not-allowed opacity-60',
               )}
             >
               <Image
@@ -114,7 +142,7 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
                 style={{ width: 22, height: 16 }}
               />
               <span>{lang.label}</span>
-              {lang.code === locale && (
+              {lang.code === effectiveLocale && (
                 <span className="ml-auto text-primary">✓</span>
               )}
             </button>

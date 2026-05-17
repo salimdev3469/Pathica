@@ -16,11 +16,7 @@ export async function POST(req: Request) {
         }
         userId = user.id;
 
-        const { cvState, jobDescription, company, jobTitle, language = 'tr', tone = 'professional', length = 'medium' } = await req.json();
-
-        if (!cvState) {
-            return NextResponse.json({ error: 'CV data is required' }, { status: 400 });
-        }
+        const { cvState = null, jobDescription, company, jobTitle, language = 'tr', tone = 'professional', length = 'medium' } = await req.json();
 
         consumption = await consumeAdvancedAiCredit(user.id, 'cover_letter', {
             cv_id: cvState?.id || null,
@@ -51,6 +47,10 @@ export async function POST(req: Request) {
         if (length === 'short') lengthPrompt = '1-2 short paragraphs, concise and direct';
         if (length === 'long') lengthPrompt = '3-4 detailed paragraphs, thoroughly explaining fit';
 
+        const cvContext = cvState
+            ? JSON.stringify(cvState)
+            : 'No CV data provided. Build the cover letter from job context and reasonable professional assumptions.';
+
         const prompt = `You are an expert career coach writing a customized, ATS-friendly cover letter.
     Rules:
     - Return plain text only. No markdown formatting.
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     ${jobDescription ? `Job Description:\n${jobDescription}` : 'No job description provided. Focus on highlighting the best aspects of the CV for the Target Job Title.'}
 
     CV Data:
-    ${JSON.stringify(cvState)}`;
+    ${cvContext}`;
 
         const result = await flashModel.generateContent(prompt);
         const responseText = result.response.text();
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
             .from('cover_letters')
             .insert({
                 user_id: user.id,
-                cv_id: cvState.id || null,
+                cv_id: cvState?.id || null,
                 job_title: jobTitle || null,
                 company_name: company || null,
                 job_description: jobDescription || null,

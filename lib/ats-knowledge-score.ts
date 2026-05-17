@@ -231,7 +231,7 @@ function buildReason(input: {
     }
 
     if (input.quantifiedHits < 3) {
-        reasonParts.push('Include measurable outcomes (%/numbers) in achievements.');
+        reasonParts.push('Include measurable outcomes (percentages or concrete numbers) in achievements.');
     }
 
     if (input.actionRatio < 0.3) {

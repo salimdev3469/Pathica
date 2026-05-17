@@ -10,6 +10,7 @@ import { useCV, Section } from '@/context/CVContext';
 import { SectionCard } from './SectionCard';
 import { PersonalInfoForm } from './PersonalInfoForm';
 import { JobMatcher } from './JobMatcher';
+import { CvImportDialog } from './CvImportDialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -442,7 +443,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
             <input
               value={state.title}
               onChange={(e) => dispatch({ type: 'UPDATE_TITLE', payload: e.target.value })}
-              className="w-full border-b-2 border-transparent bg-transparent pb-1 text-4xl font-bold leading-tight outline-none transition-colors hover:border-slate-200 focus:border-primary md:text-5xl"
+              className="w-full min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-b-2 border-transparent bg-transparent pb-1 text-2xl font-bold leading-tight outline-none transition-colors hover:border-slate-200 focus:border-primary sm:text-3xl md:text-4xl xl:text-5xl"
               placeholder={t('CV Title', 'CV Başlığı')}
             />
             <p className="mt-2 text-lg leading-relaxed text-slate-500">{t('Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!', 'Bilgileri doldurup alt bölümler ekleyerek ATS uyumlu CV oluştur. Önizlemede sürükle-bırak ile sıralamayı değiştirebilirsin!')}</p>
@@ -495,6 +496,9 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                 <Eye className="h-4 w-4" />
                 {t('Preview PDF', 'PDF Önizle')}
               </Button>
+            )}
+            {isAuthenticated && (
+              <CvImportDialog locale={locale} />
             )}
             {isAuthenticated && (
               <JobMatcher locale={locale} />

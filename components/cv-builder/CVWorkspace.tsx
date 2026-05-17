@@ -19,7 +19,7 @@ export function CVWorkspace({ locale = 'en' }: CVWorkspaceProps) {
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-slate-50 md:h-[100dvh] md:flex-row md:overflow-hidden">
+    <div className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-slate-50 md:flex-row">
       <div className="sticky top-0 z-40 border-b border-slate-200/90 bg-white/95 px-3 py-2 backdrop-blur md:hidden">
         <div className="grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1">
           <Button
@@ -45,8 +45,8 @@ export function CVWorkspace({ locale = 'en' }: CVWorkspaceProps) {
 
       <div
         className={cn(
-          'relative flex w-full flex-col border-b bg-slate-50 md:h-full md:min-h-0 md:w-1/2 md:border-b-0 md:border-r',
-          mobilePanel === 'preview' ? 'hidden md:flex' : 'min-h-[calc(100dvh-58px)]',
+          'relative flex w-full min-h-0 flex-col overflow-hidden border-b bg-slate-50 md:h-full md:w-1/2 md:border-b-0 md:border-r',
+          mobilePanel === 'preview' ? 'hidden md:flex' : 'flex-1',
         )}
       >
         <div className="absolute left-0 top-0 z-30 h-1 w-full bg-gradient-to-r from-primary to-blue-500 md:rounded-none" />
@@ -56,8 +56,8 @@ export function CVWorkspace({ locale = 'en' }: CVWorkspaceProps) {
       <div
         id="preview-section"
         className={cn(
-          'relative z-0 w-full bg-slate-200 shadow-inner md:h-full md:min-h-0 md:w-1/2',
-          mobilePanel === 'preview' ? 'min-h-[calc(100dvh-58px)]' : 'hidden md:block',
+          'relative z-0 w-full min-h-0 overflow-hidden bg-slate-200 shadow-inner md:h-full md:w-1/2',
+          mobilePanel === 'preview' ? 'flex-1' : 'hidden md:block',
         )}
       >
         <CVPreview />

@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getPasswordPolicyError, isPasswordCompromised } from '@/lib/password-security';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -41,10 +42,29 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    const language = locale === 'tr' ? 'tr' : 'en';
+    const policyError = getPasswordPolicyError(password, language);
+    if (policyError) {
+      setStatusMessage({ type: 'error', text: policyError });
+      toast.error(policyError);
+      return;
+    }
+
     setIsLoading(true);
     setStatusMessage({ type: 'info', text: t('Creating your account...', 'Hesabınız oluşturuluyor...') });
 
     try {
+      const compromised = await isPasswordCompromised(password);
+      if (compromised) {
+        const compromisedMessage = t(
+          'This password appears in known data breaches. Please choose a different password.',
+          'Bu şifre bilinen veri ihlallerinde görünüyor. Lütfen farklı bir şifre seçin.',
+        );
+        setStatusMessage({ type: 'error', text: compromisedMessage });
+        toast.error(compromisedMessage);
+        return;
+      }
+
       const signupCallbackUrl = buildAuthCallbackUrl(next, true);
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -204,7 +224,22 @@ export default function RegisterPage() {
 
                 <div className="grid gap-2">
                   <Label htmlFor="password">{t('Password', 'Şifre')}</Label>
-                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="h-11 rounded-full px-4" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={12}
+                    autoComplete="new-password"
+                    className="h-11 rounded-full px-4"
+                  />
+                  <p className="text-xs text-slate-500">
+                    {t(
+                      'Use at least 12 characters with uppercase, lowercase, and a number.',
+                      'En az 12 karakter, büyük harf, küçük harf ve rakam kullanın.',
+                    )}
+                  </p>
                 </div>
 
                 <Button className="h-11 w-full rounded-full bg-[#1a1a1a] text-md font-semibold text-white shadow-md hover:bg-black" type="submit" disabled={isBusy}>

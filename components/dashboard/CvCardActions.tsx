@@ -151,46 +151,49 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 rounded-lg border-slate-200 bg-slate-50 px-2 text-xs font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-slate-200 bg-slate-50 px-2 text-[11px] font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800 sm:text-xs"
                         onClick={handleDownload}
                         disabled={isDownloading}
+                        title={t('Download PDF', 'PDF İndir')}
                     >
                         {isDownloading ? (
-                            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
                         ) : (
-                            <Download className="mr-1.5 h-3.5 w-3.5" />
+                            <Download className="h-3.5 w-3.5 shrink-0" />
                         )}
-                        {t('Download PDF', 'PDF İndir')}
+                        <span className="min-w-0 truncate">{t('Download PDF', 'PDF İndir')}</span>
                     </Button>
 
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 rounded-lg border-slate-200 bg-slate-50 px-2 text-xs font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-slate-200 bg-slate-50 px-2 text-[11px] font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800 sm:text-xs"
                         onClick={openPreview}
                         disabled={isPreviewLoading}
+                        title={t('Preview', 'Önizle')}
                     >
                         {isPreviewLoading ? (
-                            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
                         ) : (
-                            <Eye className="mr-1.5 h-3.5 w-3.5" />
+                            <Eye className="h-3.5 w-3.5 shrink-0" />
                         )}
-                        {t('Preview', 'Önizle')}
+                        <span className="min-w-0 truncate">{t('Preview', 'Önizle')}</span>
                     </Button>
                     <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="h-9 rounded-lg border-rose-200 bg-rose-50 px-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-900/40"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-rose-200 bg-rose-50 px-2 text-[11px] font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-900/40 sm:text-xs"
                         onClick={openDeleteDialog}
                         disabled={isDeleting}
+                        title={t('Delete CV', 'CV Sil')}
                     >
                         {isDeleting ? (
-                            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
                         ) : (
-                            <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                            <Trash2 className="h-3.5 w-3.5 shrink-0" />
                         )}
-                        {t('Delete CV', 'CV Sil')}
+                        <span className="min-w-0 truncate">{t('Delete CV', 'CV Sil')}</span>
                     </Button>
                 </div>
             </div>

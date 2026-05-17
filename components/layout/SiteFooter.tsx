@@ -3,7 +3,7 @@ import path from 'node:path';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Locale } from '@/lib/locale';
-import { LEGAL_PAGE_LINKS } from '@/lib/legal-pages';
+import { getLegalPageLinks } from '@/lib/legal-pages';
 import { localizedPath } from '@/lib/seo/config';
 import CookieSettingsButton from '@/components/legal/CookieSettingsButton';
 
@@ -23,6 +23,7 @@ function getFooterLogoSrc() {
 export default function SiteFooter({ locale }: SiteFooterProps) {
   const isTr = locale === 'tr';
   const t = (en: string, tr: string) => (isTr ? tr : en);
+  const legalPageLinks = getLegalPageLinks(locale);
   const footerLogoSrc = getFooterLogoSrc();
   const seoLinks = [
     {
@@ -51,13 +52,19 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
     <footer className="border-t border-slate-800 bg-slate-900 py-12 text-slate-400">
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6">
         <div className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
-          <Image
-            src={footerLogoSrc}
-            alt={t('Pathica footer logo', 'Pathica alt logosu')}
-            width={144}
-            height={144}
-            className="h-24 w-24 object-contain sm:h-28 sm:w-28"
-          />
+          <Link
+            href={localizedPath(locale)}
+            aria-label={t('Go to Pathica homepage', 'Pathica ana sayfasına git')}
+            className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+          >
+            <Image
+              src={footerLogoSrc}
+              alt={t('Pathica footer logo', 'Pathica alt logosu')}
+              width={144}
+              height={144}
+              className="h-24 w-24 object-contain sm:h-28 sm:w-28"
+            />
+          </Link>
         </div>
 
         <p className="mx-auto mb-6 max-w-xl text-center text-sm text-slate-400">
@@ -69,7 +76,7 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
 
         <nav aria-label="Yasal ve kurumsal bağlantılar" className="w-full">
           <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center text-sm">
-            {LEGAL_PAGE_LINKS.map((link) => (
+            {legalPageLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}

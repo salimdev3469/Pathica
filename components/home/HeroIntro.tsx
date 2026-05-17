@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Typewriter } from '@/components/ui/typewriter-text';
 
 type HeroIntroProps = {
@@ -11,10 +11,15 @@ type HeroIntroProps = {
 export function HeroIntro({ headline, subtitle }: HeroIntroProps) {
   const [showSubtitle, setShowSubtitle] = useState(false);
 
+  useEffect(() => {
+    setShowSubtitle(false);
+  }, [headline, subtitle]);
+
   return (
     <>
       <h1 className="mb-8 min-h-[110px] text-5xl leading-tight tracking-[-0.04em] text-slate-900 dark:text-slate-100 sm:min-h-[150px] lg:text-7xl">
         <Typewriter
+          key={headline}
           text={headline}
           speed={50}
           loop={false}

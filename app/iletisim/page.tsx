@@ -1,8 +1,15 @@
+import { cookies } from 'next/headers';
 import LegalPageTemplate from '@/components/legal/LegalPageTemplate';
 import { getLegalPage, getLegalPageMetadata } from '@/lib/legal-pages';
+import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 
-export const metadata = getLegalPageMetadata('iletisim');
+export function generateMetadata() {
+  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
+  return getLegalPageMetadata('iletisim', locale);
+}
 
 export default function IletisimPage() {
-  return <LegalPageTemplate page={getLegalPage('iletisim')} />;
+  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
+
+  return <LegalPageTemplate page={getLegalPage('iletisim', locale)} />;
 }
