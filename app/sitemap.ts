@@ -62,6 +62,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.4,
     },
     {
+      url: absolute(baseUrl, '/cerez-politikasi'),
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
       url: absolute(baseUrl, '/kvkk-aydinlatma-metni'),
       lastModified: now,
       changeFrequency: 'monthly',

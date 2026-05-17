@@ -137,9 +137,13 @@ export function JobMatcher({ locale }: JobMatcherProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2 shrink-0 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900">
+        <Button
+          variant="outline"
+          className="w-full gap-2 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 sm:w-auto dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
+        >
           <Zap className="h-4 w-4" />
-          {t('Match with Job', 'İş İlanıyla Eşleştir')}
+          <span className="sm:hidden">{t('Match Job', 'İlan Eşleştir')}</span>
+          <span className="hidden sm:inline">{t('Match with Job', 'İş İlanıyla Eşleştir')}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">

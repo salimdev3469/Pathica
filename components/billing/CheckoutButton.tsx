@@ -94,6 +94,10 @@ export default function CheckoutButton({ packageCode, disabled = false, classNam
             <Link href="/gizlilik-politikasi" className="font-medium text-slate-900 underline underline-offset-2">
               Gizlilik Politikası
             </Link>
+            {"'nı, "}
+            <Link href="/cerez-politikasi" className="font-medium text-slate-900 underline underline-offset-2">
+              Çerez Politikası
+            </Link>
             {"'nı ve "}
             <Link href="/kvkk-aydinlatma-metni" className="font-medium text-slate-900 underline underline-offset-2">
               KVKK Aydınlatma Metni

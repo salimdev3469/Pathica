@@ -27,7 +27,19 @@ import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { X } from 'lucide-react';
 
-export const PreviewContext = React.createContext({ scale: 1, showTutorial: false, dismissTutorial: () => {} });
+type PreviewContextValue = {
+    scale: number;
+    showTutorial: boolean;
+    dismissTutorial: () => void;
+    dragEnabled: boolean;
+};
+
+export const PreviewContext = React.createContext<PreviewContextValue>({
+    scale: 1,
+    showTutorial: false,
+    dismissTutorial: () => { },
+    dragEnabled: true,
+});
 
 const PAGE_WIDTH = 794;
 const PAGE_HEIGHT = 1123;
@@ -42,13 +54,13 @@ function clamp(value: number, min: number, max: number) {
 // Drag Wrapper for Sections
 const DraggableSectionWrapper = ({ id, children, isContinuation }: { id: string, children: React.ReactNode, isContinuation?: boolean }) => {
     const { state } = useCV();
-    const { scale, showTutorial, dismissTutorial } = React.useContext(PreviewContext);
+    const { scale, showTutorial, dismissTutorial, dragEnabled } = React.useContext(PreviewContext);
     
     // Only make it sortable if it's not a continuation
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: `section-${id}`,
         data: { type: 'Section', id },
-        disabled: isContinuation
+        disabled: isContinuation || !dragEnabled
     });
 
     const isFirst = state.sections.length > 0 && state.sections[0].id === id;
@@ -81,7 +93,7 @@ const DraggableSectionWrapper = ({ id, children, isContinuation }: { id: string,
         <SortableContext items={(section.items || []).map(i => `item-${i.id}`)} strategy={verticalListSortingStrategy}>
             <div ref={setNodeRef} style={style} className={`group/section ${isFirst && showTutorial ? 'ring-2 ring-primary/50 ring-offset-4 rounded-md' : ''}`}>
                 {/* Drag Handle for Section - Top Aligned to avoid overlapping with items */}
-                {!isContinuation && (
+                {!isContinuation && dragEnabled && (
                     <div
                         {...attributes}
                         {...listeners}
@@ -121,10 +133,11 @@ const DraggableSectionWrapper = ({ id, children, isContinuation }: { id: string,
 
 // Drag Wrapper for Items (Sub-Sections)
 const DraggableItemWrapper = ({ id, sectionId, children }: { id: string, sectionId: string, children: React.ReactNode }) => {
-    const { scale } = React.useContext(PreviewContext);
+    const { scale, dragEnabled } = React.useContext(PreviewContext);
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: `item-${id}`,
-        data: { type: 'Item', id, sectionId }
+        data: { type: 'Item', id, sectionId },
+        disabled: !dragEnabled,
     });
 
     const scaledTransform = transform ? {
@@ -149,18 +162,20 @@ const DraggableItemWrapper = ({ id, sectionId, children }: { id: string, section
     };
 
     return (
-        <div ref={setNodeRef} style={style} className="group/item rounded p-1 -mx-1 -mt-1 touch-none transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/50">
+        <div ref={setNodeRef} style={style} className="group/item rounded p-1 -mx-1 -mt-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/50">
             {/* Drag Handle for Item - Top Aligned */}
-            <div
-                {...attributes}
-                {...listeners}
-                className="absolute -left-[28px] top-1 cursor-grab active:cursor-grabbing opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity"
-                title="Drag to reorder item"
-            >
-                <div className="bg-white border text-slate-400 hover:text-slate-600 shadow-sm p-0.5 rounded flex items-center justify-center">
-                    <GripVertical size={14} />
+            {dragEnabled && (
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="absolute -left-[28px] top-1 cursor-grab active:cursor-grabbing opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity"
+                    title="Drag to reorder item"
+                >
+                    <div className="bg-white border text-slate-400 hover:text-slate-600 shadow-sm p-0.5 rounded flex items-center justify-center">
+                        <GripVertical size={14} />
+                    </div>
                 </div>
-            </div>
+            )}
             {children}
         </div>
     );
@@ -169,6 +184,7 @@ const DraggableItemWrapper = ({ id, sectionId, children }: { id: string, section
 export function CVPreview() {
     const { state, dispatch } = useCV();
     const [scale, setScale] = useState(1);
+    const [dragEnabled, setDragEnabled] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [showTutorial, setShowTutorial] = useState(false);
@@ -176,6 +192,20 @@ export function CVPreview() {
     const [photoDragPosition, setPhotoDragPosition] = useState<{ x: number; y: number } | null>(null);
     const photoDragRef = useRef<{ startClientX: number; startClientY: number; baseX: number; baseY: number } | null>(null);
     const photoDragPositionRef = useRef<{ x: number; y: number } | null>(null);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(pointer: coarse)');
+        const syncDragMode = () => setDragEnabled(!mediaQuery.matches);
+        syncDragMode();
+
+        if (typeof mediaQuery.addEventListener === 'function') {
+            mediaQuery.addEventListener('change', syncDragMode);
+            return () => mediaQuery.removeEventListener('change', syncDragMode);
+        }
+
+        mediaQuery.addListener(syncDragMode);
+        return () => mediaQuery.removeListener(syncDragMode);
+    }, []);
 
 
 
@@ -319,6 +349,13 @@ export function CVPreview() {
 
 
     useEffect(() => {
+        if (!dragEnabled) {
+            if (showTutorial) {
+                setShowTutorial(false);
+            }
+            return;
+        }
+
         // Show tutorial if not seen before and there are sections
         const seen = localStorage.getItem('cv-builder-dnd-tutorial-v2');
         if (!seen && state.sections.length > 0 && !showTutorial) {
@@ -335,7 +372,7 @@ export function CVPreview() {
                 });
             }, 800);
         }
-    }, [state.sections.length, showTutorial]);
+    }, [dragEnabled, state.sections.length, showTutorial]);
 
     const dismissTutorial = () => {
         setShowTutorial(false);
@@ -422,7 +459,7 @@ export function CVPreview() {
     };
 
     return (
-        <div className="flex min-h-screen flex-col md:h-full md:min-h-0">
+        <div className="flex h-full min-h-0 flex-col">
             <div className="z-10 flex items-center justify-between border-b bg-white p-4 shadow-sm">
                 <h2 className="font-semibold text-lg text-slate-800">Preview</h2>
                 <div className="flex gap-2">
@@ -451,7 +488,7 @@ export function CVPreview() {
                         modifiers={[restrictToVerticalAxis]}
                     >
                         <SortableContext items={state.sections.map(s => `section-${s.id}`)} strategy={verticalListSortingStrategy}>
-                            <PreviewContext.Provider value={{ scale, showTutorial, dismissTutorial }}>
+                            <PreviewContext.Provider value={{ scale, showTutorial, dismissTutorial, dragEnabled }}>
                                 <div className="shadow-2xl relative">
                                     <CVTemplate
                                         previewMode
@@ -475,5 +512,3 @@ export function CVPreview() {
         </div>
     );
 }
-
-

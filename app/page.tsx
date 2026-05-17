@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { createClient } from '@/lib/supabase-server';
 import { MouseEffect } from '@/components/mouse-effect';
 import { HeroIntro } from '@/components/home/HeroIntro';
+import LazyAutoplayVideo from '@/components/home/LazyAutoplayVideo';
 import { TemplateLibraryGrid } from '@/components/home/TemplateLibraryGrid';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import LanguageToggle from '@/components/language-toggle';
@@ -89,6 +90,7 @@ export default async function Home() {
   const heroPrimaryHref = isAuthenticated ? '/dashboard' : '/cv/new';
   const logoSrc = getLogoSrc();
   const footerLogoSrc = getFooterLogoSrc();
+  const homeDemoVideoSrc = getHomeDemoVideoSrc();
   const billingSummaryText = getBillingSummaryText(locale);
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
   const sectionTitleClass = 'text-3xl md:text-5xl font-normal tracking-[-0.04em] text-slate-900 dark:text-slate-100';
@@ -320,14 +322,7 @@ export default async function Home() {
 
                   {/* Video Content */}
                   <div className="relative bg-white dark:bg-slate-900">
-                    <video
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      src="/demo_1.mp4"
-                      className="w-full h-auto block"
-                    />
+                    <LazyAutoplayVideo src={homeDemoVideoSrc} className="w-full h-auto block" />
                   </div>
                 </div>
               </div>
@@ -702,5 +697,14 @@ function getFooterLogoSrc() {
     return `/logo_pathica_footer.png?v=${Math.floor(mtime)}`;
   } catch {
     return '/logo_pathica_footer.png';
+  }
+}
+
+function getHomeDemoVideoSrc() {
+  try {
+    const mtime = fs.statSync(path.join(process.cwd(), 'public', 'demo_1.mp4')).mtimeMs;
+    return `/demo_1.mp4?v=${Math.floor(mtime)}`;
+  } catch {
+    return '/demo_1.mp4';
   }
 }

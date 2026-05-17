@@ -26,7 +26,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [authMessage, setAuthMessage] = useState<{ type: 'info' | 'success' | 'error'; text: string } | null>(null);
-  const [videoIndex, setVideoIndex] = useState(0);
   const [locale, setLocale] = useState<Locale>('en');
 
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
@@ -100,15 +99,7 @@ export default function LoginPage() {
       </Link>
 
       <div className="relative hidden w-1/2 border-r border-slate-200 bg-slate-900 lg:block">
-        <video
-          key={`video-${videoIndex}`}
-          src={`/video${videoIndex + 1}.mp4`}
-          autoPlay
-          muted
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-80"
-          onEnded={() => setVideoIndex((prev) => (prev === 0 ? 1 : 0))}
-        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.28),transparent_45%),radial-gradient(circle_at_75%_30%,rgba(16,185,129,0.22),transparent_42%),radial-gradient(circle_at_60%_85%,rgba(99,102,241,0.22),transparent_40%),linear-gradient(160deg,#0f172a_0%,#111827_45%,#020617_100%)]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-16 left-16 right-16 z-20">
           <h2 className="mb-4 text-4xl font-normal leading-tight tracking-[-0.04em] text-white">

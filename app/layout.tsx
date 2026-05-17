@@ -10,6 +10,8 @@ import SiteFooter from '@/components/layout/SiteFooter';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { getBaseUrl } from '@/lib/seo/config';
 import { Toaster } from '@/components/ui/sonner';
+import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
+import { COOKIE_CONSENT_COOKIE_NAME } from '@/lib/cookie-consent';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -75,7 +77,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
+  const cookieStore = cookies();
+  const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE_NAME)?.value);
+  const initialCookieConsent = cookieStore.get(COOKIE_CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -85,6 +89,7 @@ export default function RootLayout({
           <NavigationFeedback />
           {children}
           <SiteFooter locale={locale} />
+          <CookieConsentBanner locale={locale} initialConsentValue={initialCookieConsent} />
           <Toaster />
           <div className="fixed bottom-5 right-5 z-[100]">
             <ThemeToggle />

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Locale } from '@/lib/locale';
 import { LEGAL_PAGE_LINKS } from '@/lib/legal-pages';
 import { localizedPath } from '@/lib/seo/config';
+import CookieSettingsButton from '@/components/legal/CookieSettingsButton';
 
 type SiteFooterProps = {
   locale: Locale;
@@ -78,6 +79,9 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
                 </Link>
               </li>
             ))}
+            <li>
+              <CookieSettingsButton locale={locale} />
+            </li>
           </ul>
         </nav>
 

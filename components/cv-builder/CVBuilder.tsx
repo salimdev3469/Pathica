@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Plus, Briefcase, GraduationCap, Code, FolderGit2, Save, Loader2, FileText, ArrowLeft } from 'lucide-react';
+import { Plus, Briefcase, GraduationCap, Code, FolderGit2, Save, Loader2, FileText, ArrowLeft, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Locale } from '@/lib/locale';
 import { useCV, Section } from '@/context/CVContext';
@@ -30,9 +30,10 @@ const GUEST_EDIT_LOCK_THRESHOLD = 6;
 
 type CVBuilderProps = {
   locale?: Locale;
+  onOpenPreview?: () => void;
 };
 
-export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
+export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
 
   const PREBUILT_SECTIONS = [
@@ -397,12 +398,7 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
   };
 
   return (
-    <div className="custom-scrollbar relative mx-auto w-full max-w-2xl flex-1 px-4 py-6 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:p-8">
-      <div className="md:hidden fixed bottom-6 right-6 z-50">
-        <Button onClick={() => document.getElementById('preview-section')?.scrollIntoView({ behavior: 'smooth' })} className="rounded-full shadow-2xl h-14 px-6 text-lg">
-           <FileText className="mr-2" /> {t('Preview PDF', 'PDF Önizle')}
-        </Button>
-      </div>
+    <div className="custom-scrollbar relative mx-auto w-full max-w-2xl flex-1 overflow-y-auto overscroll-y-contain px-4 py-5 pb-8 md:min-h-0 md:p-8">
       <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -441,21 +437,21 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
           </div>
         )}
 
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <div className="flex-1">
+      <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0 flex-1">
             <input
               value={state.title}
               onChange={(e) => dispatch({ type: 'UPDATE_TITLE', payload: e.target.value })}
-              className="w-full border-b-2 border-transparent bg-transparent pb-1 text-4xl font-bold outline-none transition-colors hover:border-slate-200 focus:border-primary"
+              className="w-full border-b-2 border-transparent bg-transparent pb-1 text-4xl font-bold leading-tight outline-none transition-colors hover:border-slate-200 focus:border-primary md:text-5xl"
               placeholder={t('CV Title', 'CV Başlığı')}
             />
-            <p className="mt-2 text-slate-500">{t('Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!', 'Bilgileri doldurup alt bölümler ekleyerek ATS uyumlu CV oluştur. Önizlemede sürükle-bırak ile sıralamayı değiştirebilirsin!')}</p>
-            <div className="mt-4 max-w-xs">
+            <p className="mt-2 text-lg leading-relaxed text-slate-500">{t('Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!', 'Bilgileri doldurup alt bölümler ekleyerek ATS uyumlu CV oluştur. Önizlemede sürükle-bırak ile sıralamayı değiştirebilirsin!')}</p>
+            <div className="mt-4 w-full max-w-md">
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
                 {t('Font & Letter Spacing', 'Yazı Tipi ve Harf Aralığı')}
               </label>
-              <div className="flex gap-2">
-                <div className="flex-1">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="w-full flex-1">
                   <Select
                     value={state.fontFamily}
                     onValueChange={(value) => dispatch({ type: 'UPDATE_FONT_FAMILY', payload: value })}
@@ -472,7 +468,7 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="w-24">
+                <div className="w-full sm:w-28">
                   <div className="relative">
                     <input
                       type="number"
@@ -488,7 +484,18 @@ export function CVBuilder({ locale = 'en' }: CVBuilderProps) {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2 md:flex-row md:items-center shrink-0">
+          <div className="flex w-full shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap lg:w-auto lg:flex-col lg:items-stretch">
+            {onOpenPreview && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onOpenPreview}
+                className="gap-2 md:hidden"
+              >
+                <Eye className="h-4 w-4" />
+                {t('Preview PDF', 'PDF Önizle')}
+              </Button>
+            )}
             {isAuthenticated && (
               <JobMatcher locale={locale} />
             )}

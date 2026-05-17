@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 export type LegalPageSlug =
   | 'gizlilik-politikasi'
+  | 'cerez-politikasi'
   | 'kvkk-aydinlatma-metni'
   | 'kullanim-kosullari'
   | 'mesafeli-satis-sozlesmesi'
@@ -25,6 +26,7 @@ export type LegalPageContent = {
 
 export const LEGAL_PAGE_LINKS: Array<{ href: `/${LegalPageSlug}`; label: string }> = [
   { href: '/gizlilik-politikasi', label: 'Gizlilik Politikası' },
+  { href: '/cerez-politikasi', label: 'Çerez Politikası' },
   { href: '/kvkk-aydinlatma-metni', label: 'KVKK Aydınlatma Metni' },
   { href: '/kullanim-kosullari', label: 'Kullanım Koşulları' },
   { href: '/mesafeli-satis-sozlesmesi', label: 'Mesafeli Satış Sözleşmesi' },
@@ -38,6 +40,7 @@ export const CHECKOUT_CONSENT_DOCUMENTS: Array<{ href: string; label: string; su
   { href: '/mesafeli-satis-sozlesmesi', label: 'Mesafeli Satış Sözleşmesi', suffix: "'ni" },
   { href: '/kullanim-kosullari', label: 'Kullanım Koşulları', suffix: "'nı" },
   { href: '/gizlilik-politikasi', label: 'Gizlilik Politikası', suffix: "'nı" },
+  { href: '/cerez-politikasi', label: 'Çerez Politikası', suffix: "'nı" },
   { href: '/kvkk-aydinlatma-metni', label: 'KVKK Aydınlatma Metni', suffix: "'ni" },
 ];
 
@@ -117,6 +120,71 @@ const LEGAL_PAGES: Record<LegalPageSlug, LegalPageContent> = {
         paragraphs: [
           'Gizlilik talepleriniz için: [DESTEK_EPOSTA] / [KEP_ADRESI]',
           'Veri sorumlusu iletişim bilgileri: [FIRMA_UNVAN], [ADRES], [TELEFON]',
+        ],
+      },
+    ],
+  },
+  'cerez-politikasi': {
+    slug: 'cerez-politikasi',
+    title: 'Çerez Politikası',
+    description: 'Sitede kullanılan çerez türleri, amaçları, saklama süreleri ve tercih yönetimi hakkında bilgilendirme metni.',
+    intro: [
+      'Bu politika, internet sitemizde kullanılan çerezler ve benzeri teknolojiler hakkında bilgilendirme sağlamak amacıyla hazırlanmıştır.',
+      'Çerez tercihlerinizi, siteye girişte gösterilen panelden veya alt bilgide yer alan “Çerez Tercihleri” bağlantısından her zaman güncelleyebilirsiniz.',
+    ],
+    sections: [
+      {
+        title: '1. Çerez Nedir?',
+        paragraphs: [
+          'Çerezler, internet sitesini ziyaret ettiğinizde tarayıcınız üzerinden cihazınıza kaydedilen küçük metin dosyalarıdır.',
+          'Çerezler, oturum sürekliliği, güvenlik, tercihlerin hatırlanması ve hizmet kalitesinin ölçülmesi gibi amaçlarla kullanılabilir.',
+        ],
+      },
+      {
+        title: '2. Çerez Kategorileri',
+        bullets: [
+          'Zorunlu Çerezler: Oturum güvenliği, kimlik doğrulama ve temel sayfa fonksiyonları için gereklidir.',
+          'Analitik Çerezler: Site performansını ölçmek ve kullanım istatistikleri üretmek için kullanılır.',
+          'Pazarlama Çerezleri: Reklam kampanyalarının ölçümü ve kişiselleştirilmiş içerik süreçlerinde kullanılabilir.',
+        ],
+      },
+      {
+        title: '3. Hukuki Dayanak ve Açık Rıza',
+        paragraphs: [
+          'Zorunlu çerezler, hizmetin teknik olarak sunulabilmesi için gerekli olması nedeniyle ilgili mevzuatta öngörülen istisnalar kapsamında kullanılabilir.',
+          'Zorunlu olmayan analitik ve pazarlama çerezleri, yalnızca açık rıza vermeniz halinde etkinleştirilir.',
+          'Çerez panelinde “Hepsini kabul et”, “Sadece zorunlu” ve “Tercihler” seçenekleri sunularak tercihinizi özgürce belirlemeniz amaçlanır.',
+        ],
+      },
+      {
+        title: '4. Kullanım Süreleri',
+        bullets: [
+          'Oturum çerezleri: Tarayıcı oturumu kapandığında silinir.',
+          'Kalıcı çerezler: Belirli bir süre boyunca cihazınızda saklanır ve süre sonunda otomatik silinir.',
+          'Çerez tercih kaydı: Tercihinizin tekrar sorulmaması için sınırlı süreyle saklanır.',
+        ],
+      },
+      {
+        title: '5. Birinci Taraf / Üçüncü Taraf Çerezler',
+        paragraphs: [
+          'Birinci taraf çerezler doğrudan internet sitemiz tarafından yerleştirilir.',
+          'Üçüncü taraf çerezler, analitik veya entegrasyon hizmeti sağlayan iş ortakları tarafından yerleştirilebilir.',
+          'Üçüncü taraf çerez kullanımında, aktarım ve işleme süreçleri için yürürlükteki mevzuata uygun teknik/idari tedbirler uygulanır.',
+        ],
+      },
+      {
+        title: '6. Çerez Tercihlerini Yönetme',
+        bullets: [
+          'Açılış çerez panelinden kategorileri seçebilir veya tamamını reddedebilirsiniz.',
+          'Alt bilgideki “Çerez Tercihleri” bağlantısından tercihlerinizi sonradan değiştirebilirsiniz.',
+          'Tarayıcı ayarlarınızdan çerezleri silme veya engelleme işlemi yapabilirsiniz; bu durumda bazı özellikler çalışmayabilir.',
+        ],
+      },
+      {
+        title: '7. İletişim',
+        paragraphs: [
+          'Çerez kullanımı ve kişisel verilerin işlenmesi hakkında talepleriniz için: [DESTEK_EPOSTA]',
+          'Veri sorumlusu bilgileri: [FIRMA_UNVAN], [ADRES], [KEP_ADRESI]',
         ],
       },
     ],
