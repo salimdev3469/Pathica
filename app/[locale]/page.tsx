@@ -76,6 +76,17 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
   const isTr = locale === 'tr';
   const landingPages = getSeoLandingPagesByLocale(locale);
   const programmaticPath = getProfessionListPath(locale);
+  const hubSteps = isTr
+    ? [
+        'İhtiyacına uygun sayfayı aç (CV oluşturma, ATS, ön yazı vb.).',
+        'Sayfadaki önerileri baz alarak içerik planını netleştir.',
+        'CV oluşturma ekranına geçip taslağını hemen başlat.',
+      ]
+    : [
+        'Open the page that matches your intent (builder, ATS, cover letter, etc.).',
+        'Use that page guidance to shape your content plan.',
+        'Switch to the builder and start your draft immediately.',
+      ];
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -122,6 +133,35 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
           <div className="mt-6 rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-sm text-slate-700">
             <p className="font-medium">{PRICING_MESSAGE[locale]}</p>
           </div>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              href="/cv/new"
+              className="inline-flex h-11 items-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-black"
+            >
+              {isTr ? 'Ücretsiz CV Oluştur' : 'Start Builder Free'}
+            </Link>
+            <Link
+              href={programmaticPath}
+              className="inline-flex h-11 items-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900"
+            >
+              {isTr ? 'Meslek Örneklerini Aç' : 'Open Role Examples'}
+            </Link>
+          </div>
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <p className="text-sm font-semibold text-slate-900">
+              {isTr ? 'Ne yapmalıyım? 3 adımda net akış' : 'What should I do? 3-step flow'}
+            </p>
+            <ol className="mt-3 space-y-2 text-sm text-slate-700">
+              {hubSteps.map((step, index) => (
+                <li key={step} className="flex items-start gap-2">
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+                    {index + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 
@@ -139,6 +179,12 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
                 className="mt-6 inline-flex h-10 items-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-900"
               >
                 {isTr ? 'Sayfayı Aç' : 'Open Page'}
+              </Link>
+              <Link
+                href="/cv/new"
+                className="mt-2 inline-flex h-10 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-black"
+              >
+                {isTr ? 'Direkt CV Oluştur' : 'Build Directly'}
               </Link>
             </article>
           ))}
@@ -160,6 +206,25 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
             className="mt-6 inline-flex h-11 items-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-black"
           >
             {isTr ? 'Meslek Sayfalarını Gör' : 'Browse Role Pages'}
+          </Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="rounded-2xl border bg-slate-900 p-6 text-white md:p-8">
+          <h2 className="text-2xl font-semibold">
+            {isTr ? 'Hazırsan doğrudan oluşturma ekranına geç' : 'Ready? Jump straight to the builder'}
+          </h2>
+          <p className="mt-3 text-sm text-slate-100">
+            {isTr
+              ? 'İçerik fikirlerini bu merkezden alıp tek adımda üretim ekranına geçebilirsin.'
+              : 'Use this hub for direction, then move in one step to the production editor.'}
+          </p>
+          <Link
+            href="/cv/new"
+            className="mt-6 inline-flex h-11 items-center rounded-full bg-white px-6 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+          >
+            {isTr ? 'Şimdi CV Oluştur' : 'Build Resume Now'}
           </Link>
         </div>
       </section>

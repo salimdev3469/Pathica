@@ -12,6 +12,17 @@ type SeoLandingPageProps = {
 export default function SeoLandingPageView({ locale, page, alternates }: SeoLandingPageProps) {
   const isTr = locale === 'tr';
   const pageUrl = toAbsoluteUrl(alternates[locale]);
+  const journeySteps = isTr
+    ? [
+        'Ücretsiz oluşturma ekranını aç.',
+        'CV içeriğini bu sayfadaki önerilere göre ilana uyarlayıp güçlendir.',
+        'Ücretsiz önizle, hazır olduğunda PDF export al.',
+      ]
+    : [
+        'Open the free builder.',
+        'Tailor your resume to the job using the guidance on this page.',
+        'Preview for free, then export PDF when you are ready.',
+      ];
 
   const structuredData = [
     {
@@ -86,6 +97,22 @@ export default function SeoLandingPageView({ locale, page, alternates }: SeoLand
             ))}
           </div>
 
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <p className="text-sm font-semibold text-slate-900">
+              {isTr ? 'Ne yapacağın net: 3 adımda başla' : 'Clear next step: start in 3 actions'}
+            </p>
+            <ol className="mt-3 space-y-2 text-sm text-slate-700">
+              {journeySteps.map((step, index) => (
+                <li key={step} className="flex items-start gap-2">
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+                    {index + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href={page.ctaHref}
@@ -110,13 +137,56 @@ export default function SeoLandingPageView({ locale, page, alternates }: SeoLand
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-5xl gap-4 px-6 pb-12 md:grid-cols-3">
-        {page.sections.map((section) => (
-          <article key={section.title} className="rounded-2xl border bg-white p-6">
-            <h2 className="text-xl font-semibold text-slate-900">{section.title}</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-700">{section.body}</p>
-          </article>
-        ))}
+      <section className="mx-auto max-w-5xl px-6 pb-12 lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-5">
+        <div className="grid gap-4 md:grid-cols-3">
+          {page.sections.map((section) => (
+            <article key={section.title} className="rounded-2xl border bg-white p-6">
+              <h2 className="text-xl font-semibold text-slate-900">{section.title}</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-700">{section.body}</p>
+            </article>
+          ))}
+        </div>
+        <aside className="mt-4 rounded-2xl border bg-white p-5 lg:sticky lg:top-24 lg:mt-0">
+          <p className="text-sm font-semibold text-slate-900">{isTr ? 'Hemen Uygula' : 'Apply It Now'}</p>
+          <p className="mt-2 text-sm text-slate-700">
+            {isTr
+              ? 'Bu sayfadaki önerileri bekletmeden CV ekranında uygulayıp dakikalar içinde sürümünü hazırla.'
+              : 'Apply this page guidance immediately in the builder and produce your next version in minutes.'}
+          </p>
+          <Link
+            href={page.ctaHref}
+            className="mt-4 inline-flex h-10 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-black"
+          >
+            {page.ctaLabel}
+          </Link>
+        </aside>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 pb-12">
+        <div className="rounded-2xl border bg-slate-900 p-6 text-white md:p-8">
+          <h2 className="text-2xl font-semibold">
+            {isTr ? 'Hazırsan şimdi CV oluşturma ekranına geç' : 'If you are ready, move to the builder now'}
+          </h2>
+          <p className="mt-3 text-sm text-slate-100">
+            {isTr
+              ? 'Plan net: oluştur, ilana göre optimize et, ücretsiz önizle. Export kararı her zaman sende.'
+              : 'Simple path: build, tailor to the role, preview free. You decide when to export.'}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href={page.ctaHref}
+              className="inline-flex h-11 items-center rounded-full bg-white px-6 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+            >
+              {page.ctaLabel}
+            </Link>
+            <Link
+              href={isTr ? '/tr/cv-ornekleri' : '/en/resume-examples'}
+              className="inline-flex h-11 items-center rounded-full border border-white/40 px-6 text-sm font-semibold text-white transition hover:border-white"
+            >
+              {isTr ? 'Önce Örnekleri İncele' : 'Review Examples First'}
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section className="mx-auto max-w-5xl px-6 pb-16">

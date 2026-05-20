@@ -12,6 +12,21 @@ type ProgrammaticProfessionDetailPageProps = {
 export default function ProgrammaticProfessionDetailPage({ locale, profession }: ProgrammaticProfessionDetailPageProps) {
   const isTr = locale === 'tr';
   const pageUrl = toAbsoluteUrl(getProfessionPath(locale, profession.slug));
+  const roleBuilderLabel = isTr ? 'Bu Rol İçin CV Oluştur' : 'Build This Resume Free';
+  const roleBuilderHint = isTr
+    ? `${profession.roleName.tr} için düzenlenebilir bir taslakla başla.`
+    : `Start with an editable draft for ${profession.roleName.en}.`;
+  const roleJourneySteps = isTr
+    ? [
+        'Örnekteki yetkinlik etiketlerini CV’ne ekle.',
+        'Başarı cümlelerinden kendine uyanları ölçülebilir hale getir.',
+        'Hemen başvuracağın ilan için son düzenlemeyi yap.',
+      ]
+    : [
+        'Add the highlighted skills to your draft.',
+        'Rewrite achievement ideas with your own measurable outcomes.',
+        'Finalize your version for the next job application.',
+      ];
 
   const structuredData = [
     {
@@ -71,7 +86,7 @@ export default function ProgrammaticProfessionDetailPage({ locale, profession }:
               href="/cv/new"
               className="inline-flex h-11 items-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-black"
             >
-              {isTr ? 'Bu Rol İçin CV Oluştur' : 'Build This Resume Free'}
+              {roleBuilderLabel}
             </Link>
             <Link
               href={getProfessionListPath(locale)}
@@ -79,6 +94,22 @@ export default function ProgrammaticProfessionDetailPage({ locale, profession }:
             >
               {isTr ? 'Tüm Meslekler' : 'All Roles'}
             </Link>
+          </div>
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <p className="text-sm font-semibold text-slate-900">
+              {isTr ? 'Bu sayfayı böyle kullan' : 'Use this page with this flow'}
+            </p>
+            <p className="mt-2 text-sm text-slate-700">{roleBuilderHint}</p>
+            <ol className="mt-3 space-y-2 text-sm text-slate-700">
+              {roleJourneySteps.map((step, index) => (
+                <li key={step} className="flex items-start gap-2">
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+                    {index + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       </section>
@@ -106,6 +137,33 @@ export default function ProgrammaticProfessionDetailPage({ locale, profession }:
               <li key={item}>{item}</li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 pb-16">
+        <div className="rounded-2xl border bg-slate-900 p-6 text-white md:p-8">
+          <h2 className="text-2xl font-semibold">
+            {isTr ? 'Bu örneği kendi CV’ne dönüştür' : 'Turn this example into your own resume'}
+          </h2>
+          <p className="mt-3 text-sm text-slate-100">
+            {isTr
+              ? 'Örnek fikirleri kaybetmeden kendi deneyiminle birleştir ve başvuruya hazır sürümü oluştur.'
+              : 'Keep the structure, swap in your own experience, and ship an application-ready version quickly.'}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/cv/new"
+              className="inline-flex h-11 items-center rounded-full bg-white px-6 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+            >
+              {roleBuilderLabel}
+            </Link>
+            <Link
+              href={getProfessionListPath(locale)}
+              className="inline-flex h-11 items-center rounded-full border border-white/40 px-6 text-sm font-semibold text-white transition hover:border-white"
+            >
+              {isTr ? 'Diğer Meslekleri Gör' : 'See Other Roles'}
+            </Link>
+          </div>
         </div>
       </section>
     </main>
