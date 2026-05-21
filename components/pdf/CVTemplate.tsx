@@ -66,6 +66,10 @@ type CvLayoutTheme = {
   pageAccentStyle?: React.CSSProperties;
 };
 
+type ContactEntry =
+  | { kind: 'text'; value: string }
+  | { kind: 'link'; value: string; href: string };
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -158,6 +162,18 @@ function mapSectionTitle(title: string): string {
 
 function normalizeBulletLine(line: string): string {
   return line.replace(/^[\s*\-\u2022]+/, '').trim();
+}
+
+function normalizeExternalUrl(url?: string): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+function displayUrl(url: string): string {
+  return url.replace(/^https?:\/\/(www\.)?/i, '');
 }
 
 function isCvLayoutVariant(value: unknown): value is CvLayoutVariant {
@@ -411,14 +427,17 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   const fontFamily = getCvFontStack(cv.fontFamily);
   const { fullName, email, phone, location, linkedin, portfolio, github, photoDataUrl } = personalInfo || {};
 
-  const contactItems = [
-    phone,
-    email,
-    linkedin?.replace(/^https?:\/\/(www\.)?/, ''),
-    github?.replace(/^https?:\/\/(www\.)?/, ''),
-    portfolio?.replace(/^https?:\/\/(www\.)?/, ''),
-  ].filter(Boolean);
-  const contactLine = [location, ...contactItems].filter(Boolean).join(layoutTheme.contactSeparator);
+  const linkedinUrl = normalizeExternalUrl(linkedin);
+  const githubUrl = normalizeExternalUrl(github);
+  const portfolioUrl = normalizeExternalUrl(portfolio);
+  const contactEntries = [
+    location ? { kind: 'text', value: location } : null,
+    phone ? { kind: 'text', value: phone } : null,
+    email ? { kind: 'text', value: email } : null,
+    linkedinUrl ? { kind: 'link', value: 'LinkedIn', href: linkedinUrl } : null,
+    githubUrl ? { kind: 'link', value: 'Github', href: githubUrl } : null,
+    portfolioUrl ? { kind: 'link', value: displayUrl(portfolioUrl), href: portfolioUrl } : null,
+  ].filter((entry): entry is ContactEntry => entry !== null);
 
   const hasPhoto = Boolean(photoDataUrl);
   const hasSummary = Boolean(summary?.trim());
@@ -534,7 +553,23 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                       textAlign: layoutTheme.headerAlign,
                     }}
                   >
-                    {contactLine}
+                    {contactEntries.map((entry, index) => (
+                      <React.Fragment key={`contact-${index}`}>
+                        {index > 0 ? layoutTheme.contactSeparator : null}
+                        {entry.kind === 'link' ? (
+                          <a
+                            href={entry.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: '#000000', textDecoration: 'underline' }}
+                          >
+                            {entry.value}
+                          </a>
+                        ) : (
+                          entry.value
+                        )}
+                      </React.Fragment>
+                    ))}
                   </div>
                 </div>
               )}
