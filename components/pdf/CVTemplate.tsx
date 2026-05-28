@@ -1,6 +1,7 @@
 import React from 'react';
 import { CVState, Section, Item } from '@/context/CVContext';
 import { getCvFontStack } from '@/lib/cv-fonts';
+import { CV_PAGE_HEIGHT_PX, CV_PAGE_WIDTH_PX, normalizeCvPageMargins, type CvPageMargins } from '@/lib/cv-layout';
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -31,14 +32,9 @@ type PaginatedPage = {
 const DefaultSectionWrapper: React.FC<WrapperProps> = ({ children }) => <div style={{ marginBottom: '14px' }}>{children}</div>;
 const DefaultItemWrapper: React.FC<WrapperProps> = ({ children }) => <div>{children}</div>;
 
-const PAGE_WIDTH = 794;
-const PAGE_HEIGHT = 1123;
-const PAGE_MARGIN = 54;
 const DEFAULT_PHOTO_SIZE = 112;
 const MIN_PHOTO_SIZE = 72;
 const MAX_PHOTO_SIZE = 200;
-const HEADER_HEIGHT = 82;
-const CONTENT_HEIGHT = PAGE_HEIGHT - PAGE_MARGIN * 2;
 const CV_LAYOUT_VARIANTS = ['classic-ats', 'entry-starter', 'technical-impact', 'career-switch'] as const;
 
 type CvLayoutVariant = (typeof CV_LAYOUT_VARIANTS)[number];
@@ -79,13 +75,10 @@ function ptToPx(pt: number): number {
   return pt * 1.333;
 }
 
-// Chars per line based on font size, using ~0.52 em-width ratio (for monospace-like average)
-function countWrappedLines(text: string, fontSizePt: number, isBullet = true): number {
+// Chars per line based on font size, using ~0.42 em-width ratio (conservative).
+function countWrappedLines(text: string, fontSizePt: number, contentWidthPx: number, isBullet = true): number {
   if (!text) return 0;
-  // Available content width in px: page 794 - 2*margin 54 = 686px
-  // Bullets add 18px left padding → 668px
-  const availWidth = isBullet ? 668 : 686;
-  // 0.42 = conservative char width ratio — prevents overestimating line wraps
+  const availWidth = Math.max(120, contentWidthPx - (isBullet ? 18 : 0));
   const charWidthPx = ptToPx(fontSizePt) * 0.42;
   const charsPerLine = Math.max(10, Math.floor(availWidth / charWidthPx));
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
@@ -93,19 +86,19 @@ function countWrappedLines(text: string, fontSizePt: number, isBullet = true): n
   return lines.reduce((acc, line) => acc + Math.ceil(Math.max(1, line.length) / charsPerLine), 0);
 }
 
-function estimateSummaryHeight(summary?: string, fontSize = 11, titleFontSize = 12): number {
+function estimateSummaryHeight(summary: string | undefined, contentWidthPx: number, fontSize = 11, titleFontSize = 12): number {
   if (!summary?.trim()) return 0;
   // h2: lineHeight 1.4, marginTop 6, marginBottom 3, paddingBottom 3, parent-div marginTop 6, marginBottom 6
   const h2Px = ptToPx(titleFontSize) * 1.4;
   const headingBlock = h2Px + 6 + 3 + 3 + 6 + 6; // wrapper margins + h2 margins
   // Each bullet li: lineHeight 1.4, marginBottom 3
-  const lines = Math.max(1, countWrappedLines(summary, fontSize, true));
+  const lines = Math.max(1, countWrappedLines(summary, fontSize, contentWidthPx, true));
   const bulletsBlock = 4 + lines * (ptToPx(fontSize) * 1.4 + 3); // ul marginTop + lis
   const wrapperMargin = 14; // div marginBottom
   return headingBlock + bulletsBlock + wrapperMargin;
 }
 
-function estimateItemHeight(item: Item): number {
+function estimateItemHeight(item: Item, contentWidthPx: number): number {
   const titlePt = item.titleFontSize ?? 11;
   const subtitlePt = item.subtitleFontSize ?? 11;
   const bulletsPt = item.bulletsFontSize ?? 11;
@@ -120,22 +113,12 @@ function estimateItemHeight(item: Item): number {
 
   // Bullet rows
   if (item.bullets?.trim()) {
-    const lines = countWrappedLines(item.bullets, bulletsPt, true);
+    const lines = countWrappedLines(item.bullets, bulletsPt, contentWidthPx, true);
     h += 4 + lines * (ptToPx(bulletsPt) * 1.4 + 3); // ul marginTop + each line
   }
 
   h += 12; // div marginBottom inside the item group
   return h;
-}
-
-function estimateSectionHeight(section: Section): number {
-  const titlePt = section.titleFontSize ?? 12;
-  // h2 block: h2 itself + margins + parent-div margins + sectionWrapper marginBottom
-  const h2Px = ptToPx(titlePt) * 1.4;
-  const headingBlock = h2Px + 16 + 6 + 3 + 6; // marginTop 16, marginBottom 6, paddingBottom 3, parent div marginBottom 6
-  const sectionWrapperMargin = 14;
-  const itemsHeight = (section.items || []).reduce((total, item) => total + estimateItemHeight(item), 0);
-  return headingBlock + itemsHeight + sectionWrapperMargin;
 }
 
 function mapSectionTitle(title: string): string {
@@ -194,7 +177,7 @@ function resolveLayoutVariant(cv: CVState): CvLayoutVariant {
   return 'classic-ats';
 }
 
-function getLayoutTheme(variant: CvLayoutVariant): CvLayoutTheme {
+function getLayoutTheme(variant: CvLayoutVariant, pageMargins: CvPageMargins): CvLayoutTheme {
   switch (variant) {
     case 'entry-starter':
       return {
@@ -223,9 +206,9 @@ function getLayoutTheme(variant: CvLayoutVariant): CvLayoutTheme {
         },
         pageAccentStyle: {
           position: 'absolute',
-          left: `${PAGE_MARGIN}px`,
-          right: `${PAGE_MARGIN}px`,
-          top: `${PAGE_MARGIN - 20}px`,
+          left: `${pageMargins.left}px`,
+          right: `${pageMargins.right}px`,
+          top: `${Math.max(0, pageMargins.top - 20)}px`,
           height: '6px',
           borderRadius: '999px',
           backgroundColor: '#10b981',
@@ -259,9 +242,9 @@ function getLayoutTheme(variant: CvLayoutVariant): CvLayoutTheme {
         },
         pageAccentStyle: {
           position: 'absolute',
-          left: `${PAGE_MARGIN - 16}px`,
-          top: `${PAGE_MARGIN - 6}px`,
-          bottom: `${PAGE_MARGIN - 6}px`,
+          left: `${Math.max(0, pageMargins.left - 16)}px`,
+          top: `${Math.max(0, pageMargins.top - 6)}px`,
+          bottom: `${Math.max(0, pageMargins.bottom - 6)}px`,
           width: '6px',
           borderRadius: '999px',
           backgroundColor: '#2563eb',
@@ -295,9 +278,9 @@ function getLayoutTheme(variant: CvLayoutVariant): CvLayoutTheme {
         },
         pageAccentStyle: {
           position: 'absolute',
-          right: `${PAGE_MARGIN - 16}px`,
-          top: `${PAGE_MARGIN - 6}px`,
-          bottom: `${PAGE_MARGIN - 6}px`,
+          right: `${Math.max(0, pageMargins.right - 16)}px`,
+          top: `${Math.max(0, pageMargins.top - 6)}px`,
+          bottom: `${Math.max(0, pageMargins.bottom - 6)}px`,
           width: '6px',
           borderRadius: '999px',
           backgroundColor: '#f97316',
@@ -325,7 +308,7 @@ function getLayoutTheme(variant: CvLayoutVariant): CvLayoutTheme {
           borderBottom: '1.5px solid #000000',
           backgroundColor: 'transparent',
           borderLeft: 'none',
-          borderRadius: 0,
+          borderRadius: '0',
           padding: '0 0 3px 0',
           textTransform: 'uppercase',
           letterSpacing: '0.5px',
@@ -338,6 +321,7 @@ function paginateSectionsByPage(
   sections: Section[],
   firstPageAvailable: number,
   otherPageAvailable: number,
+  contentWidthPx: number,
 ): Section[][] {
   if (sections.length === 0) {
     return [[]];
@@ -346,12 +330,10 @@ function paginateSectionsByPage(
   const pages: Section[][] = [];
   let currentPageSections: Section[] = [];
   let remaining = firstPageAvailable;
-  let isFirstPage = true;
 
   const pushNewPage = () => {
     pages.push(currentPageSections);
     currentPageSections = [];
-    isFirstPage = false;
     remaining = otherPageAvailable;
   };
 
@@ -372,9 +354,9 @@ function paginateSectionsByPage(
 
     const items = section.items || [];
     for (const item of items) {
-      const itemHeight = estimateItemHeight(item);
+      const itemHeight = estimateItemHeight(item, contentWidthPx);
 
-      // Allow items to bleed up to 48px into the bottom margin (safe since bottom margin is 54px)
+      // Allow items to bleed up to 48px into the bottom margin.
       if (itemHeight > remaining + 48) {
         if (currentPageSections.length === 1 && currentSectionPart.items.length === 0 && remaining >= otherPageAvailable - headingHeight - 20) {
           // Extremely large single item on a fresh page. Let it stay to not loop infinitely.
@@ -422,8 +404,11 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   previewMode = false,
 }) => {
   const { personalInfo, summaryTitle, summary, sections } = cv;
+  const pageMargins = normalizeCvPageMargins(cv.pageMargins);
+  const contentWidth = Math.max(240, CV_PAGE_WIDTH_PX - pageMargins.left - pageMargins.right);
+  const contentHeight = CV_PAGE_HEIGHT_PX - pageMargins.top - pageMargins.bottom;
   const layoutVariant = resolveLayoutVariant(cv);
-  const layoutTheme = getLayoutTheme(layoutVariant);
+  const layoutTheme = getLayoutTheme(layoutVariant, pageMargins);
   const fontFamily = getCvFontStack(cv.fontFamily);
   const { fullName, email, phone, location, linkedin, portfolio, github, photoDataUrl } = personalInfo || {};
 
@@ -454,14 +439,14 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
       : mappedSummaryTitle;
 
   const photoSize = clamp(personalInfo?.photoSize ?? DEFAULT_PHOTO_SIZE, MIN_PHOTO_SIZE, MAX_PHOTO_SIZE);
-  const defaultPhotoX = PAGE_WIDTH - photoSize;
-  const defaultPhotoY = 0;
+  const defaultPhotoX = CV_PAGE_WIDTH_PX - pageMargins.right - photoSize;
+  const defaultPhotoY = pageMargins.top;
 
   const requestedX = photoPositionOverride?.x ?? personalInfo?.photoX ?? defaultPhotoX;
   const requestedY = photoPositionOverride?.y ?? personalInfo?.photoY ?? defaultPhotoY;
 
-  const photoX = clamp(requestedX, 0, PAGE_WIDTH - photoSize);
-  const photoY = clamp(requestedY, 0, PAGE_HEIGHT - photoSize);
+  const photoX = clamp(requestedX, pageMargins.left, CV_PAGE_WIDTH_PX - pageMargins.right - photoSize);
+  const photoY = clamp(requestedY, pageMargins.top, CV_PAGE_HEIGHT_PX - pageMargins.bottom - photoSize);
 
   // Header height: h1 (fontPx * 1.4 + margin-bottom 6) + contact-div (contactPx * 1.3) + wrapper marginBottom 14
   const fullNamePx = ptToPx(personalInfo?.fullNameFontSize ?? 18);
@@ -469,9 +454,10 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   const contactPx = ptToPx(personalInfo?.contactFontSize ?? 10);
   const actualHeaderHeight = (fullNamePx * 1.4 + 6) + (personalInfo?.jobTitle ? jobTitlePx * 1.4 + 4 : 0) + (contactPx * 1.3) + 14;
 
-  const summaryBlockHeight = hasSummary ? estimateSummaryHeight(summary, cv.summaryFontSize ?? 11, cv.summaryTitleFontSize ?? 12) : 0;
-  const firstPageAvailable = CONTENT_HEIGHT - actualHeaderHeight - summaryBlockHeight;
-  const sectionPages = paginateSectionsByPage(sections || [], firstPageAvailable, CONTENT_HEIGHT);
+  const safeContentHeight = Math.max(220, contentHeight);
+  const summaryBlockHeight = hasSummary ? estimateSummaryHeight(summary, contentWidth, cv.summaryFontSize ?? 11, cv.summaryTitleFontSize ?? 12) : 0;
+  const firstPageAvailable = Math.max(60, safeContentHeight - actualHeaderHeight - summaryBlockHeight);
+  const sectionPages = paginateSectionsByPage(sections || [], firstPageAvailable, safeContentHeight, contentWidth);
 
   const paginatedPages: PaginatedPage[] = sectionPages.map((pageSections, index) => ({
     includeHeader: index === 0,
@@ -485,7 +471,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
       : paginatedPages;
 
   return (
-    <div style={{ width: `${PAGE_WIDTH}px`, margin: '0 auto' }}>
+    <div style={{ width: `${CV_PAGE_WIDTH_PX}px`, margin: '0 auto' }}>
       {pagesToRender.map((page, pageIndex) => {
         const isLastPage = pageIndex === pagesToRender.length - 1;
 
@@ -497,11 +483,10 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               fontSize: '11pt',
               lineHeight: '1.4',
               color: '#000000',
-              width: `${PAGE_WIDTH}px`,
-              height: `${PAGE_HEIGHT}px`,
-              padding: `${PAGE_MARGIN}px`,
+              width: `${CV_PAGE_WIDTH_PX}px`,
+              height: `${CV_PAGE_HEIGHT_PX}px`,
+              padding: `${pageMargins.top}px ${pageMargins.right}px ${pageMargins.bottom}px ${pageMargins.left}px`,
               letterSpacing: `${cv.letterSpacing ?? 0}px`,
-              fontFamily,
               backgroundColor: '#ffffff',
               boxSizing: 'border-box',
               position: 'relative',
@@ -726,8 +711,8 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                 <div
                   style={{
                     position: 'absolute',
-                    left: `${PAGE_MARGIN}px`,
-                    right: `${PAGE_MARGIN}px`,
+                    left: `${pageMargins.left}px`,
+                    right: `${pageMargins.right}px`,
                     bottom: '14px',
                     textAlign: 'right',
                     fontFamily,

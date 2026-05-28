@@ -26,6 +26,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { X } from 'lucide-react';
+import { CV_PAGE_HEIGHT_PX, CV_PAGE_WIDTH_PX, normalizeCvPageMargins } from '@/lib/cv-layout';
 
 type PreviewContextValue = {
     scale: number;
@@ -41,8 +42,6 @@ export const PreviewContext = React.createContext<PreviewContextValue>({
     dragEnabled: true,
 });
 
-const PAGE_WIDTH = 794;
-const PAGE_HEIGHT = 1123;
 const DEFAULT_PHOTO_SIZE = 112;
 const MIN_PHOTO_SIZE = 72;
 const MAX_PHOTO_SIZE = 200;
@@ -183,6 +182,7 @@ const DraggableItemWrapper = ({ id, sectionId, children }: { id: string, section
 
 export function CVPreview() {
     const { state, dispatch } = useCV();
+    const pageMargins = normalizeCvPageMargins(state.pageMargins);
     const [scale, setScale] = useState(1);
     const [dragEnabled, setDragEnabled] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -214,10 +214,10 @@ export function CVPreview() {
     };
 
     const getPhotoBounds = (photoSize: number) => ({
-        minX: 0,
-        maxX: PAGE_WIDTH - photoSize,
-        minY: 0,
-        maxY: PAGE_HEIGHT - photoSize,
+        minX: pageMargins.left,
+        maxX: CV_PAGE_WIDTH_PX - pageMargins.right - photoSize,
+        minY: pageMargins.top,
+        maxY: CV_PAGE_HEIGHT_PX - pageMargins.bottom - photoSize,
     });
 
     const clampPhotoPosition = (x: number, y: number, photoSize: number) => {
@@ -230,8 +230,8 @@ export function CVPreview() {
 
     const getCurrentPhotoPosition = () => {
         const size = getCurrentPhotoSize();
-        const defaultX = PAGE_WIDTH - size;
-        const defaultY = 0;
+        const defaultX = CV_PAGE_WIDTH_PX - pageMargins.right - size;
+        const defaultY = pageMargins.top;
 
         return clampPhotoPosition(
             state.personalInfo?.photoX ?? defaultX,
@@ -305,7 +305,7 @@ export function CVPreview() {
             window.removeEventListener('pointerup', finishDragging);
             window.removeEventListener('pointercancel', finishDragging);
         };
-    }, [dispatch, isPhotoDragging, scale, state.personalInfo?.photoDataUrl, state.personalInfo?.photoSize]);
+    }, [dispatch, isPhotoDragging, pageMargins.bottom, pageMargins.left, pageMargins.right, pageMargins.top, scale, state.personalInfo?.photoDataUrl, state.personalInfo?.photoSize]);
 
     useEffect(() => {
         if (!state.personalInfo?.photoDataUrl) {
@@ -318,8 +318,8 @@ export function CVPreview() {
 
         const size = getCurrentPhotoSize();
         const clamped = clampPhotoPosition(
-            state.personalInfo?.photoX ?? (PAGE_WIDTH - size),
-            state.personalInfo?.photoY ?? 0,
+            state.personalInfo?.photoX ?? (CV_PAGE_WIDTH_PX - pageMargins.right - size),
+            state.personalInfo?.photoY ?? pageMargins.top,
             size,
         );
 
@@ -329,7 +329,7 @@ export function CVPreview() {
                 payload: { photoX: clamped.x, photoY: clamped.y },
             });
         }
-    }, [dispatch, state.personalInfo?.photoDataUrl, state.personalInfo?.photoSize]);
+    }, [dispatch, pageMargins.bottom, pageMargins.left, pageMargins.right, pageMargins.top, state.personalInfo?.photoDataUrl, state.personalInfo?.photoSize]);
     // Auto-scale the A4 preview to fit its container
     useEffect(() => {
         const updateScale = () => {
@@ -340,7 +340,7 @@ export function CVPreview() {
             if (containerWidth <= 0) return;
 
             // A4 width in px is 794
-            const newScale = containerWidth / PAGE_WIDTH;
+            const newScale = containerWidth / CV_PAGE_WIDTH_PX;
             setScale(newScale < 1 ? newScale : 1);
         };
 
@@ -494,7 +494,7 @@ export function CVPreview() {
                 <div style={{
                     transform: `scale(${scale})`,
                     transformOrigin: 'top center',
-                    marginBottom: `${(1 - scale) * -1123}px` // Adjust bottom margin depending on scale
+                    marginBottom: `${(1 - scale) * -CV_PAGE_HEIGHT_PX}px` // Adjust bottom margin depending on scale
                 }}>
                     <DndContext
                         sensors={sensors}

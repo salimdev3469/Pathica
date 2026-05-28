@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { DEFAULT_CV_FONT, normalizeCvFont, type CvFontKey } from '@/lib/cv-fonts';
 import type { CvTemplateSlug } from '@/lib/cv-templates';
+import { DEFAULT_CV_PAGE_MARGINS, normalizeCvPageMargins, type CvPageMargins } from '@/lib/cv-layout';
 
 export interface PersonalInfo {
     fullName: string;
@@ -52,6 +53,7 @@ export interface CVState {
     title: string;
     templateSlug?: CvTemplateSlug | null;
     fontFamily: CvFontKey;
+    pageMargins?: CvPageMargins;
     personalInfo: PersonalInfo;
     summaryTitle: string;
     summary: string;
@@ -82,8 +84,10 @@ const defaultCVState: CVState = {
     title: 'My CV',
     templateSlug: null,
     fontFamily: DEFAULT_CV_FONT,
+    pageMargins: DEFAULT_CV_PAGE_MARGINS,
     personalInfo: {
         fullName: 'PRADEEP M',
+        jobTitle: 'Data Integrity & Reporting Analyst',
         email: 'pradeepm.analyst@gmail.com',
         phone: '+91-99999 99999',
         location: 'Hyderabad, Telangana',
@@ -133,6 +137,7 @@ const cvReducer = (state: CVState, action: CVAction): CVState => {
                 ...defaultCVState,
                 ...action.payload,
                 templateSlug: action.payload.templateSlug ?? state.templateSlug ?? defaultCVState.templateSlug,
+                pageMargins: normalizeCvPageMargins(action.payload.pageMargins ?? state.pageMargins ?? defaultCVState.pageMargins),
                 personalInfo: action.payload.personalInfo || defaultCVState.personalInfo,
                 sections: action.payload.sections || [],
                 fontFamily: normalizeCvFont(action.payload.fontFamily),
@@ -238,6 +243,7 @@ export const CVProvider = ({ children, initialState }: { children: ReactNode; in
         ...initialState,
         templateSlug: initialState.templateSlug ?? defaultCVState.templateSlug,
         fontFamily: normalizeCvFont(initialState.fontFamily),
+        pageMargins: normalizeCvPageMargins(initialState.pageMargins ?? defaultCVState.pageMargins),
         personalInfo: initialState.personalInfo || defaultCVState.personalInfo,
         summaryTitle: initialState.summaryTitle || defaultCVState.summaryTitle,
         summaryTitleFontSize: initialState.summaryTitleFontSize ?? defaultCVState.summaryTitleFontSize,

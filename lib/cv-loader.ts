@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase-server';
 import { CVState, Section, Item, PersonalInfo } from '@/context/CVContext';
 import { normalizeCvFont } from '@/lib/cv-fonts';
+import { normalizeCvPageMargins } from '@/lib/cv-layout';
 import { isCvTemplateSlug } from '@/lib/cv-templates';
 
 type CvFieldRow = {
@@ -64,6 +65,7 @@ export async function loadCvState(cvId: string): Promise<CVState | null> {
     let letterSpacing: number | undefined;
     let templateSlug: CVState['templateSlug'] = null;
     let fontFamily = normalizeCvFont(undefined);
+    let pageMargins = normalizeCvPageMargins(undefined);
 
     if (summarySection) {
         const summaryField = summarySection.cv_fields.find((field) => field.label === 'summary') || summarySection.cv_fields[0];
@@ -97,6 +99,22 @@ export async function loadCvState(cvId: string): Promise<CVState | null> {
         if (templateSlugField?.value && isCvTemplateSlug(templateSlugField.value)) {
             templateSlug = templateSlugField.value;
         }
+
+        const parseMargin = (label: string): number | undefined => {
+            const field = summarySection.cv_fields.find((candidate) => candidate.label === label);
+            if (!field?.value) {
+                return undefined;
+            }
+            const parsed = parseInt(field.value, 10);
+            return Number.isNaN(parsed) ? undefined : parsed;
+        };
+
+        pageMargins = normalizeCvPageMargins({
+            top: parseMargin('page_margin_top'),
+            right: parseMargin('page_margin_right'),
+            bottom: parseMargin('page_margin_bottom'),
+            left: parseMargin('page_margin_left'),
+        });
     }
 
     const normalSections = allSections.filter(
@@ -139,6 +157,7 @@ export async function loadCvState(cvId: string): Promise<CVState | null> {
         summaryTitle,
         ...(summaryTitleFontSize !== undefined && { summaryTitleFontSize }),
         fontFamily,
+        pageMargins,
         summary: summary || '',
         ...(summaryFontSize !== undefined && { summaryFontSize }),
         ...(letterSpacing !== undefined && { letterSpacing }),

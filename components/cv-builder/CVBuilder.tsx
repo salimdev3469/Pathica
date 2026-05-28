@@ -6,12 +6,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Plus, Briefcase, GraduationCap, Code, FolderGit2, Save, Loader2, FileText, ArrowLeft, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Locale } from '@/lib/locale';
-import { useCV, Section } from '@/context/CVContext';
+import { useCV, Section, type CVState } from '@/context/CVContext';
 import { SectionCard } from './SectionCard';
 import { PersonalInfoForm } from './PersonalInfoForm';
 import { JobMatcher } from './JobMatcher';
 import { CvImportDialog } from './CvImportDialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
@@ -25,6 +26,7 @@ import {
 import { createBrowserClient } from '@/lib/supabase';
 import { CV_FONT_OPTIONS } from '@/lib/cv-fonts';
 import { getCvTemplateSeed, getLocalizedText, getCvTemplateDefaultFont } from '@/lib/cv-templates';
+import { CV_PAGE_MARGIN_MAX_PX, CV_PAGE_MARGIN_MIN_PX, normalizeCvPageMargins } from '@/lib/cv-layout';
 
 const GUEST_DRAFT_STORAGE_KEY = 'pathica_guest_cv_draft_v1';
 const GUEST_EDIT_LOCK_THRESHOLD = 6;
@@ -109,8 +111,9 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
   const authNext = '/cv/new?restoreGuest=1';
   const loginHref = `/login?next=${encodeURIComponent(authNext)}`;
   const registerHref = `/register?next=${encodeURIComponent(authNext)}`;
+  const pageMargins = normalizeCvPageMargins(state.pageMargins);
 
-  const buildTemplateState = (templateSlugValue: string) => {
+  const buildTemplateState = (templateSlugValue: string): CVState | null => {
     const template = getCvTemplateSeed(templateSlugValue);
     if (!template) {
       return null;
@@ -398,6 +401,25 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
     setIsPopoverOpen(false);
   };
 
+  const handlePageMarginChange = (
+    side: 'top' | 'right' | 'bottom' | 'left',
+    rawValue: string,
+  ) => {
+    const parsed = rawValue === '' ? undefined : Number(rawValue);
+    const nextMargins = normalizeCvPageMargins({
+      ...pageMargins,
+      [side]: Number.isFinite(parsed) ? parsed : pageMargins[side],
+    });
+
+    dispatch({
+      type: 'SET_CV',
+      payload: {
+        ...state,
+        pageMargins: nextMargins,
+      },
+    });
+  };
+
   return (
     <div
       className="custom-scrollbar relative mx-auto w-full max-w-2xl flex-1 overflow-y-auto overscroll-y-contain px-4 py-5 pb-8 md:min-h-0 md:p-8"
@@ -485,6 +507,34 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                     <span className="pointer-events-none absolute right-8 top-3 text-[10px] font-bold uppercase text-slate-400">px</span>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="mt-4 w-full max-w-xl">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {t('Page Margins (px)', 'Sayfa Kenar Boşlukları (px)')}
+              </label>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {([
+                  { key: 'top', label: t('Top', 'Üst') },
+                  { key: 'right', label: t('Right', 'Sağ') },
+                  { key: 'bottom', label: t('Bottom', 'Alt') },
+                  { key: 'left', label: t('Left', 'Sol') },
+                ] as const).map((item) => (
+                  <div key={item.key}>
+                    <label className="mb-1 block pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                      {item.label}
+                    </label>
+                    <Input
+                      type="number"
+                      min={CV_PAGE_MARGIN_MIN_PX}
+                      max={CV_PAGE_MARGIN_MAX_PX}
+                      step={1}
+                      value={pageMargins[item.key]}
+                      onChange={(event) => handlePageMarginChange(item.key, event.target.value)}
+                      className="bg-white"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>

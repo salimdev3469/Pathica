@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { ATS_ONTOLOGY } from '@/lib/ats-ontology';
 import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
 import { normalizeCvFont } from '@/lib/cv-fonts';
+import { normalizeCvPageMargins } from '@/lib/cv-layout';
 import { createClient } from '@/lib/supabase-server';
 import { isCvTemplateSlug } from '@/lib/cv-templates';
 
@@ -27,6 +28,12 @@ type SaveCvState = {
     title?: string;
     templateSlug?: string | null;
     fontFamily?: string;
+    pageMargins?: {
+        top?: number;
+        right?: number;
+        bottom?: number;
+        left?: number;
+    };
     personalInfo?: {
         fullName?: string;
         jobTitle?: string;
@@ -240,6 +247,38 @@ export async function POST(req: Request) {
                     position: 6,
                 });
             }
+
+            const pageMargins = normalizeCvPageMargins(cvState.pageMargins);
+            summaryFields.push(
+                {
+                    section_id: summarySection.id,
+                    label: 'page_margin_top',
+                    value: String(pageMargins.top),
+                    field_type: 'number',
+                    position: 7,
+                },
+                {
+                    section_id: summarySection.id,
+                    label: 'page_margin_right',
+                    value: String(pageMargins.right),
+                    field_type: 'number',
+                    position: 8,
+                },
+                {
+                    section_id: summarySection.id,
+                    label: 'page_margin_bottom',
+                    value: String(pageMargins.bottom),
+                    field_type: 'number',
+                    position: 9,
+                },
+                {
+                    section_id: summarySection.id,
+                    label: 'page_margin_left',
+                    value: String(pageMargins.left),
+                    field_type: 'number',
+                    position: 10,
+                },
+            );
 
             if (summaryFields.length > 0) {
                 await supabase.from('cv_fields').insert(summaryFields);

@@ -8,13 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { CV_PAGE_WIDTH_PX, normalizeCvPageMargins } from '@/lib/cv-layout';
 
 type PersonalInfoFormProps = {
   locale?: Locale;
 };
 
-const DEFAULT_PHOTO_X = 628;
-const DEFAULT_PHOTO_Y = 54;
 const DEFAULT_PHOTO_SIZE = 112;
 const MIN_PHOTO_SIZE = 72;
 const MAX_PHOTO_SIZE = 200;
@@ -25,6 +24,12 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
 
   const { state, dispatch } = useCV();
   const { personalInfo, summary, summaryTitle } = state;
+  const pageMargins = normalizeCvPageMargins(state.pageMargins);
+
+  const getDefaultPhotoPosition = (photoSize: number) => ({
+    x: CV_PAGE_WIDTH_PX - pageMargins.right - photoSize,
+    y: pageMargins.top,
+  });
 
   const handleInfoChange = <K extends keyof typeof personalInfo>(field: K, value: (typeof personalInfo)[K]) => {
     dispatch({ type: 'UPDATE_PERSONAL_INFO', payload: { [field]: value } as Partial<typeof personalInfo> });
@@ -53,8 +58,14 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
         type: 'UPDATE_PERSONAL_INFO',
         payload: {
           photoDataUrl: result,
-          photoX: typeof personalInfo?.photoX === 'number' ? personalInfo.photoX : DEFAULT_PHOTO_X,
-          photoY: typeof personalInfo?.photoY === 'number' ? personalInfo.photoY : DEFAULT_PHOTO_Y,
+          photoX:
+            typeof personalInfo?.photoX === 'number'
+              ? personalInfo.photoX
+              : getDefaultPhotoPosition(typeof personalInfo?.photoSize === 'number' ? personalInfo.photoSize : DEFAULT_PHOTO_SIZE).x,
+          photoY:
+            typeof personalInfo?.photoY === 'number'
+              ? personalInfo.photoY
+              : getDefaultPhotoPosition(typeof personalInfo?.photoSize === 'number' ? personalInfo.photoSize : DEFAULT_PHOTO_SIZE).y,
           photoSize: typeof personalInfo?.photoSize === 'number' ? personalInfo.photoSize : DEFAULT_PHOTO_SIZE,
         },
       });
@@ -76,12 +87,14 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
   };
 
   const handleRemovePhoto = () => {
+    const defaults = getDefaultPhotoPosition(DEFAULT_PHOTO_SIZE);
+
     dispatch({
       type: 'UPDATE_PERSONAL_INFO',
       payload: {
         photoDataUrl: '',
-        photoX: DEFAULT_PHOTO_X,
-        photoY: DEFAULT_PHOTO_Y,
+        photoX: defaults.x,
+        photoY: defaults.y,
         photoSize: DEFAULT_PHOTO_SIZE,
       },
     });
