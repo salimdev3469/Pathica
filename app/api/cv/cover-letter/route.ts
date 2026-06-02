@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { consumeAdvancedAiCredit, refundConsumption } from '@/lib/billing';
-import { flashModel } from '@/lib/gemini';
+import { generateGeminiText, mapGeminiErrorToResponse } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase-server';
 
 export async function POST(req: Request) {
@@ -16,7 +16,18 @@ export async function POST(req: Request) {
         }
         userId = user.id;
 
+        if (!process.env.GEMINI_API_KEY) {
+            return NextResponse.json({ error: 'AI service is not configured right now.' }, { status: 503 });
+        }
+
         const { cvState = null, jobDescription, company, jobTitle, language = 'tr', tone = 'professional', length = 'medium' } = await req.json();
+
+        if (!cvState && !jobDescription && !jobTitle) {
+            return NextResponse.json(
+                { error: 'Provide a job description, a job title, or a base CV to generate a cover letter.' },
+                { status: 400 },
+            );
+        }
 
         consumption = await consumeAdvancedAiCredit(user.id, 'cover_letter', {
             cv_id: cvState?.id || null,
@@ -66,8 +77,21 @@ export async function POST(req: Request) {
     CV Data:
     ${cvContext}`;
 
-        const result = await flashModel.generateContent(prompt);
-        const responseText = result.response.text();
+        const responseText = (
+            await generateGeminiText({
+                request: prompt,
+                modelOrder: ['flash', 'pro'],
+                timeoutMs: 20000,
+                maxAttemptsPerModel: 2,
+            })
+        )
+            .replace(/```[a-z]*\n?/gi, '')
+            .replace(/```/g, '')
+            .trim();
+
+        if (!responseText) {
+            throw new Error('Empty cover letter response');
+        }
 
         const { data: savedCoverLetter, error: dbError } = await supabase
             .from('cover_letters')
@@ -109,6 +133,13 @@ export async function POST(req: Request) {
         }
 
         console.error('Cover letter error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        const mappedError = mapGeminiErrorToResponse(error, 'Failed to generate cover letter.');
+        return NextResponse.json(
+            {
+                error: mappedError.message,
+                code: mappedError.code,
+            },
+            { status: mappedError.status },
+        );
     }
 }

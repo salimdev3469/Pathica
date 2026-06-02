@@ -529,20 +529,18 @@ export function CVPreview() {
                         >
                             <SortableContext items={state.sections.map(s => `section-${s.id}`)} strategy={verticalListSortingStrategy}>
                                 <PreviewContext.Provider value={{ scale, showTutorial, dismissTutorial, dragEnabled }}>
-                                    <div className="shadow-2xl relative">
-                                        <CVTemplate
-                                            previewMode
-                                            cv={state}
-                                            SectionWrapper={DraggableSectionWrapper}
-                                            ItemWrapper={DraggableItemWrapper}
-                                            photoPositionOverride={photoDragPosition || undefined}
-                                            photoInteractive={
-                                                state.personalInfo?.photoDataUrl
-                                                    ? { onPointerDown: handlePhotoPointerDown, isDragging: isPhotoDragging }
-                                                    : undefined
-                                            }
-                                        />
-                                    </div>
+                                    <CVTemplate
+                                        previewMode
+                                        cv={state}
+                                        SectionWrapper={DraggableSectionWrapper}
+                                        ItemWrapper={DraggableItemWrapper}
+                                        photoPositionOverride={photoDragPosition || undefined}
+                                        photoInteractive={
+                                            state.personalInfo?.photoDataUrl
+                                                ? { onPointerDown: handlePhotoPointerDown, isDragging: isPhotoDragging }
+                                                : undefined
+                                        }
+                                    />
                                 </PreviewContext.Provider>
                             </SortableContext>
                         </DndContext>

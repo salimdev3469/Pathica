@@ -440,3 +440,40 @@ create policy "Users can update their own cover letters"
 create policy "Users can delete their own cover letters"
     on public.cover_letters for delete
     using (auth.uid() = user_id);
+
+create table if not exists public.resume_reviews (
+    id uuid default gen_random_uuid() primary key,
+    user_id uuid references auth.users(id) on delete cascade not null,
+    file_name text not null,
+    file_type text not null,
+    file_hash text not null,
+    category text not null,
+    field text not null,
+    experience_level text not null,
+    job_description text,
+    normalized_resume jsonb not null,
+    analysis jsonb not null,
+    score integer not null check (score >= 0 and score <= 100),
+    ontology_version text not null,
+    created_at timestamp with time zone default now() not null
+);
+
+create index if not exists idx_resume_reviews_user_created_at
+    on public.resume_reviews(user_id, created_at desc);
+
+create index if not exists idx_resume_reviews_user_hash
+    on public.resume_reviews(user_id, file_hash);
+
+alter table public.resume_reviews enable row level security;
+
+create policy "Users can view their own resume reviews"
+    on public.resume_reviews for select
+    using (auth.uid() = user_id);
+
+create policy "Users can insert their own resume reviews"
+    on public.resume_reviews for insert
+    with check (auth.uid() = user_id);
+
+create policy "Users can delete their own resume reviews"
+    on public.resume_reviews for delete
+    using (auth.uid() = user_id);

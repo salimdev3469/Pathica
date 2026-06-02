@@ -9,7 +9,6 @@ import type { Locale } from '@/lib/locale';
 import { useCV, Section, type CVState } from '@/context/CVContext';
 import { SectionCard } from './SectionCard';
 import { PersonalInfoForm } from './PersonalInfoForm';
-import { JobMatcher } from './JobMatcher';
 import { CvImportDialog } from './CvImportDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -467,8 +466,8 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
             <p className="font-semibold">{t('AI Draft Loaded', 'AI Taslağı Yüklendi')}</p>
             <p className="mt-1 leading-relaxed">
               {t(
-                'This draft was generated in English from your input and may include mock suggestions. Review every section and replace all placeholders and "Recommendation:" lines with your real details before applying.',
-                'Bu taslak girdinizden İngilizce olarak üretildi ve örnek öneriler içerebilir. Başvurmadan önce tüm bölümleri kontrol edin, tüm placeholder ve "Recommendation:" satırlarını gerçek bilgilerinizle değiştirin.',
+                'This draft was generated from the job description in English. Review every section and replace generic guidance with your actual experience, tools, dates, and measurable results before applying.',
+                'Bu taslak iş tanımından İngilizce olarak üretildi. Başvurmadan önce tüm bölümleri gözden geçirin ve genel yönlendirmeleri kendi gerçek deneyiminiz, araçlarınız, tarihleriniz ve ölçülebilir sonuçlarınızla değiştirin.',
               )}
             </p>
           </div>
@@ -598,9 +597,6 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
             )}
             {isAuthenticated && (
               <CvImportDialog locale={locale} />
-            )}
-            {isAuthenticated && (
-              <JobMatcher locale={locale} />
             )}
             {isAuthenticated && (
               <Button onClick={handleSave} disabled={isSaving} className="gap-2">

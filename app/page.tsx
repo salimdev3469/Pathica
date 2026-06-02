@@ -535,8 +535,8 @@ export default async function Home() {
                     {t('After free usage: PDF export costs', 'Ücretsiz hak sonrası: PDF export maliyeti')}{' '}
                     <strong>{PDF_EXPORT_CREDIT_COST}</strong>{' '}
                     {t(
-                      'credits. Tailor, Match Job, and Generate from Job cost',
-                      'kredi. Tailor, Match Job ve Generate from Job maliyeti',
+                      'credits. Tailor and Generate from Job cost',
+                      'kredi. Tailor ve Generate from Job maliyeti',
                     )}{' '}
                     <strong>{ADVANCED_AI_CREDIT_COST}</strong>{' '}
                     {t(
@@ -561,7 +561,7 @@ export default async function Home() {
                     </li>
                     <li className="flex">
                       <CheckCircle2 className="mr-2 h-4 w-4 shrink-0 text-slate-700" />
-                      {t('Advanced AI: generate-from-job, match-job, tailor, cover-letter', 'Gelişmiş AI: generate-from-job, match-job, tailor, cover-letter')}
+                      {t('Advanced AI: generate-from-job, tailor, cover-letter', 'Gelişmiş AI: generate-from-job, tailor, cover-letter')}
                     </li>
                   </ul>
                   <Button className="mt-6 w-full" asChild>

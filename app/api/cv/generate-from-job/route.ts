@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { consumeAdvancedAiCredit, refundConsumption } from '@/lib/billing';
-import { flashModel } from '@/lib/gemini';
+import { generateGeminiText, mapGeminiErrorToResponse } from '@/lib/gemini';
 import { extractJobKeywords } from '@/lib/job-keywords';
 import { createClient } from '@/lib/supabase-server';
 
@@ -78,9 +78,8 @@ type DraftSection = {
 };
 
 const SUMMARY_TITLE = 'Profile Summary';
-
-const GENERIC_RECOMMENDATION =
-  '- Recommendation: Replace mock values with your real details before applying.';
+const DEFAULT_GENERATED_BULLET =
+  '- Add factual, role-relevant achievements, tools, and measurable outcomes from your own background.';
 
 export async function POST(req: Request) {
   let userId: string | null = null;
@@ -109,6 +108,10 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json({ error: 'AI service is not configured right now.' }, { status: 503 });
+    }
+
     consumption = await consumeAdvancedAiCredit(user.id, 'generate_from_job', {
       input_length: jobDescription.length,
     });
@@ -132,13 +135,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Could not consume AI entitlement.' }, { status: 500 });
     }
 
+    const generated = await generateCvDraft(jobDescription, jobTitle || null, extractedKeywords);
+    const cvId = crypto.randomUUID();
+    const cvState = buildCvState(cvId, generated, jobDescription, jobTitle || null, extractedKeywords);
+
     const { data: cvRow, error: cvCreateError } = await supabase
       .from('cvs')
       .insert([
         {
-          id: crypto.randomUUID(),
+          id: cvId,
           user_id: user.id,
-          title: jobTitle ? `${jobTitle} CV Draft` : 'AI Generated CV',
+          title: cvState.title,
         },
       ])
       .select('id')
@@ -148,9 +155,6 @@ export async function POST(req: Request) {
       console.error('Failed to create CV row:', cvCreateError);
       throw new Error('Could not create CV shell.');
     }
-
-    const generated = await generateCvDraft(jobDescription, jobTitle || null, extractedKeywords);
-    const cvState = buildCvState(cvRow.id, generated, jobDescription, jobTitle || null, extractedKeywords);
 
     return NextResponse.json({ cvId: cvRow.id, cvState }, { status: 200 });
   } catch (error) {
@@ -169,7 +173,14 @@ export async function POST(req: Request) {
     }
 
     console.error('Generate from job route error:', error);
-    return NextResponse.json({ error: 'Failed to generate CV draft.' }, { status: 500 });
+    const mappedError = mapGeminiErrorToResponse(error, 'Failed to generate CV draft.');
+    return NextResponse.json(
+      {
+        error: mappedError.message,
+        code: mappedError.code,
+      },
+      { status: mappedError.status },
+    );
   }
 }
 
@@ -178,26 +189,21 @@ async function generateCvDraft(
   targetRoleTitle: string | null,
   extractedKeywords: string[],
 ): Promise<RawGeneratedCv | null> {
-  try {
-    if (!process.env.GEMINI_API_KEY) {
-      return null;
-    }
-
-    const prompt = `You are an expert resume writer.
+  const prompt = `You are an expert resume writer.
 The user input can be in any language, but your output MUST be in English only.
 
 Goal:
-Create an editable resume draft from the user's input.
+Create a clean, ATS-friendly CV draft framework based on the target job description.
 
 Hard rules:
-1) Use user-provided facts when available (company names, schools, job titles, dates, tools).
-2) If details are missing, add realistic MOCK suggestions marked with "(Mock)".
-3) For every item, include at least one bullet starting with "Recommendation:" that tells the user what to replace or improve.
-4) Do not claim unknown personal facts as real.
-5) Keep everything in English, even if the input is not English.
+1) Never invent employers, schools, dates, locations, certifications, metrics, or personal facts.
+2) If a field is unknown, use an empty string instead of placeholders.
+3) Use the job description only to infer role priorities, tools, responsibilities, and keywords.
+4) For unknown candidate history, write neutral editable guidance in bullets instead of fake achievements.
+5) Do not use "(Mock)", "Recommendation:", square-bracket placeholders, or fake company/university names.
+6) Return ONLY valid JSON.
 
 Output format:
-Return ONLY valid JSON and match this exact schema:
 {
   "title": string,
   "summary": string,
@@ -221,8 +227,8 @@ Requirements:
 - Provide 4 to 6 sections.
 - Must include Experience, Education, Projects, and Technical Skills.
 - bullets must be newline-separated and start with "- ".
-- Keep content dense and editable.
-- Weave important job keywords naturally into summary and bullet points.
+- Keep the draft practical, readable, and easy to personalize.
+- Weave important job keywords naturally into the summary and skills section.
 
 Important keywords:
 ${extractedKeywords.join(', ') || 'N/A'}
@@ -230,24 +236,14 @@ ${extractedKeywords.join(', ') || 'N/A'}
 User input:
 ${targetRoleTitle ? `Target role title: ${targetRoleTitle}\n` : ''}${jobDescription}`;
 
-    const generationPromise = flashModel.generateContent(prompt);
-    const timeoutPromise = new Promise<null>((resolve) => {
-      setTimeout(() => resolve(null), 18000);
-    });
+  const text = await generateGeminiText({
+    request: prompt,
+    modelOrder: ['flash', 'pro'],
+    timeoutMs: 20000,
+    maxAttemptsPerModel: 2,
+  });
 
-    const result = await Promise.race([generationPromise, timeoutPromise]);
-    if (result === null) {
-      return null;
-    }
-
-    const text = result.response.text();
-    const parsed = parseGeneratedJson(text);
-
-    return parsed;
-  } catch (error) {
-    console.error('Gemini draft generation failed:', error);
-    return null;
-  }
+  return parseGeneratedJson(text);
 }
 
 function parseGeneratedJson(rawText: string): RawGeneratedCv | null {
@@ -279,10 +275,10 @@ function buildCvState(
   targetRoleTitle: string | null,
   extractedKeywords: string[],
 ): CvStatePayload {
-  const fallback = buildFallbackDraft(sourceInput, targetRoleTitle, extractedKeywords);
+  const fallback = buildGuidedDraft(sourceInput, targetRoleTitle, extractedKeywords);
 
-  const title = sanitizeField(asString(generated?.title), 90) || fallback.title;
-  const summary = sanitizeField(asString(generated?.summary), 900) || fallback.summary;
+  const title = sanitizeOptionalField(asString(generated?.title), 90) || fallback.title;
+  const summary = sanitizeGeneratedSummary(asString(generated?.summary), fallback.summary);
   const normalizedSections = normalizeSections(generated?.sections);
 
   const sectionsWithRequired = ensureRequiredSections(
@@ -300,12 +296,10 @@ function buildCvState(
       subtitle: item.subtitle,
       date: item.date,
       location: item.location,
-      bullets: ensureRecommendationLine(item.bullets),
+      bullets: item.bullets,
       position: itemIndex,
     })),
   }));
-
-  const enrichedSections = injectKeywordHintsIntoSections(sections, extractedKeywords);
 
   return {
     id: cvId,
@@ -321,8 +315,8 @@ function buildCvState(
     },
     summaryTitle: SUMMARY_TITLE,
     fontFamily: 'calibri',
-    summary: appendKeywordHintToSummary(summary, extractedKeywords),
-    sections: enrichedSections,
+    summary,
+    sections,
   };
 }
 
@@ -334,22 +328,29 @@ function normalizeSections(input: unknown): DraftSection[] | null {
   const sections = input
     .map((rawSection) => {
       const section = rawSection as RawGeneratedSection;
-      const title = sanitizeField(asString(section.title), 70) || 'Additional Section';
+      const title = sanitizeOptionalField(asString(section.title), 70) || 'Additional Section';
       const rawItems = Array.isArray(section.items) ? section.items : [];
 
       const items = rawItems
         .map((rawItem) => {
           const item = rawItem as RawGeneratedItem;
 
-          const title = sanitizeField(asString(item.title), 90) || 'Editable Entry';
-          const subtitle = sanitizeField(asString(item.subtitle), 130);
-          const date = sanitizeField(asString(item.date), 50) || '[Add date range]';
-          const location = sanitizeField(asString(item.location), 60) || '[Add location]';
+          const title = sanitizeOptionalField(asString(item.title), 90);
+          const subtitle = sanitizeOptionalField(asString(item.subtitle), 130);
+          const date = sanitizeOptionalField(asString(item.date), 50);
+          const location = sanitizeOptionalField(asString(item.location), 60);
           const bullets = normalizeBullets(item.bullets);
 
           return { title, subtitle, date, location, bullets };
         })
-        .filter((item) => item.title.length > 0 || item.bullets.length > 0);
+        .filter(
+          (item) =>
+            item.title.length > 0 ||
+            item.subtitle.length > 0 ||
+            item.date.length > 0 ||
+            item.location.length > 0 ||
+            item.bullets.length > 0,
+        );
 
       if (items.length === 0) {
         return null;
@@ -396,7 +397,7 @@ function ensureRequiredSections(input: DraftSection[], fallbackSections: DraftSe
   return sections;
 }
 
-function buildFallbackDraft(
+function buildGuidedDraft(
   sourceInput: string,
   targetRoleTitle?: string | null,
   extractedKeywords: string[] = [],
@@ -407,22 +408,24 @@ function buildFallbackDraft(
 } {
   const roleHint = targetRoleTitle && targetRoleTitle.trim().length > 2 ? targetRoleTitle.trim() : extractRoleHint(sourceInput);
   const keywordList = (extractedKeywords.length > 0 ? extractedKeywords : extractKeywords(sourceInput)).slice(0, 12);
-  const summaryKeywords = keywordList.slice(0, 6).join(', ');
+  const summaryKeywords = keywordList.slice(0, 5);
+  const summaryKeywordText =
+    summaryKeywords.length > 0 ? summaryKeywords.join(', ') : 'the responsibilities and tools in the job description';
+  const emphasisText = keywordList.length > 0 ? keywordList.slice(0, 4).join(', ') : 'the highest-priority job requirements';
 
   return {
     title: `${roleHint} Resume`,
-    summary: `AI-generated English draft based on your input. This draft uses provided facts when possible and includes mock suggestions for missing details. Update every placeholder and every Recommendation bullet before using the resume.${summaryKeywords ? ` Targeted keywords: ${summaryKeywords}.` : ''}`,
+    summary: `Targeting ${roleHint} roles with emphasis on ${summaryKeywordText}. Personalize this draft with your actual experience, tools, dates, and measurable results before applying.`,
     sections: [
       {
         title: 'Experience',
         items: [
           {
-            title: 'Software Engineer (Mock)',
-            subtitle: 'Example Company (Mock)',
-            date: '2022 - Present',
-            location: '[City, Country]',
-            bullets:
-              '- Built and maintained role-aligned features for web products.\n- Improved performance and delivery speed with measurable engineering changes.\n- Collaborated with cross-functional teams to prioritize high-impact tasks.\n- Recommendation: Replace company name, role scope, and metrics with your real experience.',
+            title: 'Relevant Experience',
+            subtitle: '',
+            date: '',
+            location: '',
+            bullets: `- Highlight roles where you used ${emphasisText}.\n- Quantify results with real metrics such as performance, reliability, delivery speed, revenue, or user growth.\n- Keep every bullet factual and based on work you actually completed.`,
           },
         ],
       },
@@ -430,12 +433,11 @@ function buildFallbackDraft(
         title: 'Education',
         items: [
           {
-            title: 'B.Sc. in Computer Science (Mock)',
-            subtitle: 'Example University (Mock)',
-            date: '[Add start - end dates]',
-            location: '[City, Country]',
-            bullets:
-              '- Relevant coursework: Data Structures, Databases, Software Engineering.\n- Capstone focus: Building practical systems for real-world use cases.\n- Recommendation: Replace degree, institution, dates, and coursework with your real education details.',
+            title: 'Education',
+            subtitle: '',
+            date: '',
+            location: '',
+            bullets: `- Add your degree, institution, and dates only if they are accurate and relevant to ${roleHint} roles.\n- Include coursework, thesis, or academic projects only when they strengthen your fit for the job requirements.`,
           },
         ],
       },
@@ -443,12 +445,11 @@ function buildFallbackDraft(
         title: 'Projects',
         items: [
           {
-            title: 'Role-Aligned Project (Mock)',
-            subtitle: 'React, Next.js, Node.js',
-            date: '[Add project dates]',
+            title: 'Relevant Projects',
+            subtitle: '',
+            date: '',
             location: '',
-            bullets:
-              '- Developed an end-to-end project relevant to the target role.\n- Added measurable outcomes such as reduced latency or improved conversion.\n- Recommendation: Replace project scope, stack, and impact metrics with your real project data.',
+            bullets: `- Add one or two projects that demonstrate ${emphasisText}.\n- Mention the stack, scope, users, and measurable outcomes using your real project details.`,
           },
         ],
       },
@@ -461,7 +462,7 @@ function buildFallbackDraft(
             date: '',
             location: '',
             bullets:
-              `- ${keywordList.length > 0 ? keywordList.join(', ') : 'JavaScript, TypeScript, React, Node.js, SQL'}\n- Recommendation: Keep only skills you can confidently defend in interviews.`,
+              `- ${keywordList.length > 0 ? keywordList.join(', ') : 'Add the main tools, frameworks, languages, and platforms required for the role.'}\n- Remove any skill that you cannot support with real work, project, or academic experience.`,
           },
         ],
       },
@@ -474,30 +475,17 @@ function normalizeBullets(value: unknown): string {
 
   const normalizedLines = rawLines
     .map((line) => line.replace(/^[-*\u2022]\s*/, '').trim())
+    .map(stripMockMarkers)
     .map((line) => sanitizeField(line, 200))
+    .filter((line) => !isDiscardableBulletLine(line))
     .filter(Boolean)
     .map((line) => (line.startsWith('-') ? line : `- ${line}`));
 
   if (normalizedLines.length === 0) {
-    return `- Add role-aligned details from your background.\n${GENERIC_RECOMMENDATION}`;
+    return DEFAULT_GENERATED_BULLET;
   }
 
-  return ensureRecommendationLine(normalizedLines.slice(0, 5).join('\n'));
-}
-
-function ensureRecommendationLine(bullets: string): string {
-  const lines = bullets
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => (line.startsWith('-') ? line : `- ${line}`));
-
-  const hasRecommendation = lines.some((line) => /recommendation\s*:/i.test(line));
-  if (!hasRecommendation) {
-    lines.push(GENERIC_RECOMMENDATION);
-  }
-
-  return lines.join('\n');
+  return normalizedLines.slice(0, 5).join('\n');
 }
 
 function extractRoleHint(input: string): string {
@@ -579,71 +567,45 @@ function normalizeText(value: string | undefined): string {
   return value.replace(/\s+/g, ' ').trim();
 }
 
-function appendKeywordHintToSummary(summary: string, extractedKeywords: string[]): string {
-  if (!summary) {
-    return summary;
+function sanitizeOptionalField(value: string, maxLength: number): string {
+  const cleaned = sanitizeField(stripMockMarkers(value), maxLength);
+  if (!cleaned) {
+    return '';
   }
 
-  const keywordHint = extractedKeywords.slice(0, 6).join(', ');
-  if (!keywordHint) {
-    return summary;
-  }
-
-  if (summary.toLowerCase().includes('targeted keywords:')) {
-    return summary;
-  }
-
-  return `${summary} Targeted keywords: ${keywordHint}.`;
+  return isPlaceholderLikeValue(cleaned) ? '' : cleaned;
 }
 
-function injectKeywordHintsIntoSections(sections: CvSection[], extractedKeywords: string[]): CvSection[] {
-  const keywords = extractedKeywords.slice(0, 10);
-  if (keywords.length === 0) {
-    return sections;
-  }
+function sanitizeGeneratedSummary(value: string, fallback: string): string {
+  const cleaned = sanitizeField(
+    stripMockMarkers(value).replace(/recommendation\s*:[^.]*\.?/gi, ''),
+    900,
+  );
 
-  const keywordLine = `- ATS Keywords: ${keywords.join(', ')}`;
-  const skillsSectionIndex = sections.findIndex((section) => /skills?|technical|competencies/i.test(section.title));
+  return cleaned || fallback;
+}
 
-  if (skillsSectionIndex >= 0) {
-    const section = sections[skillsSectionIndex];
+function stripMockMarkers(value: string): string {
+  return value.replace(/\(mock\)/gi, '').replace(/\bmock\b/gi, '').replace(/\s+/g, ' ').trim();
+}
 
-    if (section.items.length === 0) {
-      section.items.push({
-        id: crypto.randomUUID(),
-        title: 'Role Keywords',
-        subtitle: '',
-        date: '',
-        location: '',
-        bullets: `${keywordLine}\n${GENERIC_RECOMMENDATION}`,
-        position: 0,
-      });
-      return sections;
-    }
+function isPlaceholderLikeValue(value: string): boolean {
+  const normalized = value.trim().toLowerCase();
+  return (
+    /^\[.*\]$/.test(normalized) ||
+    normalized.startsWith('add ') ||
+    normalized.startsWith('replace ') ||
+    normalized.startsWith('enter ') ||
+    normalized.startsWith('your ')
+  );
+}
 
-    const firstItem = section.items[0];
-    if (!firstItem.bullets.toLowerCase().includes('ats keywords:')) {
-      firstItem.bullets = `${firstItem.bullets}\n${keywordLine}`;
-    }
-    return sections;
-  }
-
-  sections.push({
-    id: crypto.randomUUID(),
-    title: 'Technical Skills',
-    position: sections.length,
-    items: [
-      {
-        id: crypto.randomUUID(),
-        title: 'Role Keywords',
-        subtitle: '',
-        date: '',
-        location: '',
-        bullets: `${keywordLine}\n${GENERIC_RECOMMENDATION}`,
-        position: 0,
-      },
-    ],
-  });
-
-  return sections.map((section, index) => ({ ...section, position: index }));
+function isDiscardableBulletLine(value: string): boolean {
+  const normalized = value.trim().toLowerCase();
+  return (
+    normalized.length === 0 ||
+    normalized.includes('recommendation:') ||
+    normalized.includes('(mock)') ||
+    /^\[.*\]$/.test(normalized)
+  );
 }

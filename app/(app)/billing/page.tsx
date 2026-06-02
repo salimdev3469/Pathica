@@ -106,7 +106,7 @@ export default async function BillingPage() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-slate-700">
               <p>
-                {t('Tailor / Match Job / Generate from Job cost', 'Tailor / Match Job / Generate from Job maliyeti')}:{' '}
+                {t('Tailor / Generate from Job cost', 'Tailor / Generate from Job maliyeti')}:{' '}
                 <strong>{ADVANCED_AI_CREDIT_COST}</strong> {t('credits', 'kredi')}
               </p>
               <p>

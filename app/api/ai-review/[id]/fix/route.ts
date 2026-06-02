@@ -1,0 +1,501 @@
+import crypto from 'node:crypto';
+import { NextResponse } from 'next/server';
+import type { NormalizedResume, NormalizedResumeItem, NormalizedResumeSection } from '@/lib/ai-review/extract';
+import type { ReviewAnalysis } from '@/lib/ai-review/score';
+import { consumeAdvancedAiCredit, refundConsumption } from '@/lib/billing';
+import { AI_REVIEW_FIX_CREDIT_COST } from '@/lib/billing-config';
+import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
+import { generateGeminiText, mapGeminiErrorToResponse } from '@/lib/gemini';
+import { createClient } from '@/lib/supabase-server';
+
+export const runtime = 'nodejs';
+
+type ResumeReviewRow = {
+  id: string;
+  file_name: string;
+  field: string;
+  experience_level: string;
+  job_description: string | null;
+  normalized_resume: NormalizedResume;
+  analysis: ReviewAnalysis;
+  score: number;
+  ontology_version: string;
+};
+
+type PersistableCvItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  location: string;
+  bullets: string;
+  position: number;
+};
+
+type PersistableCvSection = {
+  id: string;
+  title: string;
+  position: number;
+  items: PersistableCvItem[];
+};
+
+type PersistableCvState = {
+  id: string;
+  title: string;
+  templateSlug: 'classic-ats';
+  fontFamily: 'calibri';
+  personalInfo: {
+    fullName: string;
+    jobTitle: string;
+    email: string;
+    phone: string;
+    location: string;
+    linkedin: string;
+    portfolio: string;
+    github: string;
+  };
+  summaryTitle: string;
+  summary: string;
+  sections: PersistableCvSection[];
+};
+
+export async function POST(_req: Request, { params }: { params: { id: string } }) {
+  let userId: string | null = null;
+  let consumption: Awaited<ReturnType<typeof consumeAdvancedAiCredit>> | null = null;
+  let createdCvId: string | null = null;
+
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    userId = user.id;
+
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json({ error: 'AI service is not configured right now.' }, { status: 503 });
+    }
+
+    const { data: review, error: reviewError } = await supabase
+      .from('resume_reviews')
+      .select('id,file_name,field,experience_level,job_description,normalized_resume,analysis,score,ontology_version')
+      .eq('id', params.id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (reviewError) {
+      console.error('AI Review fix load error:', reviewError);
+      return NextResponse.json({ error: 'Could not load review.' }, { status: 500 });
+    }
+
+    if (!review) {
+      return NextResponse.json({ error: 'Review not found.' }, { status: 404 });
+    }
+
+    const typedReview = review as ResumeReviewRow;
+    consumption = await consumeAdvancedAiCredit(user.id, 'ai_review_fix', {
+      review_id: typedReview.id,
+      score: typedReview.score,
+      credit_cost: AI_REVIEW_FIX_CREDIT_COST,
+    });
+
+    if (!consumption.ok && consumption.code === 'INSUFFICIENT_CREDITS') {
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits. Buy a package to unlock the job-ready review.',
+          code: 'INSUFFICIENT_CREDITS',
+          status: 402,
+          wallet: {
+            creditBalance: consumption.creditBalance,
+            freeExportsRemaining: consumption.freeExportsRemaining,
+          },
+        },
+        { status: 402 },
+      );
+    }
+
+    if (!consumption.ok) {
+      return NextResponse.json({ error: 'Could not consume AI Review credits.' }, { status: 500 });
+    }
+
+    const fixedResume = await generateFixedResume(typedReview);
+    const cvId = crypto.randomUUID();
+    createdCvId = cvId;
+    const cvState = buildCvStateFromNormalizedResume(cvId, fixedResume, typedReview.file_name);
+    const atsMeta = calculateKnowledgeBasedAts(cvState);
+
+    const { data: cvRow, error: cvError } = await supabase
+      .from('cvs')
+      .insert({
+        id: cvId,
+        user_id: user.id,
+        title: cvState.title,
+        ats_score: atsMeta.score,
+        ats_score_updated_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single();
+
+    if (cvError || !cvRow) {
+      throw cvError || new Error('Could not create fixed CV.');
+    }
+
+    await persistCvState(supabase, cvState, atsMeta);
+
+    return NextResponse.json({
+      cvId,
+      consumedCredits: consumption.consumedCredits,
+    });
+  } catch (error) {
+    const supabase = createClient();
+
+    if (createdCvId) {
+      try {
+        await supabase.from('cvs').delete().eq('id', createdCvId);
+      } catch (cleanupError) {
+        console.error('Failed to clean up failed AI Review CV:', cleanupError);
+      }
+    }
+
+    if (userId && consumption?.ok) {
+      try {
+        await refundConsumption(
+          userId,
+          'ai_review_fix',
+          consumption.consumedCredits,
+          consumption.consumedFreeExport,
+          { reason: 'ai_review_fix_failed', review_id: params.id },
+        );
+      } catch (refundError) {
+        console.error('Failed to refund AI Review fix credits:', refundError);
+      }
+    }
+
+    console.error('AI Review fix error:', error);
+    const mappedError = mapGeminiErrorToResponse(error, 'Could not create the fixed CV.');
+    return NextResponse.json({ error: mappedError.message, code: mappedError.code }, { status: mappedError.status });
+  }
+}
+
+async function generateFixedResume(review: ResumeReviewRow): Promise<NormalizedResume> {
+  const prompt = `You are a senior resume editor.
+Rewrite the provided normalized resume using ONLY the factual information already present.
+
+Hard rules:
+1) Do not invent employers, schools, dates, locations, metrics, certifications, technologies, or achievements.
+2) You may improve wording, structure, section titles, summary, and bullets.
+3) If a metric is absent, do not fabricate a number.
+4) Apply the deterministic findings below in priority order.
+5) Return ONLY valid JSON with the exact same top-level shape as the normalized resume.
+
+Target:
+- field: ${review.field}
+- experience level: ${review.experience_level}
+- job description: ${review.job_description || 'N/A'}
+
+Deterministic findings:
+${review.analysis.findings.map((finding, index) => `${index + 1}. [${finding.severity}] ${finding.title}: ${finding.detail}`).join('\n')}
+
+Normalized resume JSON:
+${JSON.stringify(review.normalized_resume)}`;
+
+  const rawText = await generateGeminiText({
+    request: prompt,
+    modelOrder: ['flash', 'pro'],
+    timeoutMs: 22000,
+    maxAttemptsPerModel: 2,
+  });
+
+  const parsed = parseJsonObject(rawText);
+  return sanitizeFixedResume(parsed, review.normalized_resume);
+}
+
+function parseJsonObject(rawText: string): unknown {
+  const cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+  try {
+    return JSON.parse(cleaned) as unknown;
+  } catch {
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace === -1 || lastBrace <= firstBrace) {
+      throw new Error('AI returned invalid JSON.');
+    }
+
+    return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1)) as unknown;
+  }
+}
+
+function sanitizeFixedResume(candidate: unknown, original: NormalizedResume): NormalizedResume {
+  if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
+    throw new Error('AI returned an invalid resume object.');
+  }
+
+  const raw = candidate as Partial<NormalizedResume>;
+  const sections = Array.isArray(raw.sections) ? raw.sections.map((section, index) => sanitizeSection(section, index)).filter(Boolean) as NormalizedResumeSection[] : original.sections;
+
+  return {
+    title: sanitizeString(raw.title, original.title, 140),
+    personalInfo: {
+      fullName: sanitizeString(raw.personalInfo?.fullName, original.personalInfo.fullName, 90),
+      email: sanitizeString(raw.personalInfo?.email, original.personalInfo.email, 120),
+      phone: sanitizeString(raw.personalInfo?.phone, original.personalInfo.phone, 60),
+      location: sanitizeString(raw.personalInfo?.location, original.personalInfo.location, 120),
+      linkedin: sanitizeString(raw.personalInfo?.linkedin, original.personalInfo.linkedin, 180),
+      portfolio: sanitizeString(raw.personalInfo?.portfolio, original.personalInfo.portfolio, 180),
+      github: sanitizeString(raw.personalInfo?.github, original.personalInfo.github, 180),
+    },
+    summaryTitle: sanitizeString(raw.summaryTitle, original.summaryTitle || 'Profile Summary', 80),
+    summary: sanitizeString(raw.summary, original.summary, 1200),
+    sections: sections.length > 0 ? sections : original.sections,
+    rawTextHash: original.rawTextHash,
+    wordCount: original.wordCount,
+  };
+}
+
+function sanitizeSection(section: unknown, index: number): NormalizedResumeSection | null {
+  if (!section || typeof section !== 'object' || Array.isArray(section)) {
+    return null;
+  }
+
+  const raw = section as Partial<NormalizedResumeSection>;
+  const items = Array.isArray(raw.items)
+    ? raw.items.map((item, itemIndex) => sanitizeItem(item, itemIndex)).filter(Boolean) as NormalizedResumeItem[]
+    : [];
+
+  if (!sanitizeString(raw.title, '', 90) && items.length === 0) {
+    return null;
+  }
+
+  return {
+    title: sanitizeString(raw.title, `Section ${index + 1}`, 90),
+    concept: sanitizeString(raw.concept, 'additional', 50),
+    position: typeof raw.position === 'number' ? raw.position : index,
+    items,
+  };
+}
+
+function sanitizeItem(item: unknown, index: number): NormalizedResumeItem | null {
+  if (!item || typeof item !== 'object' || Array.isArray(item)) {
+    return null;
+  }
+
+  const raw = item as Partial<NormalizedResumeItem>;
+  const bullets = normalizeBullets(sanitizeString(raw.bullets, '', 2200));
+
+  if (!sanitizeString(raw.title, '', 120) && !sanitizeString(raw.subtitle, '', 140) && !bullets) {
+    return null;
+  }
+
+  return {
+    title: sanitizeString(raw.title, `Entry ${index + 1}`, 120),
+    subtitle: sanitizeString(raw.subtitle, '', 140),
+    date: sanitizeString(raw.date, '', 80),
+    location: sanitizeString(raw.location, '', 100),
+    bullets,
+    position: typeof raw.position === 'number' ? raw.position : index,
+  };
+}
+
+function buildCvStateFromNormalizedResume(cvId: string, resume: NormalizedResume, fileName: string): PersistableCvState {
+  return {
+    id: cvId,
+    title: `${sanitizeCvTitle(resume.title || fileName)} - Job-Ready`,
+    templateSlug: 'classic-ats',
+    fontFamily: 'calibri',
+    personalInfo: {
+      fullName: resume.personalInfo.fullName,
+      jobTitle: '',
+      email: resume.personalInfo.email,
+      phone: resume.personalInfo.phone,
+      location: resume.personalInfo.location,
+      linkedin: resume.personalInfo.linkedin,
+      portfolio: resume.personalInfo.portfolio,
+      github: resume.personalInfo.github,
+    },
+    summaryTitle: resume.summaryTitle || 'Profile Summary',
+    summary: resume.summary || '',
+    sections: resume.sections.map((section, sectionIndex) => ({
+      id: crypto.randomUUID(),
+      title: section.title,
+      position: sectionIndex,
+      items: section.items.map((item, itemIndex) => ({
+        id: crypto.randomUUID(),
+        title: item.title,
+        subtitle: item.subtitle,
+        date: item.date,
+        location: item.location,
+        bullets: item.bullets,
+        position: itemIndex,
+      })),
+    })),
+  };
+}
+
+async function persistCvState(
+  supabase: ReturnType<typeof createClient>,
+  cvState: PersistableCvState,
+  atsMeta: ReturnType<typeof calculateKnowledgeBasedAts>,
+): Promise<void> {
+  const { data: personalInfoSection, error: personalInfoSectionError } = await supabase
+    .from('cv_sections')
+    .insert({ cv_id: cvState.id, title: '_personal_info', position: -2 })
+    .select('id')
+    .single();
+
+  if (personalInfoSectionError || !personalInfoSection) {
+    throw personalInfoSectionError || new Error('Could not create personal info section.');
+  }
+
+  const { error: personalInfoError } = await supabase.from('cv_fields').insert({
+    section_id: personalInfoSection.id,
+    label: 'personal_info',
+    value: JSON.stringify(cvState.personalInfo),
+    field_type: 'json',
+    position: 0,
+  });
+
+  if (personalInfoError) throw personalInfoError;
+
+  const { data: summarySection, error: summarySectionError } = await supabase
+    .from('cv_sections')
+    .insert({ cv_id: cvState.id, title: '_summary', position: -1 })
+    .select('id')
+    .single();
+
+  if (summarySectionError || !summarySection) {
+    throw summarySectionError || new Error('Could not create summary section.');
+  }
+
+  const { error: summaryFieldsError } = await supabase.from('cv_fields').insert([
+    {
+      section_id: summarySection.id,
+      label: 'summary',
+      value: cvState.summary,
+      field_type: 'text',
+      position: 0,
+    },
+    {
+      section_id: summarySection.id,
+      label: 'summary_title',
+      value: cvState.summaryTitle,
+      field_type: 'text',
+      position: 1,
+    },
+    {
+      section_id: summarySection.id,
+      label: 'font_family',
+      value: cvState.fontFamily,
+      field_type: 'text',
+      position: 2,
+    },
+    {
+      section_id: summarySection.id,
+      label: 'template_slug',
+      value: cvState.templateSlug,
+      field_type: 'text',
+      position: 3,
+    },
+  ]);
+
+  if (summaryFieldsError) throw summaryFieldsError;
+
+  for (const section of cvState.sections) {
+    const { data: insertedSection, error: sectionError } = await supabase
+      .from('cv_sections')
+      .insert({
+        cv_id: cvState.id,
+        title: section.title,
+        position: section.position,
+      })
+      .select('id')
+      .single();
+
+    if (sectionError || !insertedSection) {
+      throw sectionError || new Error('Could not create CV section.');
+    }
+
+    if (section.items.length === 0) {
+      continue;
+    }
+
+    const { error: fieldsError } = await supabase.from('cv_fields').insert(
+      section.items.map((item) => ({
+        section_id: insertedSection.id,
+        label: item.title || 'item',
+        value: JSON.stringify(item),
+        field_type: 'item',
+        position: item.position,
+      })),
+    );
+
+    if (fieldsError) throw fieldsError;
+  }
+
+  const { data: atsSection, error: atsSectionError } = await supabase
+    .from('cv_sections')
+    .insert({ cv_id: cvState.id, title: '_ats_meta', position: -3 })
+    .select('id')
+    .single();
+
+  if (atsSectionError || !atsSection) {
+    throw atsSectionError || new Error('Could not create ATS metadata section.');
+  }
+
+  const { error: atsFieldsError } = await supabase.from('cv_fields').insert([
+    {
+      section_id: atsSection.id,
+      label: 'score',
+      value: String(atsMeta.score),
+      field_type: 'number',
+      position: 0,
+    },
+    {
+      section_id: atsSection.id,
+      label: 'reason',
+      value: atsMeta.reason,
+      field_type: 'text',
+      position: 1,
+    },
+    {
+      section_id: atsSection.id,
+      label: 'signature',
+      value: `ai-review:${cvState.id}`,
+      field_type: 'text',
+      position: 2,
+    },
+    {
+      section_id: atsSection.id,
+      label: 'source',
+      value: 'ai_review_fix',
+      field_type: 'text',
+      position: 3,
+    },
+  ]);
+
+  if (atsFieldsError) throw atsFieldsError;
+}
+
+function sanitizeString(value: unknown, fallback: string, maxLength: number): string {
+  const normalized = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
+  const selected = normalized || fallback;
+  return selected.length > maxLength ? selected.slice(0, maxLength).trim() : selected;
+}
+
+function normalizeBullets(value: string): string {
+  return value
+    .replace(/\r/g, '\n')
+    .split(/\n+/)
+    .map((line) => line.replace(/^[-*•]\s*/, '').trim())
+    .filter(Boolean)
+    .slice(0, 8)
+    .map((line) => `- ${line}`)
+    .join('\n');
+}
+
+function sanitizeCvTitle(value: string): string {
+  return value.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90) || 'Fixed CV';
+}

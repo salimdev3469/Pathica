@@ -58,12 +58,10 @@ export function ReadOnlyViewer({ cvState }: { cvState: CVState }) {
                 marginBottom: `${(1 - scale) * -contentHeight}px`
             }}>
                 <div ref={contentRef}>
-                    <div className="shadow-2xl bg-white">
-                        <CVTemplate
-                            previewMode
-                            cv={cvState}
-                        />
-                    </div>
+                    <CVTemplate
+                        previewMode
+                        cv={cvState}
+                    />
                 </div>
             </div>
         </div>

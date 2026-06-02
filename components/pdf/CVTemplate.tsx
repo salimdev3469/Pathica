@@ -488,6 +488,16 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
     <div style={{ width: `${CV_PAGE_WIDTH_PX}px`, margin: '0 auto' }}>
       {pagesToRender.map((page, pageIndex) => {
         const isLastPage = pageIndex === pagesToRender.length - 1;
+        const previewPageStyles = previewMode
+          ? {
+              marginBottom: isLastPage ? '0' : '28px',
+              border: '1px solid #cbd5e1',
+              borderRadius: '2px',
+              boxShadow: '0 18px 40px rgba(15, 23, 42, 0.14)',
+            }
+          : {
+              marginBottom: '0',
+            };
 
         return (
           <div
@@ -505,8 +515,8 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
               boxSizing: 'border-box',
               position: 'relative',
               overflow: 'hidden',
-              marginBottom: previewMode && !isLastPage ? '24px' : '0',
               pageBreakAfter: !previewMode && !isLastPage ? 'always' : 'auto',
+              ...previewPageStyles,
             }}
           >
             <div style={{ height: '100%', overflow: previewMode ? 'visible' : 'hidden' }}>
