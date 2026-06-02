@@ -213,7 +213,7 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
           )}
 
           <p className="text-xs text-slate-500">
-            {t('Default position is top-right. Drag in preview to move and resize with the slider.', 'Varsayilan konum sag ust. Tasimak icin onizlemede surukle, boyut icin kaydiriciyi kullan.')}
+            {t('Default position is top-right. Drag in preview to move it freely anywhere on the page and resize with the slider.', 'Varsayilan konum sag ust. Sayfa icinde serbestce tasimak icin onizlemede surukle, boyut icin kaydiriciyi kullan.')}
           </p>
         </div>
 

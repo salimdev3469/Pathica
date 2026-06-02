@@ -216,10 +216,10 @@ export function CVPreview() {
     };
 
     const getPhotoBounds = (photoSize: number) => ({
-        minX: pageMargins.left,
-        maxX: CV_PAGE_WIDTH_PX - pageMargins.right - photoSize,
-        minY: pageMargins.top,
-        maxY: CV_PAGE_HEIGHT_PX - pageMargins.bottom - photoSize,
+        minX: 0,
+        maxX: CV_PAGE_WIDTH_PX - photoSize,
+        minY: 0,
+        maxY: CV_PAGE_HEIGHT_PX - photoSize,
     });
 
     const clampPhotoPosition = (x: number, y: number, photoSize: number) => {

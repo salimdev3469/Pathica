@@ -445,8 +445,8 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   const requestedX = photoPositionOverride?.x ?? personalInfo?.photoX ?? defaultPhotoX;
   const requestedY = photoPositionOverride?.y ?? personalInfo?.photoY ?? defaultPhotoY;
 
-  const photoX = clamp(requestedX, pageMargins.left, CV_PAGE_WIDTH_PX - pageMargins.right - photoSize);
-  const photoY = clamp(requestedY, pageMargins.top, CV_PAGE_HEIGHT_PX - pageMargins.bottom - photoSize);
+  const photoX = clamp(requestedX, 0, CV_PAGE_WIDTH_PX - photoSize);
+  const photoY = clamp(requestedY, 0, CV_PAGE_HEIGHT_PX - photoSize);
 
   // Header height: h1 (fontPx * 1.4 + margin-bottom 6) + contact-div (contactPx * 1.3) + wrapper marginBottom 14
   const fullNamePx = ptToPx(personalInfo?.fullNameFontSize ?? 18);
