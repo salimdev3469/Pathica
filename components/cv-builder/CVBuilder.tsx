@@ -30,6 +30,11 @@ import { CV_PAGE_MARGIN_MAX_PX, CV_PAGE_MARGIN_MIN_PX, normalizeCvPageMargins } 
 
 const GUEST_DRAFT_STORAGE_KEY = 'pathica_guest_cv_draft_v1';
 const GUEST_EDIT_LOCK_THRESHOLD = 6;
+const PAGE_MARGIN_PRESETS = [
+  { key: 'compact', value: 36 },
+  { key: 'default', value: 54 },
+  { key: 'comfortable', value: 72 },
+] as const;
 
 type CVBuilderProps = {
   locale?: Locale;
@@ -411,11 +416,17 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
       [side]: Number.isFinite(parsed) ? parsed : pageMargins[side],
     });
 
+    dispatch({ type: 'UPDATE_PAGE_MARGINS', payload: nextMargins });
+  };
+
+  const applyPageMarginPreset = (value: number) => {
     dispatch({
-      type: 'SET_CV',
+      type: 'UPDATE_PAGE_MARGINS',
       payload: {
-        ...state,
-        pageMargins: nextMargins,
+        top: value,
+        right: value,
+        bottom: value,
+        left: value,
       },
     });
   };
@@ -510,9 +521,38 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
               </div>
             </div>
             <div className="mt-4 w-full max-w-xl">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {t('Page Margins (px)', 'Sayfa Kenar Boşlukları (px)')}
-              </label>
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {t('Page Margins (A4 / px)', 'Sayfa Kenar Boşlukları (A4 / px)')}
+                </label>
+                <div className="flex flex-wrap gap-1">
+                  {PAGE_MARGIN_PRESETS.map((preset) => (
+                    <Button
+                      key={preset.key}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-[11px]"
+                      onClick={() => applyPageMarginPreset(preset.value)}
+                    >
+                      {preset.key === 'compact'
+                        ? t('Compact', 'Dar')
+                        : preset.key === 'default'
+                          ? t('Default', 'Varsayılan')
+                          : t('Comfortable', 'Geniş')}
+                    </Button>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-[11px]"
+                    onClick={() => applyPageMarginPreset(54)}
+                  >
+                    {t('Reset', 'Sıfırla')}
+                  </Button>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {([
                   { key: 'top', label: t('Top', 'Üst') },
@@ -536,6 +576,12 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                   </div>
                 ))}
               </div>
+              <p className="mt-2 text-xs text-slate-500">
+                {t(
+                  'These margins are applied to the live A4 preview and the exported PDF.',
+                  'Bu kenar boşlukları canlı A4 önizlemeye ve dışa aktarılan PDF’e uygulanır.',
+                )}
+              </p>
             </div>
           </div>
           <div className="flex w-full shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap lg:w-auto lg:flex-col lg:items-stretch">

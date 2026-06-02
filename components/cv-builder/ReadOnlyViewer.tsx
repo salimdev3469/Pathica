@@ -3,10 +3,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { CVState } from '@/context/CVContext';
 import { CVTemplate } from '@/components/pdf/CVTemplate';
+import { CV_PAGE_HEIGHT_PX } from '@/lib/cv-layout';
 
 export function ReadOnlyViewer({ cvState }: { cvState: CVState }) {
     const [scale, setScale] = useState(1);
     const containerRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [contentHeight, setContentHeight] = useState(CV_PAGE_HEIGHT_PX);
 
     useEffect(() => {
         const handleResize = () => {
@@ -23,6 +26,27 @@ export function ReadOnlyViewer({ cvState }: { cvState: CVState }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    useEffect(() => {
+        const content = contentRef.current;
+        if (!content) {
+            return;
+        }
+
+        const updateContentHeight = () => {
+            setContentHeight(Math.max(CV_PAGE_HEIGHT_PX, content.offsetHeight));
+        };
+
+        updateContentHeight();
+
+        if (typeof ResizeObserver === 'undefined') {
+            return;
+        }
+
+        const observer = new ResizeObserver(() => updateContentHeight());
+        observer.observe(content);
+        return () => observer.disconnect();
+    }, [cvState]);
+
     return (
         <div 
             ref={containerRef} 
@@ -31,13 +55,15 @@ export function ReadOnlyViewer({ cvState }: { cvState: CVState }) {
             <div style={{
                 transform: `scale(${scale})`,
                 transformOrigin: 'top center',
-                marginBottom: `${(1 - scale) * -1123}px` // Adjust bottom margin depending on scale
+                marginBottom: `${(1 - scale) * -contentHeight}px`
             }}>
-                <div className="shadow-2xl bg-white">
-                    <CVTemplate
-                        previewMode
-                        cv={cvState}
-                    />
+                <div ref={contentRef}>
+                    <div className="shadow-2xl bg-white">
+                        <CVTemplate
+                            previewMode
+                            cv={cvState}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

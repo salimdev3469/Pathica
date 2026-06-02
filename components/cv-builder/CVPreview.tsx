@@ -186,10 +186,12 @@ export function CVPreview() {
     const [scale, setScale] = useState(1);
     const [dragEnabled, setDragEnabled] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
+    const previewContentRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [showTutorial, setShowTutorial] = useState(false);
     const [isPhotoDragging, setIsPhotoDragging] = useState(false);
     const [photoDragPosition, setPhotoDragPosition] = useState<{ x: number; y: number } | null>(null);
+    const [previewContentHeight, setPreviewContentHeight] = useState(CV_PAGE_HEIGHT_PX);
     const photoDragRef = useRef<{ startClientX: number; startClientY: number; baseX: number; baseY: number } | null>(null);
     const photoDragPositionRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -330,6 +332,28 @@ export function CVPreview() {
             });
         }
     }, [dispatch, pageMargins.bottom, pageMargins.left, pageMargins.right, pageMargins.top, state.personalInfo?.photoDataUrl, state.personalInfo?.photoSize]);
+
+    useEffect(() => {
+        const content = previewContentRef.current;
+        if (!content) {
+            return;
+        }
+
+        const updateContentHeight = () => {
+            const nextHeight = Math.max(CV_PAGE_HEIGHT_PX, content.offsetHeight);
+            setPreviewContentHeight(nextHeight);
+        };
+
+        updateContentHeight();
+
+        if (typeof ResizeObserver === 'undefined') {
+            return;
+        }
+
+        const observer = new ResizeObserver(() => updateContentHeight());
+        observer.observe(content);
+        return () => observer.disconnect();
+    }, [state]);
     // Auto-scale the A4 preview to fit its container
     useEffect(() => {
         const updateScale = () => {
@@ -494,33 +518,35 @@ export function CVPreview() {
                 <div style={{
                     transform: `scale(${scale})`,
                     transformOrigin: 'top center',
-                    marginBottom: `${(1 - scale) * -CV_PAGE_HEIGHT_PX}px` // Adjust bottom margin depending on scale
+                    marginBottom: `${(1 - scale) * -previewContentHeight}px`
                 }}>
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                        modifiers={[restrictToVerticalAxis]}
-                    >
-                        <SortableContext items={state.sections.map(s => `section-${s.id}`)} strategy={verticalListSortingStrategy}>
-                            <PreviewContext.Provider value={{ scale, showTutorial, dismissTutorial, dragEnabled }}>
-                                <div className="shadow-2xl relative">
-                                    <CVTemplate
-                                        previewMode
-                                        cv={state}
-                                        SectionWrapper={DraggableSectionWrapper}
-                                        ItemWrapper={DraggableItemWrapper}
-                                        photoPositionOverride={photoDragPosition || undefined}
-                                        photoInteractive={
-                                            state.personalInfo?.photoDataUrl
-                                                ? { onPointerDown: handlePhotoPointerDown, isDragging: isPhotoDragging }
-                                                : undefined
-                                        }
-                                    />
-                                </div>
-                            </PreviewContext.Provider>
-                        </SortableContext>
-                    </DndContext>
+                    <div ref={previewContentRef}>
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                            modifiers={[restrictToVerticalAxis]}
+                        >
+                            <SortableContext items={state.sections.map(s => `section-${s.id}`)} strategy={verticalListSortingStrategy}>
+                                <PreviewContext.Provider value={{ scale, showTutorial, dismissTutorial, dragEnabled }}>
+                                    <div className="shadow-2xl relative">
+                                        <CVTemplate
+                                            previewMode
+                                            cv={state}
+                                            SectionWrapper={DraggableSectionWrapper}
+                                            ItemWrapper={DraggableItemWrapper}
+                                            photoPositionOverride={photoDragPosition || undefined}
+                                            photoInteractive={
+                                                state.personalInfo?.photoDataUrl
+                                                    ? { onPointerDown: handlePhotoPointerDown, isDragging: isPhotoDragging }
+                                                    : undefined
+                                            }
+                                        />
+                                    </div>
+                                </PreviewContext.Provider>
+                            </SortableContext>
+                        </DndContext>
+                    </div>
                 </div>
             </div>
 

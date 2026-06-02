@@ -67,6 +67,7 @@ type CVAction =
     | { type: 'SET_CV'; payload: CVState }
     | { type: 'UPDATE_TITLE'; payload: string }
     | { type: 'UPDATE_FONT_FAMILY'; payload: string }
+    | { type: 'UPDATE_PAGE_MARGINS'; payload: Partial<CvPageMargins> }
     | { type: 'UPDATE_PERSONAL_INFO'; payload: Partial<PersonalInfo> }
     | { type: 'UPDATE_SUMMARY_TITLE'; payload: string }
     | { type: 'UPDATE_SUMMARY'; payload: string }
@@ -146,6 +147,14 @@ const cvReducer = (state: CVState, action: CVAction): CVState => {
             return { ...state, title: action.payload };
         case 'UPDATE_FONT_FAMILY':
             return { ...state, fontFamily: normalizeCvFont(action.payload) };
+        case 'UPDATE_PAGE_MARGINS':
+            return {
+                ...state,
+                pageMargins: normalizeCvPageMargins({
+                    ...state.pageMargins,
+                    ...action.payload,
+                }),
+            };
         case 'UPDATE_PERSONAL_INFO':
             return { ...state, personalInfo: { ...state.personalInfo, ...action.payload } };
         case 'UPDATE_SUMMARY_TITLE':
