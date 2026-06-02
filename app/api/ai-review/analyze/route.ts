@@ -9,6 +9,7 @@ import {
 import { serializeReviewForClient } from '@/lib/ai-review/report';
 import { scoreResumeReview } from '@/lib/ai-review/score';
 import { createClient } from '@/lib/supabase-server';
+import { isMissingTableInSchemaCache } from '@/lib/supabase-errors';
 
 export const runtime = 'nodejs';
 
@@ -113,6 +114,16 @@ export async function POST(req: Request) {
       .single();
 
     if (error || !inserted) {
+      if (isMissingTableInSchemaCache(error, 'resume_reviews')) {
+        return NextResponse.json(
+          {
+            error: 'AI Review database schema is missing. Please apply supabase/schema.sql before analyzing resumes.',
+            code: 'DATABASE_SCHEMA_MISSING',
+          },
+          { status: 503 },
+        );
+      }
+
       console.error('AI Review insert error:', error);
       return NextResponse.json({ error: 'Could not save AI Review result.' }, { status: 500 });
     }

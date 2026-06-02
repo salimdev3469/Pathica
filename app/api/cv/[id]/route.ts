@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
-
-function isMissingTableInSchemaCache(error: unknown, tableName: string) {
-    const asRecord = error as { code?: string; message?: string } | null;
-    if (!asRecord) return false;
-
-    return asRecord.code === 'PGRST205' && (asRecord.message || '').includes(`public.${tableName}`);
-}
+import { isMissingTableInSchemaCache } from '@/lib/supabase-errors';
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
     try {
@@ -35,12 +29,8 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
             .eq('cv_id', params.id)
             .eq('user_id', user.id);
 
-        if (coverLettersError) {
-            if (isMissingTableInSchemaCache(coverLettersError, 'cover_letters')) {
-                console.warn('cover_letters table is missing. Continuing CV delete without unlinking cover letters.');
-            } else {
-                return NextResponse.json({ error: coverLettersError.message }, { status: 500 });
-            }
+        if (coverLettersError && !isMissingTableInSchemaCache(coverLettersError, 'cover_letters')) {
+            return NextResponse.json({ error: coverLettersError.message }, { status: 500 });
         }
 
         const { error } = await supabase

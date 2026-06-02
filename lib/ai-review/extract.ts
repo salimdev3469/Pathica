@@ -76,15 +76,9 @@ export async function extractTextFromResumeFile(input: {
         : 'txt';
 
   if (fileType === 'pdf') {
-    const { PDFParse } = await import('pdf-parse');
-    const parser = new PDFParse({ data: input.buffer });
-
-    try {
-      const parsed = await parser.getText();
-      return { text: normalizeExtractedText(parsed.text || ''), fileHash, fileType };
-    } finally {
-      await parser.destroy();
-    }
+    const { default: pdfParse } = await import('pdf-parse');
+    const parsed = await pdfParse(input.buffer);
+    return { text: normalizeExtractedText(parsed.text || ''), fileHash, fileType };
   }
 
   if (fileType === 'docx') {

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { serializeReviewForClient, type ResumeReviewRecord } from '@/lib/ai-review/report';
 import { createClient } from '@/lib/supabase-server';
+import { isMissingTableInSchemaCache } from '@/lib/supabase-errors';
 
 export const runtime = 'nodejs';
 
@@ -39,6 +40,19 @@ export async function GET() {
     .limit(30);
 
   if (error) {
+    if (isMissingTableInSchemaCache(error, 'resume_reviews')) {
+      return NextResponse.json({
+        reviews: [],
+        stats: {
+          targetScore: 92,
+          bestScore: null,
+          avgScore: null,
+          reviewCount: 0,
+        },
+        schemaMissing: true,
+      });
+    }
+
     console.error('AI Review history error:', error);
     return NextResponse.json({ error: 'Could not load AI Review history.' }, { status: 500 });
   }

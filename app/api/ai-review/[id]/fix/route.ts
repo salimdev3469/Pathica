@@ -7,6 +7,7 @@ import { AI_REVIEW_FIX_CREDIT_COST } from '@/lib/billing-config';
 import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
 import { generateGeminiText, mapGeminiErrorToResponse } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase-server';
+import { isMissingTableInSchemaCache } from '@/lib/supabase-errors';
 
 export const runtime = 'nodejs';
 
@@ -87,6 +88,16 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
       .maybeSingle();
 
     if (reviewError) {
+      if (isMissingTableInSchemaCache(reviewError, 'resume_reviews')) {
+        return NextResponse.json(
+          {
+            error: 'AI Review database schema is missing. Please apply supabase/schema.sql before fixing resumes.',
+            code: 'DATABASE_SCHEMA_MISSING',
+          },
+          { status: 503 },
+        );
+      }
+
       console.error('AI Review fix load error:', reviewError);
       return NextResponse.json({ error: 'Could not load review.' }, { status: 500 });
     }
