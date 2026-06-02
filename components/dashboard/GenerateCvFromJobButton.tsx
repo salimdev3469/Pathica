@@ -107,8 +107,8 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
           <DialogTitle>{t('Generate CV with AI', 'AI ile CV Üret')}</DialogTitle>
           <DialogDescription>
             {t(
-              'Paste the full job description. The more detailed your description, the better and more targeted the draft CV will be.',
-              'Tam iş tanımını yapıştırın. Tanım ne kadar detaylı olursa üretilen taslak o kadar hedefli olur.',
+              'Paste the full job description. AI extracts role keywords, builds a targeted draft, and opens it in the editor.',
+              'Tam iş tanımını yapıştırın. Yapay zeka rol anahtar kelimelerini çıkarır, hedefli taslak oluşturur ve editörde açar.',
             )}
           </DialogDescription>
         </DialogHeader>

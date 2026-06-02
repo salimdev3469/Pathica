@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Sparkles, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Loader2, Sparkles, AlertCircle, ArrowLeft, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import type { Locale } from '@/lib/locale';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 type CV = {
     id: string;
@@ -31,6 +32,49 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
     const [generatedText, setGeneratedText] = useState('');
+    const [copied, setCopied] = useState(false);
+
+    const copyToClipboard = async (text: string) => {
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+
+        if (typeof document === 'undefined') {
+            throw new Error('Clipboard is not available');
+        }
+
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = text;
+        tempTextArea.setAttribute('readonly', '');
+        tempTextArea.style.position = 'absolute';
+        tempTextArea.style.left = '-9999px';
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        tempTextArea.setSelectionRange(0, tempTextArea.value.length);
+        const copiedWithCommand = document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+
+        if (!copiedWithCommand) {
+            throw new Error('Copy command failed');
+        }
+    };
+
+    const handleCopy = async () => {
+        const text = generatedText.trim();
+        if (!text) {
+            return;
+        }
+
+        try {
+            await copyToClipboard(text);
+            setCopied(true);
+            toast.success(t('Cover letter copied to clipboard.', 'Ön yazı panoya kopyalandı.'));
+            window.setTimeout(() => setCopied(false), 1600);
+        } catch {
+            toast.error(t('Could not copy the cover letter.', 'Ön yazı kopyalanamadı.'));
+        }
+    };
 
     const handleGenerate = async () => {
         setError('');
@@ -229,7 +273,20 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
 
                 <Card className="shadow-sm border-slate-200 dark:border-slate-800 h-full flex flex-col">
                     <CardHeader>
-                        <CardTitle className="text-lg">{t('Result', 'Sonuç')}</CardTitle>
+                        <div className="flex items-center justify-between gap-3">
+                            <CardTitle className="text-lg">{t('Result', 'Sonuç')}</CardTitle>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={handleCopy}
+                                disabled={!generatedText.trim() || isGenerating}
+                                className="gap-2"
+                            >
+                                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                {copied ? t('Copied', 'Kopyalandı') : t('Copy', 'Kopyala')}
+                            </Button>
+                        </div>
                         <CardDescription>{t('Your generated cover letter will appear here.', 'Oluşturulan ön yazınız burada görünecek.')}</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 flex flex-col h-full min-h-[400px]">

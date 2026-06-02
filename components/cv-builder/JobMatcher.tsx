@@ -20,6 +20,8 @@ type MatchResponse = {
   score: number;
   feedback: string;
   missingSkills: string[];
+  extractedKeywords?: string[];
+  embeddedKeywords?: string[];
   improvedCvState: CVState;
 };
 
@@ -34,6 +36,7 @@ export function JobMatcher({ locale }: JobMatcherProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [jobDescription, setJobDescription] = useState('');
   const [matchResult, setMatchResult] = useState<MatchResponse | null>(null);
+  const [isApplyingCurrent, setIsApplyingCurrent] = useState(false);
   const [isSavingAsNew, setIsSavingAsNew] = useState(false);
 
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
@@ -77,8 +80,61 @@ export function JobMatcher({ locale }: JobMatcherProps) {
     }
   };
 
+  const buildAppliedState = () => {
+    if (!matchResult?.improvedCvState) {
+      return null;
+    }
+
+    const improved = matchResult.improvedCvState;
+
+    return {
+      ...state,
+      ...improved,
+      id: state.id,
+      title: state.title,
+      fontFamily: improved.fontFamily || state.fontFamily,
+      summaryTitle: improved.summaryTitle || state.summaryTitle,
+      summary: improved.summary || state.summary,
+      personalInfo: improved.personalInfo || state.personalInfo,
+      sections: Array.isArray(improved.sections) && improved.sections.length > 0 ? improved.sections : state.sections,
+    } as CVState;
+  };
+
+  const handleApplyToCurrent = async () => {
+    const nextState = buildAppliedState();
+    if (!nextState) {
+      return;
+    }
+
+    setIsApplyingCurrent(true);
+    try {
+      const saveRes = await fetch('/api/cv/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nextState),
+      });
+
+      const payload = (await saveRes.json().catch(() => ({}))) as { error?: string };
+      if (!saveRes.ok) {
+        throw new Error(payload.error || 'Failed to save optimized CV');
+      }
+
+      dispatch({ type: 'SET_CV', payload: nextState });
+      toast.success(t('CV updated with job keywords.', 'CV iş tanımı anahtar kelimeleriyle güncellendi.'));
+      setIsOpen(false);
+      setMatchResult(null);
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      toast.error(t('Could not apply changes to this CV.', 'Değişiklikler bu CV’ye uygulanamadı.'));
+    } finally {
+      setIsApplyingCurrent(false);
+    }
+  };
+
   const handleApplyAndSaveAsNew = async () => {
-    if (!matchResult?.improvedCvState) return;
+    const optimizedState = buildAppliedState();
+    if (!optimizedState) return;
 
     setIsSavingAsNew(true);
     try {
@@ -104,8 +160,8 @@ export function JobMatcher({ locale }: JobMatcherProps) {
       }
 
       // Construct deeply copied improved state with new ID
-      const newCvState = {
-        ...matchResult.improvedCvState,
+      const newCvState: CVState = {
+        ...optimizedState,
         id: newId,
         title: newTitle,
       };
@@ -124,6 +180,7 @@ export function JobMatcher({ locale }: JobMatcherProps) {
       // Update local context and navigate
       dispatch({ type: 'SET_CV', payload: newCvState });
       setIsOpen(false);
+      setMatchResult(null);
       router.push(`/cv/${newId}`);
       
     } catch (error) {
@@ -150,12 +207,12 @@ export function JobMatcher({ locale }: JobMatcherProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Zap className="h-5 w-5 text-blue-500" />
-            {t('AI Match & Optimize', 'Yapay Zeka ile Eşleştir ve Optimize Et')}
+            {t('AI Match, Keywords & Optimize', 'Yapay Zeka ile Eşleştir, Anahtar Kelime Çıkar ve Optimize Et')}
           </DialogTitle>
           <DialogDescription>
             {t(
-              'Paste the job description below. Our AI will analyze your CV, provide a score, show missing keywords, and automatically optimize your text.',
-              'İş ilanını aşağıya yapıştırın. Yapay zeka CV\'nizi analiz edip skorlayacak, eksik anahtar kelimeleri gösterecek ve kelimelerinizi ilanla eşleşecek şekilde oto-optimize edecek.'
+              'Paste the job description below. AI will extract keywords, show what is missing, and update your CV text to match the role naturally.',
+              'İş ilanını aşağıya yapıştırın. Yapay zeka anahtar kelimeleri çıkarır, eksikleri gösterir ve CV metnini role doğal şekilde uyarlayarak günceller.'
             )}
           </DialogDescription>
         </DialogHeader>
@@ -194,6 +251,36 @@ export function JobMatcher({ locale }: JobMatcherProps) {
                 </p>
               </div>
 
+              {matchResult.extractedKeywords && matchResult.extractedKeywords.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2 text-slate-700 dark:text-slate-300">
+                    {t('Extracted Job Keywords', 'Çıkarılan İş Anahtar Kelimeleri')}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {matchResult.extractedKeywords.map((keyword) => (
+                      <span key={keyword} className="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {matchResult.embeddedKeywords && matchResult.embeddedKeywords.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2 text-emerald-700 dark:text-emerald-300">
+                    {t('Keywords Embedded into CV', 'CV İçine Yerleştirilen Anahtar Kelimeler')}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {matchResult.embeddedKeywords.map((keyword) => (
+                      <span key={keyword} className="px-2.5 py-1 text-xs font-medium rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {matchResult.missingSkills && matchResult.missingSkills.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
@@ -213,9 +300,13 @@ export function JobMatcher({ locale }: JobMatcherProps) {
                 <Button variant="ghost" onClick={() => setMatchResult(null)}>
                   {t('Back', 'Geri')}
                 </Button>
-                <Button onClick={handleApplyAndSaveAsNew} disabled={isSavingAsNew} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                <Button onClick={handleApplyToCurrent} disabled={isApplyingCurrent || isSavingAsNew} className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+                  {isApplyingCurrent ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                  {t('Apply to Current CV', 'Mevcut CV’ye Uygula')}
+                </Button>
+                <Button onClick={handleApplyAndSaveAsNew} disabled={isApplyingCurrent || isSavingAsNew} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
                   {isSavingAsNew ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
-                  {t('Apply Changes & Save as New CV', 'Değişiklikleri Uygula ve Yeni CV Olarak Kaydet')}
+                  {t('Save as New Tailored CV', 'Yeni Uyumlu CV Olarak Kaydet')}
                 </Button>
               </div>
             </div>

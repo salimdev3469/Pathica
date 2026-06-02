@@ -319,15 +319,21 @@ export default async function DashboardPage() {
                                 'İlk CV’ni oluştur ve ATS ile insan kaynakları okunabilirliği için optimize etmeye başla.',
                             )}
                         </p>
-                        <Button
-                            size="lg"
-                            className="h-12 rounded-xl bg-slate-900 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-                            asChild
-                        >
-                            <Link href="/cv/new">
-                                <Plus className="mr-2 h-5 w-5" /> {t('Create Your First CV', 'İlk CV’ni Oluştur')}
-                            </Link>
-                        </Button>
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                            <GenerateCvFromJobButton
+                                locale={locale}
+                                triggerClassName="h-12 rounded-xl border-slate-300 px-5 text-sm font-semibold"
+                            />
+                            <Button
+                                size="lg"
+                                className="h-12 rounded-xl bg-slate-900 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                                asChild
+                            >
+                                <Link href="/cv/new">
+                                    <Plus className="mr-2 h-5 w-5" /> {t('Create Your First CV', 'İlk CV’ni Oluştur')}
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
                 )}
 

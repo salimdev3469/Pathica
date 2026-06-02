@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { consumeAdvancedAiCredit, refundConsumption } from '@/lib/billing';
 import { flashModel } from '@/lib/gemini';
+import { extractJobKeywords } from '@/lib/job-keywords';
 import { createClient } from '@/lib/supabase-server';
 
 type GenerateRequest = {
@@ -99,6 +100,7 @@ export async function POST(req: Request) {
     const body = (await req.json()) as GenerateRequest;
     const jobTitle = sanitizeField(normalizeText(body.jobTitle), 90);
     const jobDescription = normalizeText(body.jobDescription);
+    const extractedKeywords = extractJobKeywords(jobDescription, 24);
 
     if (!jobDescription || jobDescription.length < 40) {
       return NextResponse.json(
@@ -147,8 +149,8 @@ export async function POST(req: Request) {
       throw new Error('Could not create CV shell.');
     }
 
-    const generated = await generateCvDraft(jobDescription, jobTitle || null);
-    const cvState = buildCvState(cvRow.id, generated, jobDescription, jobTitle || null);
+    const generated = await generateCvDraft(jobDescription, jobTitle || null, extractedKeywords);
+    const cvState = buildCvState(cvRow.id, generated, jobDescription, jobTitle || null, extractedKeywords);
 
     return NextResponse.json({ cvId: cvRow.id, cvState }, { status: 200 });
   } catch (error) {
@@ -171,7 +173,11 @@ export async function POST(req: Request) {
   }
 }
 
-async function generateCvDraft(jobDescription: string, targetRoleTitle: string | null): Promise<RawGeneratedCv | null> {
+async function generateCvDraft(
+  jobDescription: string,
+  targetRoleTitle: string | null,
+  extractedKeywords: string[],
+): Promise<RawGeneratedCv | null> {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return null;
@@ -216,6 +222,10 @@ Requirements:
 - Must include Experience, Education, Projects, and Technical Skills.
 - bullets must be newline-separated and start with "- ".
 - Keep content dense and editable.
+- Weave important job keywords naturally into summary and bullet points.
+
+Important keywords:
+${extractedKeywords.join(', ') || 'N/A'}
 
 User input:
 ${targetRoleTitle ? `Target role title: ${targetRoleTitle}\n` : ''}${jobDescription}`;
@@ -267,8 +277,9 @@ function buildCvState(
   generated: RawGeneratedCv | null,
   sourceInput: string,
   targetRoleTitle: string | null,
+  extractedKeywords: string[],
 ): CvStatePayload {
-  const fallback = buildFallbackDraft(sourceInput, targetRoleTitle);
+  const fallback = buildFallbackDraft(sourceInput, targetRoleTitle, extractedKeywords);
 
   const title = sanitizeField(asString(generated?.title), 90) || fallback.title;
   const summary = sanitizeField(asString(generated?.summary), 900) || fallback.summary;
@@ -294,6 +305,8 @@ function buildCvState(
     })),
   }));
 
+  const enrichedSections = injectKeywordHintsIntoSections(sections, extractedKeywords);
+
   return {
     id: cvId,
     title,
@@ -308,8 +321,8 @@ function buildCvState(
     },
     summaryTitle: SUMMARY_TITLE,
     fontFamily: 'calibri',
-    summary,
-    sections,
+    summary: appendKeywordHintToSummary(summary, extractedKeywords),
+    sections: enrichedSections,
   };
 }
 
@@ -383,18 +396,22 @@ function ensureRequiredSections(input: DraftSection[], fallbackSections: DraftSe
   return sections;
 }
 
-function buildFallbackDraft(sourceInput: string, targetRoleTitle?: string | null): {
+function buildFallbackDraft(
+  sourceInput: string,
+  targetRoleTitle?: string | null,
+  extractedKeywords: string[] = [],
+): {
   title: string;
   summary: string;
   sections: DraftSection[];
 } {
   const roleHint = targetRoleTitle && targetRoleTitle.trim().length > 2 ? targetRoleTitle.trim() : extractRoleHint(sourceInput);
-  const keywordList = extractKeywords(sourceInput).slice(0, 12);
+  const keywordList = (extractedKeywords.length > 0 ? extractedKeywords : extractKeywords(sourceInput)).slice(0, 12);
+  const summaryKeywords = keywordList.slice(0, 6).join(', ');
 
   return {
     title: `${roleHint} Resume`,
-    summary:
-      'AI-generated English draft based on your input. This draft uses provided facts when possible and includes mock suggestions for missing details. Update every placeholder and every Recommendation bullet before using the resume.',
+    summary: `AI-generated English draft based on your input. This draft uses provided facts when possible and includes mock suggestions for missing details. Update every placeholder and every Recommendation bullet before using the resume.${summaryKeywords ? ` Targeted keywords: ${summaryKeywords}.` : ''}`,
     sections: [
       {
         title: 'Experience',
@@ -500,7 +517,7 @@ function extractRoleHint(input: string): string {
 function extractKeywords(text: string): string[] {
   const words = text
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}+.#\s-]/gu, ' ')
+    .replace(/[^a-z0-9çğıöşüâîû+.#\s-]/gi, ' ')
     .split(/\s+/)
     .map((token) => token.trim())
     .filter((token) => token.length >= 3);
@@ -535,7 +552,7 @@ function extractKeywords(text: string): string[] {
     }
   }
 
-  return [...counts.entries()]
+  return Array.from(counts.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 20)
     .map(([word]) => word);
@@ -560,4 +577,73 @@ function normalizeText(value: string | undefined): string {
   }
 
   return value.replace(/\s+/g, ' ').trim();
+}
+
+function appendKeywordHintToSummary(summary: string, extractedKeywords: string[]): string {
+  if (!summary) {
+    return summary;
+  }
+
+  const keywordHint = extractedKeywords.slice(0, 6).join(', ');
+  if (!keywordHint) {
+    return summary;
+  }
+
+  if (summary.toLowerCase().includes('targeted keywords:')) {
+    return summary;
+  }
+
+  return `${summary} Targeted keywords: ${keywordHint}.`;
+}
+
+function injectKeywordHintsIntoSections(sections: CvSection[], extractedKeywords: string[]): CvSection[] {
+  const keywords = extractedKeywords.slice(0, 10);
+  if (keywords.length === 0) {
+    return sections;
+  }
+
+  const keywordLine = `- ATS Keywords: ${keywords.join(', ')}`;
+  const skillsSectionIndex = sections.findIndex((section) => /skills?|technical|competencies/i.test(section.title));
+
+  if (skillsSectionIndex >= 0) {
+    const section = sections[skillsSectionIndex];
+
+    if (section.items.length === 0) {
+      section.items.push({
+        id: crypto.randomUUID(),
+        title: 'Role Keywords',
+        subtitle: '',
+        date: '',
+        location: '',
+        bullets: `${keywordLine}\n${GENERIC_RECOMMENDATION}`,
+        position: 0,
+      });
+      return sections;
+    }
+
+    const firstItem = section.items[0];
+    if (!firstItem.bullets.toLowerCase().includes('ats keywords:')) {
+      firstItem.bullets = `${firstItem.bullets}\n${keywordLine}`;
+    }
+    return sections;
+  }
+
+  sections.push({
+    id: crypto.randomUUID(),
+    title: 'Technical Skills',
+    position: sections.length,
+    items: [
+      {
+        id: crypto.randomUUID(),
+        title: 'Role Keywords',
+        subtitle: '',
+        date: '',
+        location: '',
+        bullets: `${keywordLine}\n${GENERIC_RECOMMENDATION}`,
+        position: 0,
+      },
+    ],
+  });
+
+  return sections.map((section, index) => ({ ...section, position: index }));
 }
