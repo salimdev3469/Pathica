@@ -159,6 +159,20 @@ function displayUrl(url: string): string {
   return url.replace(/^https?:\/\/(www\.)?/i, '');
 }
 
+function getLinkLabel(url: string): string {
+  const normalized = url.toLowerCase();
+
+  if (normalized.includes('linkedin.com')) {
+    return 'LinkedIn';
+  }
+
+  if (normalized.includes('github.com')) {
+    return 'Github';
+  }
+
+  return displayUrl(url);
+}
+
 function isCvLayoutVariant(value: unknown): value is CvLayoutVariant {
   return typeof value === 'string' && (CV_LAYOUT_VARIANTS as readonly string[]).includes(value);
 }
@@ -421,7 +435,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
     email ? { kind: 'text', value: email } : null,
     linkedinUrl ? { kind: 'link', value: 'LinkedIn', href: linkedinUrl } : null,
     githubUrl ? { kind: 'link', value: 'Github', href: githubUrl } : null,
-    portfolioUrl ? { kind: 'link', value: displayUrl(portfolioUrl), href: portfolioUrl } : null,
+    portfolioUrl ? { kind: 'link', value: getLinkLabel(portfolioUrl), href: portfolioUrl } : null,
   ].filter((entry): entry is ContactEntry => entry !== null);
 
   const hasPhoto = Boolean(photoDataUrl);
