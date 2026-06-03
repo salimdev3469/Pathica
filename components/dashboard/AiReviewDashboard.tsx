@@ -273,15 +273,15 @@ export default function AiReviewDashboard({
 
   return (
     <div className="space-y-7">
-      <section className="rounded-[2rem] border border-slate-200 bg-slate-950 p-6 text-white shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:shadow-black/30 sm:p-8">
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 text-slate-950 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 sm:p-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-pink-400/20 bg-pink-400/10 px-3 py-1 text-sm font-semibold text-pink-200">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
               <Brain className="h-4 w-4" />
               {t('Deterministic ontology scoring', 'Deterministik ontoloji skoru')}
             </div>
             <h1 className="text-4xl font-bold tracking-tight">{t('AI Resume Review', 'AI Resume Review')}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
               {t(
                 'Free analysis uses file extraction, schema normalization, ontology mapping, and weighted mathematical scoring. LLM is only used for paid CV fixes.',
                 'Ücretsiz analiz dosya okuma, şema normalizasyonu, ontoloji eşleme ve ağırlıklı matematiksel skorla çalışır. LLM sadece ücretli CV fix için kullanılır.',
@@ -290,7 +290,7 @@ export default function AiReviewDashboard({
           </div>
           <Button
             onClick={openFilePicker}
-            className="h-12 rounded-2xl bg-pink-500 px-6 text-base font-bold text-white shadow-lg shadow-pink-500/20 hover:bg-pink-400"
+            className="h-12 rounded-2xl bg-slate-900 px-6 text-base font-bold text-white shadow-sm hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white"
           >
             <Upload className="mr-2 h-5 w-5" />
             {t('Upload Resume', 'CV Yükle')}
@@ -300,7 +300,7 @@ export default function AiReviewDashboard({
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard icon={Target} label={t('Target Score', 'Hedef Skor')} value={`${stats.targetScore}+`} hint="Hire Zone" tone="emerald" />
-        <MetricCard icon={TrendingUp} label={t('Your Best', 'En İyi Skor')} value={stats.bestScore === null ? '--' : String(stats.bestScore)} hint="/100" tone="pink" />
+        <MetricCard icon={TrendingUp} label={t('Your Best', 'En İyi Skor')} value={stats.bestScore === null ? '--' : String(stats.bestScore)} hint="/100" tone="slate" />
         <MetricCard icon={Brain} label={t('Reviews', 'Review')} value={String(stats.reviewCount)} hint={t('completed', 'tamamlandı')} tone="blue" />
         <MetricCard icon={Sparkles} label={t('Avg Score', 'Ortalama')} value={stats.avgScore === null ? '--' : String(stats.avgScore)} hint="/100" tone="amber" />
       </section>
@@ -308,7 +308,7 @@ export default function AiReviewDashboard({
       <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr]">
         <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-pink-500/10 text-pink-500">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-300">
               <Upload className="h-5 w-5" />
             </div>
             <div>
@@ -320,7 +320,7 @@ export default function AiReviewDashboard({
           <button
             type="button"
             onClick={openFilePicker}
-            className="flex min-h-48 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-center transition hover:border-pink-300 hover:bg-pink-50/50 dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-pink-400/40 dark:hover:bg-pink-400/5"
+            className="flex min-h-48 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-center transition hover:border-blue-300 hover:bg-blue-50/50 dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-blue-400/40 dark:hover:bg-blue-400/5"
           >
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-500 shadow-sm dark:bg-slate-900">
               <Upload className="h-7 w-7" />
@@ -395,7 +395,7 @@ export default function AiReviewDashboard({
                 onClick={() => setActiveReview(review)}
                 className={`rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${
                   activeReview?.id === review.id
-                    ? 'border-pink-300 bg-pink-50 dark:border-pink-500/40 dark:bg-pink-500/10'
+                    ? 'border-blue-300 bg-blue-50 dark:border-blue-500/40 dark:bg-blue-500/10'
                     : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/40'
                 }`}
               >
@@ -462,11 +462,11 @@ function MetricCard({
   label: string;
   value: string;
   hint: string;
-  tone: 'emerald' | 'pink' | 'blue' | 'amber';
+  tone: 'emerald' | 'slate' | 'blue' | 'amber';
 }) {
   const toneClasses = {
     emerald: 'bg-emerald-500/10 text-emerald-500',
-    pink: 'bg-pink-500/10 text-pink-500',
+    slate: 'bg-slate-900/10 text-slate-800 dark:bg-slate-100/10 dark:text-slate-200',
     blue: 'bg-blue-500/10 text-blue-500',
     amber: 'bg-amber-500/10 text-amber-500',
   };
@@ -509,13 +509,13 @@ function ReviewWizard(props: {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent className="max-h-[92vh] w-[94vw] max-w-6xl overflow-hidden rounded-[2rem] border-slate-200 bg-white p-0 text-slate-950 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
-        <DialogHeader className="border-b border-slate-200 p-7 dark:border-slate-800">
+      <DialogContent className="flex h-[92vh] max-h-[92vh] w-[94vw] max-w-6xl flex-col overflow-hidden rounded-[2rem] border-slate-200 bg-white p-0 text-slate-950 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
+        <DialogHeader className="shrink-0 border-b border-slate-200 p-7 dark:border-slate-800">
           <DialogTitle className="text-3xl font-black">{t('AI Resume Review', 'AI Resume Review')}</DialogTitle>
           <DialogDescription>{wizardSubtitle(props.step, props.locale)}</DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[68vh] overflow-y-auto p-7">
+        <div className="min-h-0 flex-1 overflow-y-auto p-7">
           <StepIndicator step={props.step} locale={props.locale} />
 
           {props.selectedFile ? (
@@ -537,7 +537,7 @@ function ReviewWizard(props: {
                     onClick={() => props.onCategorySelect(item.id)}
                     className={`rounded-3xl border p-7 text-center transition hover:-translate-y-0.5 hover:shadow-lg ${
                       isSelected
-                        ? 'border-pink-300 bg-pink-50 shadow-pink-100 dark:border-pink-500/50 dark:bg-pink-500/10'
+                        ? 'border-slate-900 bg-slate-900 text-white shadow-slate-200 dark:border-slate-100 dark:bg-slate-100 dark:text-slate-950 dark:shadow-none'
                         : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900'
                     }`}
                   >
@@ -545,7 +545,7 @@ function ReviewWizard(props: {
                       <Icon className="h-9 w-9" />
                     </div>
                     <h3 className="text-xl font-black">{item.label}</h3>
-                    <p className="mt-2 text-sm text-slate-500">{item.description}</p>
+                    <p className={`mt-2 text-sm ${isSelected ? 'text-slate-200 dark:text-slate-700' : 'text-slate-500'}`}>{item.description}</p>
                   </button>
                 );
               })}
@@ -564,8 +564,8 @@ function ReviewWizard(props: {
                     onClick={() => props.onFieldSelect(item.id)}
                     className={`rounded-full border px-6 py-3 text-base font-bold transition ${
                       props.field === item.id
-                        ? 'border-pink-400 bg-pink-500 text-white shadow-lg shadow-pink-500/20'
-                        : 'border-slate-300 bg-transparent text-slate-700 hover:border-pink-300 dark:border-slate-700 dark:text-slate-200'
+                        ? 'border-slate-900 bg-slate-900 text-white shadow-sm dark:border-slate-100 dark:bg-slate-100 dark:text-slate-950'
+                        : 'border-slate-300 bg-transparent text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
                     }`}
                   >
                     {item.label}
@@ -585,8 +585,8 @@ function ReviewWizard(props: {
                     onClick={() => props.onExperienceSelect(level.id)}
                     className={`min-w-32 rounded-[2rem] border px-6 py-4 text-center transition ${
                       props.experienceLevel === level.id
-                        ? 'border-pink-400 bg-pink-500 text-white shadow-lg shadow-pink-500/20'
-                        : 'border-slate-300 bg-transparent text-slate-700 hover:border-pink-300 dark:border-slate-700 dark:text-slate-200'
+                        ? 'border-slate-900 bg-slate-900 text-white shadow-sm dark:border-slate-100 dark:bg-slate-100 dark:text-slate-950'
+                        : 'border-slate-300 bg-transparent text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
                     }`}
                   >
                     <span className="block text-lg font-black">{level.label}</span>
@@ -597,14 +597,14 @@ function ReviewWizard(props: {
 
               <label className="mt-9 block">
                 <span className="mb-3 flex items-center gap-2 text-lg font-bold">
-                  <Zap className="h-5 w-5 text-pink-500" />
+                  <Zap className="h-5 w-5 text-blue-600 dark:text-blue-300" />
                   {t('Add job description (optional)', 'İş tanımı ekle (opsiyonel)')}
                 </span>
                 <textarea
                   value={props.jobDescription}
                   onChange={(event) => props.onJobDescriptionChange(event.target.value)}
                   rows={6}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none transition focus:border-pink-300 focus:ring-4 focus:ring-pink-500/10 dark:border-slate-800 dark:bg-slate-900"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-900/10 dark:border-slate-800 dark:bg-slate-900 dark:focus:border-slate-400"
                   placeholder={t('Paste the job description to score keyword coverage mathematically.', 'Anahtar kelime kapsamını matematiksel skorlamak için iş tanımını yapıştır.')}
                 />
               </label>
@@ -612,31 +612,33 @@ function ReviewWizard(props: {
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between border-t border-slate-200 p-7 dark:border-slate-800">
-          <Button
-            variant="outline"
-            onClick={() => props.setStep(Math.max(0, props.step - 1))}
-            disabled={props.step === 0}
-            className="h-12 rounded-xl px-5"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t('Back', 'Geri')}
-          </Button>
-
-          {props.step < 2 ? (
+        <div className="shrink-0 border-t border-slate-200 bg-white p-4 shadow-[0_-12px_30px_rgba(15,23,42,0.06)] dark:border-slate-800 dark:bg-slate-950 sm:p-7">
+          <div className="flex items-center justify-between gap-3">
             <Button
-              onClick={() => props.setStep(Math.min(2, props.step + 1))}
-              disabled={!canGoNext}
-              className="h-12 rounded-xl bg-pink-500 px-7 text-white hover:bg-pink-400"
+              variant="outline"
+              onClick={() => props.setStep(Math.max(0, props.step - 1))}
+              disabled={props.step === 0}
+              className="h-12 rounded-xl px-5"
             >
-              {t('Next', 'İleri')}
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t('Back', 'Geri')}
             </Button>
-          ) : (
-            <Button onClick={props.onStart} className="h-12 rounded-xl bg-pink-500 px-8 text-white hover:bg-pink-400">
-              {t('Start Review', 'Review Başlat')}
-            </Button>
-          )}
+
+            {props.step < 2 ? (
+              <Button
+                onClick={() => props.setStep(Math.min(2, props.step + 1))}
+                disabled={!canGoNext}
+                className="h-12 rounded-xl bg-slate-900 px-7 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white"
+              >
+                {t('Next', 'İleri')}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button onClick={props.onStart} className="h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white">
+                {t('Start Review', 'Review Başlat')}
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -658,7 +660,7 @@ function StepIndicator({ step, locale }: { step: number; locale: Locale }) {
               <div
                 className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-2xl font-black ${
                   isComplete || isActive
-                    ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20'
+                    ? 'bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-950'
                     : 'bg-slate-200 text-slate-500 dark:bg-slate-800'
                 }`}
               >
@@ -667,7 +669,7 @@ function StepIndicator({ step, locale }: { step: number; locale: Locale }) {
               <p className={`mt-3 text-sm font-bold ${isComplete || isActive ? 'text-slate-950 dark:text-slate-100' : 'text-slate-400'}`}>{label}</p>
             </div>
             {index < labels.length - 1 ? (
-              <div className={`mx-5 h-1 w-24 rounded-full ${index < step ? 'bg-purple-500' : 'bg-slate-300 dark:bg-slate-700'} sm:w-36`} />
+              <div className={`mx-5 h-1 w-24 rounded-full ${index < step ? 'bg-slate-900 dark:bg-slate-100' : 'bg-slate-300 dark:bg-slate-700'} sm:w-36`} />
             ) : null}
           </div>
         );
@@ -697,12 +699,12 @@ function AnalyzingOverlay({ locale, progress }: { locale: Locale; progress: numb
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
       <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-200 dark:bg-slate-800">
-        <div className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 transition-all duration-500" style={{ width: `${progress}%` }} />
+        <div className="h-full bg-gradient-to-r from-slate-900 via-blue-600 to-emerald-500 transition-all duration-500 dark:from-slate-100 dark:via-blue-400 dark:to-emerald-400" style={{ width: `${progress}%` }} />
       </div>
       <div className="flex flex-col items-center gap-6 text-center">
-        <div className="relative flex h-28 w-28 items-center justify-center rounded-[2rem] bg-pink-500/10 text-pink-500">
+        <div className="relative flex h-28 w-28 items-center justify-center rounded-[2rem] bg-blue-500/10 text-blue-600 dark:text-blue-300">
           <Brain className="h-12 w-12 animate-pulse" />
-          <div className="absolute inset-0 rounded-[2rem] border border-pink-500/30 animate-ping" />
+          <div className="absolute inset-0 animate-ping rounded-[2rem] border border-blue-500/30" />
         </div>
         <TextShimmer
           key={lines[index]}
@@ -734,7 +736,7 @@ function EmptyBenchmark({ locale, onUpload }: { locale: Locale; onUpload: () => 
           <TrendingUp className="h-8 w-8" />
         </div>
         <p className="text-slate-500">{t('Complete an AI review to see how you compare', 'Karşılaştırmayı görmek için ilk review’ünü tamamla')}</p>
-        <button type="button" onClick={onUpload} className="mt-6 font-bold text-pink-500 hover:text-pink-400">
+        <button type="button" onClick={onUpload} className="mt-6 font-bold text-slate-900 hover:text-blue-700 dark:text-slate-100 dark:hover:text-blue-300">
           {t('Get your first review', 'İlk review’ünü al')} →
         </button>
       </div>
@@ -749,10 +751,10 @@ function ReviewSummary({ review, locale, onFix, isFixing }: { review: AiReviewCl
 
   return (
     <div className="flex min-h-[390px] flex-col">
-      <div className="rounded-2xl border border-pink-300/50 bg-pink-500/10 p-4 dark:border-pink-500/30">
+      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-bold text-slate-800 dark:text-slate-100">{t("We'll help rebuild fast - unlock your job-ready plan", 'Job-ready planı açarak hızlıca iyileştirelim')}</p>
-          <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-pink-500 text-white hover:bg-pink-400">
+          <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-slate-900 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white">
             {isFixing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LockKeyhole className="mr-2 h-4 w-4" />}
             {t('Fix CV', 'CV’yi Fixle')}
           </Button>
@@ -791,13 +793,13 @@ function ResultPanel({
 
   return (
     <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-7 rounded-2xl border border-pink-300/50 bg-pink-500/10 p-4 dark:border-pink-500/30">
+      <div className="mb-7 rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-black text-slate-950 dark:text-slate-100">{t('Unlock Full Review', 'Full Review Aç')}</p>
             <p className="text-sm text-slate-500">{fixCreditCost} {t('credits for a new fixed CV', 'kredi ile yeni düzeltilmiş CV')}</p>
           </div>
-          <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-pink-500 px-5 text-white hover:bg-pink-400">
+          <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-slate-900 px-5 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white">
             {isFixing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
             {t('Get Job-Ready Review', 'Job-Ready Review Al')}
           </Button>
@@ -823,7 +825,7 @@ function ResultPanel({
               <div key={key} className="grid grid-cols-[92px_1fr_56px] items-center gap-3 text-sm">
                 <span className="text-slate-500">{BREAKDOWN_LABELS[typedKey]}</span>
                 <div className="h-2.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-                  <div className="h-full rounded-full bg-pink-500" style={{ width: `${Math.round((value / max) * 100)}%` }} />
+                  <div className="h-full rounded-full bg-slate-900 dark:bg-slate-100" style={{ width: `${Math.round((value / max) * 100)}%` }} />
                 </div>
                 <span className="text-right font-bold text-slate-700 dark:text-slate-200">{value}/{max}</span>
               </div>
@@ -856,10 +858,10 @@ function ScoreDonut({ score }: { score: number }) {
   return (
     <div
       className="relative flex h-40 w-40 items-center justify-center rounded-full"
-      style={{ background: `conic-gradient(#fb7185 ${score * 3.6}deg, #1e293b 0deg)` }}
+      style={{ background: `conic-gradient(#0f172a ${score * 3.6}deg, #dbe4ef 0deg)` }}
     >
       <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-white dark:bg-slate-900">
-        <span className="text-5xl font-black text-pink-500">{score}</span>
+        <span className="text-5xl font-black text-slate-950 dark:text-slate-100">{score}</span>
         <span className="text-sm font-semibold text-slate-500">/ 100</span>
       </div>
     </div>
@@ -922,7 +924,7 @@ function BillingModal({
                 key={pkg.code}
                 className={`rounded-3xl border p-5 ${
                   pkg.highlight
-                    ? 'border-pink-300 bg-pink-50 shadow-lg shadow-pink-100 dark:border-pink-500/40 dark:bg-pink-500/10 dark:shadow-none'
+                    ? 'border-slate-900 bg-slate-50 shadow-lg shadow-slate-200 dark:border-slate-100 dark:bg-slate-900 dark:shadow-none'
                     : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900'
                 }`}
               >
@@ -931,12 +933,12 @@ function BillingModal({
                     <h3 className="text-xl font-black text-slate-950 dark:text-slate-100">{pkg.name}</h3>
                     <p className="mt-1 text-sm text-slate-500">{pkg.credits} credits</p>
                   </div>
-                  <span className="text-lg font-black text-pink-500">{pkg.priceLabel}</span>
+                  <span className="text-lg font-black text-slate-950 dark:text-slate-100">{pkg.priceLabel}</span>
                 </div>
                 <CheckoutButton
                   packageCode={pkg.code}
                   label={t('Buy Credits', 'Kredi Satın Al')}
-                  className="w-full rounded-xl bg-pink-500 text-white hover:bg-pink-400"
+                  className="w-full rounded-xl bg-slate-900 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white"
                 />
               </div>
             ))}
