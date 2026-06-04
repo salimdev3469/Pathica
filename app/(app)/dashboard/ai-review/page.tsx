@@ -5,7 +5,7 @@ import DashboardBillingBar from '@/components/dashboard/DashboardBillingBar';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { serializeReviewForClient, type ResumeReviewRecord } from '@/lib/ai-review/report';
 import { getWalletSnapshot } from '@/lib/billing';
-import { AI_REVIEW_FIX_CREDIT_COST, BILLING_PACKAGES, formatUsd } from '@/lib/billing-config';
+import { AI_REVIEW_FIX_CREDIT_COST, BILLING_PACKAGES } from '@/lib/billing-config';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { createClient } from '@/lib/supabase-server';
 
@@ -17,6 +17,7 @@ type ResumeReviewRow = {
   field: string;
   experience_level: string;
   job_description: string | null;
+  file_path: string | null;
   normalized_resume: ResumeReviewRecord['normalizedResume'];
   analysis: ResumeReviewRecord['analysis'];
   score: number;
@@ -30,7 +31,7 @@ function isBillingSchemaCacheError(error: unknown): boolean {
 
   const code = String(asRecord.code || '');
   const message = String(asRecord.message || '');
-  return code === 'PGRST205' || message.includes('shopier_payments') || message.includes('credit_wallets');
+  return code === 'PGRST205' || message.includes('billing_payments') || message.includes('credit_wallets');
 }
 
 function isResumeReviewSchemaError(error: unknown): boolean {
@@ -72,7 +73,7 @@ export default async function AiReviewDashboardPage() {
   const { data: reviewRows, error: reviewError } = await supabase
     .from('resume_reviews')
     .select(
-      'id,file_name,file_type,category,field,experience_level,job_description,normalized_resume,analysis,score,ontology_version,created_at',
+      'id,file_name,file_type,category,field,experience_level,job_description,file_path,normalized_resume,analysis,score,ontology_version,created_at',
     )
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
@@ -96,6 +97,7 @@ export default async function AiReviewDashboardPage() {
         field: row.field,
         experienceLevel: row.experience_level,
         jobDescription: row.job_description || '',
+        filePath: row.file_path,
         normalizedResume: row.normalized_resume,
         analysis: row.analysis,
         score: row.score,
@@ -114,11 +116,11 @@ export default async function AiReviewDashboardPage() {
   };
 
   const billingPackages = BILLING_PACKAGES.map((pkg) => ({
-    code: pkg.code,
+    code: pkg.id,
     name: pkg.name,
     credits: pkg.credits,
-    priceLabel: formatUsd(pkg.priceUsd),
-    highlight: pkg.highlight,
+    priceLabel: pkg.displayPrice,
+    highlight: pkg.isPopular,
   }));
 
   return (

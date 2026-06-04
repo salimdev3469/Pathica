@@ -13,6 +13,7 @@ type ResumeReviewRow = {
   field: string;
   experience_level: string;
   job_description: string | null;
+  file_path: string | null;
   normalized_resume: ResumeReviewRecord['normalizedResume'];
   analysis: ResumeReviewRecord['analysis'];
   score: number;
@@ -33,7 +34,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from('resume_reviews')
     .select(
-      'id,file_name,file_type,category,field,experience_level,job_description,normalized_resume,analysis,score,ontology_version,created_at',
+      'id,file_name,file_type,category,field,experience_level,job_description,file_path,normalized_resume,analysis,score,ontology_version,created_at',
     )
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
@@ -66,6 +67,7 @@ export async function GET() {
       field: row.field,
       experienceLevel: row.experience_level,
       jobDescription: row.job_description || '',
+      filePath: row.file_path,
       normalizedResume: row.normalized_resume,
       analysis: row.analysis,
       score: row.score,

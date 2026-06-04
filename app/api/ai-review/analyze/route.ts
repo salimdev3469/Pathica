@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { AI_REVIEW_ONTOLOGY, getExperienceLevel, getReviewField, type ReviewCategoryId } from '@/lib/ai-review/ontology';
 import {
   extractTextFromResumeFile,
+  normalizeResumeWithLLM,
   isSupportedReviewFile,
   isUnsupportedLegacyDoc,
-  normalizeResumeFromText,
 } from '@/lib/ai-review/extract';
 import { serializeReviewForClient } from '@/lib/ai-review/report';
 import { scoreResumeReview } from '@/lib/ai-review/score';
 import { createClient } from '@/lib/supabase-server';
 import { isMissingTableInSchemaCache } from '@/lib/supabase-errors';
+import crypto from 'node:crypto';
 
 export const runtime = 'nodejs';
 
@@ -83,7 +84,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const normalizedResume = normalizeResumeFromText(extracted.text, file.name);
+    const normalizedResume = await normalizeResumeWithLLM(extracted.text, file.name);
     const analysis = scoreResumeReview({
       resume: normalizedResume,
       categoryId: category as ReviewCategoryId,
@@ -91,6 +92,20 @@ export async function POST(req: Request) {
       experienceLevelId: experienceConfig.id,
       jobDescription,
     });
+
+    const fileId = crypto.randomUUID();
+    const filePath = `${user.id}/${fileId}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_').toLowerCase()}`;
+    const { error: uploadError } = await supabase.storage
+      .from('resume_reviews_files')
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.warn('Could not upload CV to storage:', uploadError);
+      // We proceed even if storage fails, but without file_path
+    }
 
     const { data: inserted, error } = await supabase
       .from('resume_reviews')
@@ -103,13 +118,14 @@ export async function POST(req: Request) {
         field: fieldConfig.id,
         experience_level: experienceConfig.id,
         job_description: jobDescription || null,
+        file_path: uploadError ? null : filePath,
         normalized_resume: normalizedResume,
         analysis,
         score: analysis.score,
         ontology_version: analysis.ontologyVersion,
       })
       .select(
-        'id,file_name,file_type,category,field,experience_level,job_description,normalized_resume,analysis,score,ontology_version,created_at',
+        'id,file_name,file_type,category,field,experience_level,job_description,file_path,normalized_resume,analysis,score,ontology_version,created_at',
       )
       .single();
 
@@ -137,6 +153,7 @@ export async function POST(req: Request) {
         field: inserted.field,
         experienceLevel: inserted.experience_level,
         jobDescription: inserted.job_description || '',
+        filePath: inserted.file_path,
         normalizedResume: inserted.normalized_resume,
         analysis: inserted.analysis,
         score: inserted.score,

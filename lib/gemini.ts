@@ -34,7 +34,7 @@ export class GeminiTemporaryUnavailableError extends Error {
 const DEFAULT_MODEL_ORDER: GeminiModelKey[] = ['flash', 'pro'];
 const DEFAULT_TIMEOUT_MS = 20000;
 const DEFAULT_MAX_ATTEMPTS = 2;
-const RETRY_DELAYS_MS = [700, 1600];
+const GEMINI_BACKOFF_DELAYS_MS = [700, 1600];
 
 function getModelByKey(key: GeminiModelKey) {
   return key === 'pro' ? proModel : flashModel;
@@ -145,7 +145,7 @@ export async function generateGeminiText({
         );
 
         if (hasRemainingAttempt) {
-          const waitMs = RETRY_DELAYS_MS[Math.min(attempt, RETRY_DELAYS_MS.length - 1)];
+          const waitMs = GEMINI_BACKOFF_DELAYS_MS[Math.min(attempt, GEMINI_BACKOFF_DELAYS_MS.length - 1)];
           await delay(waitMs);
         }
       }

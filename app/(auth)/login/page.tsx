@@ -53,7 +53,7 @@ export default function LoginPage() {
       } else {
         setAuthMessage({ type: 'success', text: t('Login successful. Redirecting...', 'Giriş başarılı. Yönlendiriliyor...') });
         toast.success(t('Logged in successfully', 'Giriş başarılı'));
-        router.push(next);
+        window.location.assign(next);
       }
     } catch (error) {
       const message = getErrorMessage(error);

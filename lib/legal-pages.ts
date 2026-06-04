@@ -88,9 +88,9 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         ],
       },
       {
-        title: '3. Ödeme Süreci (Shopier)',
+        title: '3. Ödeme Süreci (Lemon Squeezy)',
         paragraphs: [
-          'Ödeme işlemleri Shopier altyapısı üzerinden yürütülür. Kart numarası, son kullanma tarihi, CVV gibi ödeme kartı verileri tarafımızca saklanmaz ve işlenmez.',
+          'Ödeme işlemleri Lemon Squeezy altyapısı üzerinden yürütülür. Kart numarası, son kullanma tarihi, CVV gibi ödeme kartı verileri tarafımızca saklanmaz ve işlenmez.',
           'Ödeme sırasında paylaşılan işlem bilgileri, sipariş doğrulama ve finansal kayıt süreçleri kapsamında sınırlı olarak işlenebilir.',
         ],
       },
@@ -251,7 +251,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '5. Aktarım Yapılabilecek Taraflar',
         bullets: [
-          'Ödeme altyapısı sağlayıcıları (örn. Shopier) ve finansal operasyon tarafları.',
+          'Ödeme altyapısı sağlayıcıları (örn. Lemon Squeezy) ve finansal operasyon tarafları.',
           'Barındırma, yazılım, güvenlik, analitik ve e-posta hizmet sağlayıcıları.',
           'Kanunen yetkili kamu kurum ve kuruluşları ile yargı mercileri.',
         ],
@@ -325,7 +325,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         title: '5. Ücretlendirme',
         paragraphs: [
           'Ücretli paketler, fiyatlandırma sayfasında ilan edilen tutarlar üzerinden sunulur.',
-          'Ödeme hizmeti Shopier altyapısıyla yürütülür; ödeme tamamlanmadan ücretli haklar aktive edilmeyebilir.',
+          'Ödeme hizmeti Lemon Squeezy altyapısıyla yürütülür; ödeme tamamlanmadan ücretli haklar aktive edilmeyebilir.',
         ],
       },
       {
@@ -383,7 +383,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         title: '3. Fiyat ve Ödeme Bilgisi',
         paragraphs: [
           'Satış fiyatı sipariş özetinde belirtilen toplam tutardır.',
-          'Ödeme, Shopier ödeme altyapısı üzerinden tahsil edilir. Kart verileri satıcı sisteminde tutulmaz.',
+          'Ödeme, Lemon Squeezy ödeme altyapısı üzerinden tahsil edilir. Kart verileri satıcı sisteminde tutulmaz.',
         ],
       },
       {
@@ -454,7 +454,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '4. Ödeme Yöntemi',
         paragraphs: [
-          'Ödemeler Shopier aracılığıyla güvenli ödeme adımında tamamlanır. Kart bilgileri satıcı sisteminde saklanmaz.',
+          'Ödemeler Lemon Squeezy aracılığıyla güvenli ödeme adımında tamamlanır. Kart bilgileri satıcı sisteminde saklanmaz.',
         ],
       },
       {
@@ -519,10 +519,10 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         ],
       },
       {
-        title: '6. Shopier Ödemelerinde İade Süreci',
+        title: '6. Lemon Squeezy Ödemelerinde İade Süreci',
         paragraphs: [
-          'Shopier üzerinden yapılan ödemelerde iade talebi önce destek ekibine iletilir, ardından işlem kayıtları doğrulanır.',
-          'İade onaylandığında süreç Shopier ve ilgili banka/ödeme kuruluşu işlem sürelerine bağlı olarak tamamlanır.',
+          'Lemon Squeezy üzerinden yapılan ödemelerde iade talebi önce destek ekibine iletilir, ardından işlem kayıtları doğrulanır.',
+          'İade onaylandığında süreç Lemon Squeezy ve ilgili banka/ödeme kuruluşu işlem sürelerine bağlı olarak tamamlanır.',
         ],
       },
     ],
@@ -583,9 +583,9 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         ],
       },
       {
-        title: '3. Payment Processing (Shopier)',
+        title: '3. Payment Processing (Lemon Squeezy)',
         paragraphs: [
-          'Payments are processed via Shopier. Card details such as card number, expiry date, and CVV are not stored by us.',
+          'Payments are processed via Lemon Squeezy. Card details such as card number, expiry date, and CVV are not stored by us.',
           'Limited payment-related transaction data may be processed for order verification and accounting obligations.',
         ],
       },
@@ -740,7 +740,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '5. Potential Data Recipients',
         bullets: [
-          'Payment infrastructure providers (e.g., Shopier) and financial operations parties.',
+          'Payment infrastructure providers (e.g., Lemon Squeezy) and financial operations parties.',
           'Hosting, software, security, analytics, and email service providers.',
           'Legally authorized public authorities and judicial bodies.',
         ],
@@ -814,7 +814,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         title: '5. Pricing',
         paragraphs: [
           'Paid packages are offered at the prices listed on the pricing page.',
-          'Payments are processed via Shopier infrastructure, and paid rights may remain inactive until payment is completed.',
+          'Payments are processed via Lemon Squeezy infrastructure, and paid rights may remain inactive until payment is completed.',
         ],
       },
       {
@@ -872,7 +872,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         title: '3. Pricing and Payment',
         paragraphs: [
           'The sale price is the total amount displayed in the order summary.',
-          'Payments are collected via Shopier. Card data is not stored in the seller system.',
+          'Payments are collected via Lemon Squeezy. Card data is not stored in the seller system.',
         ],
       },
       {
@@ -938,7 +938,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
       },
       {
         title: '4. Payment Method',
-        paragraphs: ['Payments are completed via Shopier secure checkout. Card information is not stored in the seller system.'],
+        paragraphs: ['Payments are completed via Lemon Squeezy secure checkout. Card information is not stored in the seller system.'],
       },
       {
         title: '5. Use of Digital Service',
@@ -994,10 +994,10 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         paragraphs: ['You can submit your refund request to akasalimserhat@gmail.com with order details and your explanation.'],
       },
       {
-        title: '6. Refund Process for Shopier Payments',
+        title: '6. Refund Process for Lemon Squeezy Payments',
         paragraphs: [
-          'For Shopier payments, requests are first received by support and then verified against transaction logs.',
-          'Once approved, refund completion depends on Shopier and the related bank/payment institution processing times.',
+          'For Lemon Squeezy payments, requests are first received by support and then verified against transaction logs.',
+          'Once approved, refund completion depends on Lemon Squeezy and the related bank/payment institution processing times.',
         ],
       },
     ],

@@ -9,6 +9,7 @@ export type ResumeReviewRecord = {
   field: string;
   experienceLevel: string;
   jobDescription: string;
+  filePath?: string | null;
   normalizedResume: NormalizedResume;
   analysis: ReviewAnalysis;
   score: number;
@@ -31,6 +32,7 @@ export function serializeReviewForClient(input: ResumeReviewRecord) {
     category: input.category,
     field: input.field,
     experienceLevel: input.experienceLevel,
+    filePath: input.filePath || null,
     normalizedResume: input.normalizedResume,
     analysis: input.analysis,
     score: input.score,

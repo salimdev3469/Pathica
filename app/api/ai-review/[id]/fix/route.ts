@@ -193,14 +193,11 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
 
 async function generateFixedResume(review: ResumeReviewRow): Promise<NormalizedResume> {
   const prompt = `You are a senior resume editor.
-Rewrite the provided normalized resume using ONLY the factual information already present.
-
-Hard rules:
-1) Do not invent employers, schools, dates, locations, metrics, certifications, technologies, or achievements.
-2) You may improve wording, structure, section titles, summary, and bullets.
-3) If a metric is absent, do not fabricate a number.
-4) Apply the deterministic findings below in priority order.
-5) Return ONLY valid JSON with the exact same top-level shape as the normalized resume.
+Your ONLY job is to enhance the text content (summary and bullet points) to resolve the findings, and to fix the structure if it's broken.
+If skills are hidden inside an 'experience' block, you MUST pull them out into a new 'skills' section.
+Do not hallucinate dates or locations. Keep the facts identical.
+DO NOT use any markdown formatting (like **bold** or *italic*). Return plain text only.
+You must return the JSON object representing the fixed resume. You may add a 'skills' section if it's missing, but otherwise keep the structure similar.
 
 Target:
 - field: ${review.field}
@@ -216,7 +213,7 @@ ${JSON.stringify(review.normalized_resume)}`;
   const rawText = await generateGeminiText({
     request: prompt,
     modelOrder: ['flash', 'pro'],
-    timeoutMs: 22000,
+    timeoutMs: 60000,
     maxAttemptsPerModel: 2,
   });
 
@@ -241,73 +238,64 @@ function parseJsonObject(rawText: string): unknown {
 }
 
 function sanitizeFixedResume(candidate: unknown, original: NormalizedResume): NormalizedResume {
-  if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
-    throw new Error('AI returned an invalid resume object.');
+  const raw = (candidate && typeof candidate === 'object' && !Array.isArray(candidate) ? candidate : {}) as Partial<NormalizedResume>;
+  
+  const sections = original.sections.map((origSec, secIndex) => {
+    const candSec = (raw.sections || []).find((s: any) => s.concept === origSec.concept) || (raw.sections || [])[secIndex];
+    if (!candSec) return origSec;
+
+    const mergedItems = origSec.items.map((origItem, itemIndex) => {
+      const candItem = (candSec.items || []).find((i: any) => i.position === origItem.position) || (candSec.items || [])[itemIndex];
+      if (!candItem) return origItem;
+
+      const candBullets = typeof candItem.bullets === 'string' && candItem.bullets.trim()
+        ? normalizeBullets(sanitizeString(candItem.bullets, '', 2200))
+        : origItem.bullets;
+
+      return {
+        ...origItem,
+        title: sanitizeString(candItem.title, origItem.title, 120),
+        subtitle: sanitizeString(candItem.subtitle, origItem.subtitle, 140),
+        date: origItem.date,
+        location: origItem.location,
+        bullets: candBullets,
+      };
+    });
+
+    return {
+      ...origSec,
+      title: sanitizeString(candSec.title, origSec.title, 90),
+      items: mergedItems,
+    };
+  });
+  
+  // Allow the AI to add missing sections (like 'skills') if they were extracted from a broken original structure
+  if (Array.isArray(raw.sections)) {
+    for (const candSec of raw.sections) {
+      if (candSec && typeof candSec === 'object' && candSec.concept && !original.sections.some(s => s.concept === candSec.concept)) {
+        sections.push({
+          title: sanitizeString(candSec.title, candSec.concept, 90),
+          concept: candSec.concept,
+          position: sections.length,
+          items: (Array.isArray(candSec.items) ? candSec.items : []).map((candItem: any, index: number) => ({
+            title: sanitizeString(candItem.title, 'Entry', 120),
+            subtitle: sanitizeString(candItem.subtitle, '', 140),
+            date: sanitizeString(candItem.date, '', 60),
+            location: sanitizeString(candItem.location, '', 60),
+            bullets: typeof candItem.bullets === 'string' ? normalizeBullets(sanitizeString(candItem.bullets, '', 2200)) : '',
+            position: index,
+          }))
+        });
+      }
+    }
   }
 
-  const raw = candidate as Partial<NormalizedResume>;
-  const sections = Array.isArray(raw.sections) ? raw.sections.map((section, index) => sanitizeSection(section, index)).filter(Boolean) as NormalizedResumeSection[] : original.sections;
-
   return {
+    ...original,
     title: sanitizeString(raw.title, original.title, 140),
-    personalInfo: {
-      fullName: sanitizeString(raw.personalInfo?.fullName, original.personalInfo.fullName, 90),
-      email: sanitizeString(raw.personalInfo?.email, original.personalInfo.email, 120),
-      phone: sanitizeString(raw.personalInfo?.phone, original.personalInfo.phone, 60),
-      location: sanitizeString(raw.personalInfo?.location, original.personalInfo.location, 120),
-      linkedin: sanitizeString(raw.personalInfo?.linkedin, original.personalInfo.linkedin, 180),
-      portfolio: sanitizeString(raw.personalInfo?.portfolio, original.personalInfo.portfolio, 180),
-      github: sanitizeString(raw.personalInfo?.github, original.personalInfo.github, 180),
-    },
     summaryTitle: sanitizeString(raw.summaryTitle, original.summaryTitle || 'Profile Summary', 80),
     summary: sanitizeString(raw.summary, original.summary, 1200),
-    sections: sections.length > 0 ? sections : original.sections,
-    rawTextHash: original.rawTextHash,
-    wordCount: original.wordCount,
-  };
-}
-
-function sanitizeSection(section: unknown, index: number): NormalizedResumeSection | null {
-  if (!section || typeof section !== 'object' || Array.isArray(section)) {
-    return null;
-  }
-
-  const raw = section as Partial<NormalizedResumeSection>;
-  const items = Array.isArray(raw.items)
-    ? raw.items.map((item, itemIndex) => sanitizeItem(item, itemIndex)).filter(Boolean) as NormalizedResumeItem[]
-    : [];
-
-  if (!sanitizeString(raw.title, '', 90) && items.length === 0) {
-    return null;
-  }
-
-  return {
-    title: sanitizeString(raw.title, `Section ${index + 1}`, 90),
-    concept: sanitizeString(raw.concept, 'additional', 50),
-    position: typeof raw.position === 'number' ? raw.position : index,
-    items,
-  };
-}
-
-function sanitizeItem(item: unknown, index: number): NormalizedResumeItem | null {
-  if (!item || typeof item !== 'object' || Array.isArray(item)) {
-    return null;
-  }
-
-  const raw = item as Partial<NormalizedResumeItem>;
-  const bullets = normalizeBullets(sanitizeString(raw.bullets, '', 2200));
-
-  if (!sanitizeString(raw.title, '', 120) && !sanitizeString(raw.subtitle, '', 140) && !bullets) {
-    return null;
-  }
-
-  return {
-    title: sanitizeString(raw.title, `Entry ${index + 1}`, 120),
-    subtitle: sanitizeString(raw.subtitle, '', 140),
-    date: sanitizeString(raw.date, '', 80),
-    location: sanitizeString(raw.location, '', 100),
-    bullets,
-    position: typeof raw.position === 'number' ? raw.position : index,
+    sections,
   };
 }
 
@@ -491,7 +479,7 @@ async function persistCvState(
 }
 
 function sanitizeString(value: unknown, fallback: string, maxLength: number): string {
-  const normalized = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
+  const normalized = typeof value === 'string' ? value.replace(/[ \t]+/g, ' ').trim() : '';
   const selected = normalized || fallback;
   return selected.length > maxLength ? selected.slice(0, maxLength).trim() : selected;
 }

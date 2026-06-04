@@ -33,7 +33,7 @@ export type KnowledgeScoreResult = {
 };
 
 const actionVerbSet = new Set(ATS_ONTOLOGY.actionVerbs.map((verb) => normalizeText(verb)));
-const quantificationRegex = /(\d+%|\d+\+|[$€£₺]\s?\d+|\b\d{2,}\b)/g;
+const quantificationRegex = /(\d+%|\d+\+|[$€£]\s?\d+|\b\d{2,}\b)/g;
 const normalizedSectionAliases = ATS_ONTOLOGY.sections.map((section) => ({
     ...section,
     normalizedAliases: section.aliases.map((alias) => normalizeText(alias)),

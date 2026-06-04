@@ -1,42 +1,51 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { Typewriter } from '@/components/ui/typewriter-text';
+import type { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 type HeroIntroProps = {
-  headline: string;
-  subtitle: string;
+  eyebrow: ReactNode;
+  headline: ReactNode;
+  subtitle: ReactNode;
+  className?: string;
+  eyebrowClassName?: string;
+  headingClassName?: string;
+  subtitleClassName?: string;
 };
 
-export function HeroIntro({ headline, subtitle }: HeroIntroProps) {
-  const [showSubtitle, setShowSubtitle] = useState(false);
-
-  useEffect(() => {
-    setShowSubtitle(false);
-  }, [headline, subtitle]);
-
+export function HeroIntro({
+  eyebrow,
+  headline,
+  subtitle,
+  className,
+  eyebrowClassName,
+  headingClassName,
+  subtitleClassName,
+}: HeroIntroProps) {
   return (
-    <>
-      <h1 className="mb-8 min-h-[110px] text-5xl leading-tight tracking-[-0.04em] text-slate-900 dark:text-slate-100 sm:min-h-[150px] lg:text-7xl">
-        <Typewriter
-          key={headline}
-          text={headline}
-          speed={50}
-          loop={false}
-          hideCursorOnComplete
-          onComplete={() => setShowSubtitle(true)}
-        />
-      </h1>
-
+    <div className={cn('space-y-6', className)}>
       <p
-        className={[
-          'mb-10 mx-auto max-w-2xl text-xl leading-relaxed text-slate-600',
-          'transition-all duration-700 ease-out',
-          showSubtitle ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0',
-        ].join(' ')}
+        className={cn(
+          'inline-flex items-center rounded-full border border-blue-200/80 bg-blue-50/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-200',
+          eyebrowClassName,
+        )}
+      >
+        {eyebrow}
+      </p>
+      <h1
+        className={cn(
+          'max-w-4xl text-4xl font-semibold leading-[0.92] tracking-[-0.06em] text-slate-950 dark:text-slate-50 sm:text-5xl lg:text-[4.4rem]',
+          headingClassName,
+        )}
+      >
+        {headline}
+      </h1>
+      <p
+        className={cn(
+          'max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl',
+          subtitleClassName,
+        )}
       >
         {subtitle}
       </p>
-    </>
+    </div>
   );
 }

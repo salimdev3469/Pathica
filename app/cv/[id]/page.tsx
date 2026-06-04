@@ -24,7 +24,7 @@ type CvSectionRow = {
     cv_fields: CvFieldRow[];
 };
 
-export default async function CVBuilderPage({ params }: { params: { id: string } }) {
+export default async function CVBuilderPage({ params, searchParams }: { params: { id: string }, searchParams: { [key: string]: string | string[] | undefined } }) {
     const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
     const supabase = createClient();
     const {
@@ -191,7 +191,7 @@ export default async function CVBuilderPage({ params }: { params: { id: string }
 
     return (
         <CVProvider initialState={initialState}>
-            <CVWorkspace locale={locale} />
+            <CVWorkspace locale={locale} showPostFixGuide={searchParams?.fixed === 'true'} />
         </CVProvider>
     );
 }

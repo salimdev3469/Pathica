@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { AI_REVIEW_ONTOLOGY } from '@/lib/ai-review/ontology';
+import { generateGeminiText } from '@/lib/gemini';
 
 export type NormalizedResumeItem = {
   title: string;
@@ -76,7 +77,8 @@ export async function extractTextFromResumeFile(input: {
         : 'txt';
 
   if (fileType === 'pdf') {
-    const { default: pdfParse } = await import('pdf-parse');
+    // @ts-expect-error - bypassing index.js to avoid module.parent bug in Next.js/ESM environments
+    const { default: pdfParse } = await import('pdf-parse/lib/pdf-parse.js');
     const parsed = await pdfParse(input.buffer);
     return { text: normalizeExtractedText(parsed.text || ''), fileHash, fileType };
   }
@@ -92,6 +94,84 @@ export async function extractTextFromResumeFile(input: {
     fileHash,
     fileType,
   };
+}
+
+export async function normalizeResumeWithLLM(text: string, fileName = 'Uploaded Resume'): Promise<NormalizedResume> {
+  const normalizedText = normalizeExtractedText(text);
+  
+  const prompt = `You are an expert resume parsing AI. 
+I have extracted raw text from a PDF resume. Due to multi-column layouts, the text might be scrambled (a "word salad").
+Your job is to semantically understand the text and reconstruct the resume into a perfectly structured JSON object.
+Ensure all data is structured correctly. If skills are mixed within experience descriptions, extract them out into the 'skills' array.
+DO NOT use markdown formatting like **bold** or *italic* anywhere in the output. Return plain text only.
+
+Follow these strict rules:
+1. Identify the sections logically even if the text lines are mixed up.
+2. Group all skills under a "skills" section. If there isn't one clearly labeled, but you see a list of technologies, put them in a "skills" section.
+3. Group all experiences under "experience", education under "education", projects under "projects".
+4. Output ONLY valid JSON matching this exact TypeScript type:
+type NormalizedResume = {
+  title: string; // The person's full name or "Uploaded Resume"
+  personalInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+    location: string;
+    linkedin: string;
+    portfolio: string;
+    github: string;
+  };
+  summaryTitle: string; // usually "Profile Summary"
+  summary: string;
+  sections: Array<{
+    title: string; // e.g. "Experience", "Skills", "Education"
+    concept: string; // MUST be one of: "experience", "education", "skills", "projects", "certifications", "languages"
+    position: number; // 0, 1, 2...
+    items: Array<{
+      title: string; // e.g. Job Title or Degree
+      subtitle: string; // e.g. Company Name or University
+      date: string;
+      location: string;
+      bullets: string; // The actual content/bullet points, separated by newlines \n
+      position: number;
+    }>;
+  }>;
+};
+
+Raw Resume Text:
+${normalizedText}
+
+Return ONLY the raw JSON object. Do not include markdown code blocks (\`\`\`json).`;
+
+  try {
+    const responseText = await generateGeminiText({
+      request: {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1 },
+      },
+      modelOrder: ['flash', 'pro'], // Use flash first for speed and cost
+      timeoutMs: 30000,
+    });
+    
+    // Clean potential markdown blocks just in case
+    const cleaned = responseText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace === -1 || lastBrace === -1) {
+      throw new Error('No JSON object found in response.');
+    }
+    const jsonString = cleaned.slice(firstBrace, lastBrace + 1);
+    const parsed = JSON.parse(jsonString) as NormalizedResume;
+    
+    // Fill in required hash and wordcount
+    parsed.rawTextHash = crypto.createHash('sha256').update(normalizedText).digest('hex');
+    parsed.wordCount = countWords(normalizedText);
+    
+    return parsed;
+  } catch (error) {
+    console.error('LLM Parsing failed, falling back to heuristic parsing:', error);
+    return normalizeResumeFromText(text, fileName);
+  }
 }
 
 export function normalizeResumeFromText(text: string, fileName = 'Uploaded Resume'): NormalizedResume {

@@ -477,3 +477,22 @@ create policy "Users can insert their own resume reviews"
 create policy "Users can delete their own resume reviews"
     on public.resume_reviews for delete
     using (auth.uid() = user_id);
+
+alter table if exists public.resume_reviews add column if not exists file_path text;
+
+-- Storage setup for resume review files
+insert into storage.buckets (id, name, public)
+values ('resume_reviews_files', 'resume_reviews_files', false)
+on conflict (id) do nothing;
+
+create policy "Users can upload their own resume review files"
+  on storage.objects for insert
+  with check ( bucket_id = 'resume_reviews_files' and auth.uid()::text = (storage.foldername(name))[1] );
+
+create policy "Users can view their own resume review files"
+  on storage.objects for select
+  using ( bucket_id = 'resume_reviews_files' and auth.uid()::text = (storage.foldername(name))[1] );
+
+create policy "Users can delete their own resume review files"
+  on storage.objects for delete
+  using ( bucket_id = 'resume_reviews_files' and auth.uid()::text = (storage.foldername(name))[1] );

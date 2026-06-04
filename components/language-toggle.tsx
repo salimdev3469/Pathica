@@ -10,6 +10,7 @@ import { ChevronDown } from 'lucide-react';
 type LanguageToggleProps = {
   locale: Locale;
   className?: string;
+  tone?: 'light' | 'dark';
 };
 
 const LANGUAGES: { code: Locale; label: string; flag: string }[] = [
@@ -17,7 +18,7 @@ const LANGUAGES: { code: Locale; label: string; flag: string }[] = [
   { code: 'tr', label: 'Türkçe', flag: '/tr.png' },
 ];
 
-export default function LanguageToggle({ locale, className }: LanguageToggleProps) {
+export default function LanguageToggle({ locale, className, tone = 'light' }: LanguageToggleProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
@@ -79,9 +80,10 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
         disabled={isPending}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm transition',
-          'hover:border-slate-300 hover:bg-slate-50',
-          'dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800',
+          'inline-flex items-center gap-2 rounded-full px-3 py-1.5 shadow-sm transition',
+          tone === 'dark'
+            ? 'border border-white/12 bg-white/[0.03] hover:border-white/18 hover:bg-white/[0.06]'
+            : 'border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50',
           isPending && 'opacity-60 cursor-not-allowed',
         )}
         aria-haspopup="listbox"
@@ -96,12 +98,13 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
           className="rounded-sm object-cover"
           style={{ width: 20, height: 14 }}
         />
-        <span className="text-xs font-medium text-slate-700 dark:text-slate-200">
+        <span className={cn('text-xs font-medium', tone === 'dark' ? 'text-white/80' : 'text-slate-700')}>
           {current.code.toUpperCase()}
         </span>
         <ChevronDown
           className={cn(
-            'h-3 w-3 text-slate-500 transition-transform',
+            'h-3 w-3 transition-transform',
+            tone === 'dark' ? 'text-white/45' : 'text-slate-500',
             open && 'rotate-180',
           )}
         />
@@ -112,8 +115,8 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
         <div
           role="listbox"
           className={cn(
-            'absolute right-0 z-50 mt-1.5 min-w-[120px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg',
-            'dark:border-slate-700 dark:bg-slate-900',
+            'absolute right-0 z-50 mt-1.5 min-w-[120px] overflow-hidden rounded-xl shadow-lg',
+            tone === 'dark' ? 'border border-white/12 bg-[#0d1018]' : 'border border-slate-200 bg-white',
           )}
         >
           {LANGUAGES.map((lang) => (
@@ -126,10 +129,14 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
               onClick={() => handleChange(lang.code)}
               className={cn(
                 'flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition',
-                'hover:bg-slate-50 dark:hover:bg-slate-800',
+                tone === 'dark' ? 'hover:bg-white/[0.04]' : 'hover:bg-slate-50',
                 lang.code === effectiveLocale
-                  ? 'bg-slate-100 font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100'
-                  : 'text-slate-700 dark:text-slate-300',
+                  ? tone === 'dark'
+                    ? 'bg-white/[0.06] font-semibold text-white'
+                    : 'bg-slate-100 font-semibold text-slate-900'
+                  : tone === 'dark'
+                    ? 'text-white/75'
+                    : 'text-slate-700',
                 isPending && 'cursor-not-allowed opacity-60',
               )}
             >
@@ -143,7 +150,7 @@ export default function LanguageToggle({ locale, className }: LanguageToggleProp
               />
               <span>{lang.label}</span>
               {lang.code === effectiveLocale && (
-                <span className="ml-auto text-primary">✓</span>
+                <span className={cn('ml-auto', tone === 'dark' ? 'text-sky-300' : 'text-primary')}>✓</span>
               )}
             </button>
           ))}

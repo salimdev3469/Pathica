@@ -50,6 +50,7 @@ export type AiReviewClientReview = {
   category: string;
   field: string;
   experienceLevel: string;
+  filePath?: string | null;
   normalizedResume: NormalizedResume;
   analysis: ReviewAnalysis;
   score: number;
@@ -264,7 +265,7 @@ export default function AiReviewDashboard({
           throw new Error(payload.error || t('Could not create fixed CV.', 'Düzeltilmiş CV oluşturulamadı.'));
         }
 
-        router.push(`/cv/${payload.cvId}`);
+        router.push(`/cv/${payload.cvId}?fixed=true`);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : t('Fix failed.', 'Düzeltme başarısız oldu.'));
       }
@@ -365,7 +366,7 @@ export default function AiReviewDashboard({
               </div>
               <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-300">Ready</span>
             </div>
-            <ResumePreview resume={activeReview.normalizedResume} />
+            <ResumePreview review={activeReview} />
           </div>
 
           <ResultPanel review={activeReview} locale={locale} onFix={fixActiveReview} isFixing={isPending} fixCreditCost={fixCreditCost} />
@@ -438,6 +439,7 @@ export default function AiReviewDashboard({
       />
 
       {isAnalyzing ? <AnalyzingOverlay locale={locale} progress={loadingProgress} /> : null}
+      {isPending ? <FixingOverlay locale={locale} /> : null}
 
       <BillingModal
         open={billingOpen}
@@ -719,6 +721,40 @@ function AnalyzingOverlay({ locale, progress }: { locale: Locale; progress: numb
   );
 }
 
+function FixingOverlay({ locale }: { locale: Locale }) {
+  const lines = locale === 'tr'
+    ? ['CV yeniden yazılıyor...', 'Zayıf eylem fiilleri düzeltiliyor...', 'Anahtar kelimeler yerleştiriliyor...', 'ATS skoru maksimize ediliyor...']
+    : ['Rewriting your CV...', 'Fixing weak action verbs...', 'Injecting target keywords...', 'Maximizing ATS score...'];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setIndex((current) => (current + 1) % lines.length), 2000);
+    return () => window.clearInterval(interval);
+  }, [lines.length]);
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
+      <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-200 dark:bg-slate-800">
+        <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-500 via-blue-600 to-indigo-500 transition-all duration-500 dark:from-emerald-400 dark:via-blue-400 dark:to-indigo-400" />
+      </div>
+      <div className="flex flex-col items-center gap-6 text-center">
+        <div className="relative flex h-28 w-28 items-center justify-center rounded-[2rem] bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+          <Sparkles className="h-12 w-12 animate-pulse" />
+          <div className="absolute inset-0 animate-ping rounded-[2rem] border border-emerald-500/30" />
+        </div>
+        <TextShimmer
+          key={lines[index]}
+          as="p"
+          duration={1.1}
+          className="py-2 text-4xl font-semibold leading-[1.25] md:text-6xl [--base-color:#10b981] [--base-gradient-color:#6ee7b7]"
+        >
+          {lines[index]}
+        </TextShimmer>
+      </div>
+    </div>
+  );
+}
+
 function EmptyBenchmark({ locale, onUpload }: { locale: Locale; onUpload: () => void }) {
   const isTr = locale === 'tr';
   const t = (en: string, tr: string) => (isTr ? tr : en);
@@ -868,9 +904,17 @@ function ScoreDonut({ score }: { score: number }) {
   );
 }
 
-function ResumePreview({ resume }: { resume: NormalizedResume }) {
-  const cvState = useMemo(() => normalizedResumeToCvState(resume), [resume]);
+function ResumePreview({ review }: { review: AiReviewClientReview }) {
+  const cvState = useMemo(() => normalizedResumeToCvState(review.normalizedResume), [review.normalizedResume]);
   const scale = 0.55;
+
+  if (review.filePath && review.fileType === 'pdf') {
+    return (
+      <div className="h-[620px] overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-950">
+        <iframe src={`/api/ai-review/${review.id}/file`} className="h-full w-full border-0" title={review.fileName} />
+      </div>
+    );
+  }
 
   return (
     <div className="h-[620px] overflow-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-950">

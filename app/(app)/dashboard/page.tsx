@@ -68,7 +68,7 @@ function isBillingSchemaCacheError(error: unknown): boolean {
 
   const code = String(asRecord.code || '');
   const message = String(asRecord.message || '');
-  return code === 'PGRST205' || message.includes('shopier_payments') || message.includes('credit_wallets');
+  return code === 'PGRST205' || message.includes('billing_payments') || message.includes('credit_wallets');
 }
 
 export default async function DashboardPage() {

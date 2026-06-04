@@ -77,6 +77,9 @@ export const ATS_ONTOLOGY: AtsOntology = {
                 'beceriler',
                 'teknik beceriler',
                 'teknik yetkinlikler',
+                'yetkinlikler',
+                'teknolojiler',
+                'yazilim becerileri',
             ],
         },
         {

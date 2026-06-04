@@ -44,7 +44,7 @@ type ScoreInput = {
   jobDescription?: string;
 };
 
-const quantificationRegex = /(\d+%|\d+\+|[$€£₺]\s?\d+|\b\d{2,}\b)/g;
+const quantificationRegex = /(\d+%|\d+\+|[$€£]\s?\d+|\b\d{2,}\b)/g;
 const firstPersonRegex = /\b(i|me|my|ben|bana|benim)\b/i;
 
 export function scoreResumeReview(input: ScoreInput): ReviewAnalysis {
