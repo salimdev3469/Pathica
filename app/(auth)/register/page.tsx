@@ -24,6 +24,7 @@ function getErrorMessage(error: unknown): string {
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'info' | 'success' | 'error'; text: string } | null>(null);
@@ -65,6 +66,18 @@ export default function RegisterPage() {
         return;
       }
 
+      // Honeypot check (Bots often fill hidden fields)
+      if (honeypot) {
+        // Pretend it succeeded to fool the bot
+        setStatusMessage({
+          type: 'success',
+          text: t('Account created. Check your email to verify your account.', 'Hesap oluşturuldu. Doğrulama için e-postanı kontrol et.'),
+        });
+        toast.success(t('Registration successful', 'Kayıt başarılı'));
+        setIsLoading(false);
+        return;
+      }
+
       const signupCallbackUrl = buildAuthCallbackUrl(next, true);
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -79,18 +92,23 @@ export default function RegisterPage() {
         toast.error(error.message);
       } else {
         const hasSession = Boolean(data.session);
-        setStatusMessage({
-          type: 'success',
-          text: hasSession
-            ? t('Account created. Redirecting...', 'Hesap oluşturuldu. Yönlendiriliyor...')
-            : t('Account created. Check your email to verify your account.', 'Hesap oluşturuldu. Doğrulama için e-postanı kontrol et.'),
-        });
-        toast.success(t('Registration successful', 'Kayıt başarılı'));
         if (hasSession) {
+          setStatusMessage({
+            type: 'success',
+            text: t('Account created. Redirecting...', 'Hesap oluşturuldu. Yönlendiriliyor...'),
+          });
+          toast.success(t('Registration successful', 'Kayıt başarılı'));
           document.cookie = 'pathica_welcome_pending=1; Path=/; Max-Age=600; SameSite=Lax';
-          router.push(`/welcome?next=${encodeURIComponent(next)}`);
+          window.location.assign(`/welcome?next=${encodeURIComponent(next)}`);
         } else {
-          router.push(`/login?registered=1&next=${encodeURIComponent(next)}`);
+          setStatusMessage({
+            type: 'info',
+            text: t(
+              'Account created! We sent a verification link to your email. You MUST click the link to activate your account before logging in.',
+              'Hesabınız oluşturuldu! E-posta adresinize bir doğrulama bağlantısı gönderdik. Giriş yapabilmek için mutlaka gelen kutunuzdaki bağlantıya tıklamalısınız.'
+            ),
+          });
+          toast.success(t('Please check your email', 'Lütfen e-postanızı kontrol edin'), { duration: 8000 });
         }
       }
     } catch (error) {
@@ -217,6 +235,20 @@ export default function RegisterPage() {
               )}
 
               <form onSubmit={handleRegister} className="grid gap-4">
+                {/* Honeypot Field (Invisible to users) */}
+                <div aria-hidden="true" className="absolute -left-[9999px] top-auto h-[1px] w-[1px] overflow-hidden">
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <Input
+                    id="companyName"
+                    type="text"
+                    name="companyName"
+                    autoComplete="off"
+                    tabIndex={-1}
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
+
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" type="email" placeholder="youremail@address.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11 rounded-full px-4" />
