@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Coins, Download, Loader2, RefreshCw } from 'lucide-react';
+import { Coins, Download, Loader2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type WalletPayload = {
@@ -16,12 +16,14 @@ type LiveTokenCounterProps = {
   locale?: 'en' | 'tr';
   initialCredits?: number;
   initialFreeExports?: number;
+  compact?: boolean;
 };
 
 export default function LiveTokenCounter({
   locale = 'en',
   initialCredits,
   initialFreeExports,
+  compact = false,
 }: LiveTokenCounterProps) {
   const isTr = locale === 'tr';
   const t = (en: string, tr: string) => (isTr ? tr : en);
@@ -72,6 +74,17 @@ export default function LiveTokenCounter({
     return () => clearInterval(timer);
   }, [refreshWallet]);
 
+  if (compact) {
+    return (
+      <div className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 text-white shadow-sm transition hover:bg-white/10" title={t('Available credits', 'Kullanılabilir kredi')}>
+        <Coins className="h-4 w-4 text-blue-400" />
+        <span className="text-sm font-bold tabular-nums">
+          {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : formatter.format(credits)}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-w-0 flex-wrap items-center gap-2">
       <div className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-white">
@@ -90,15 +103,10 @@ export default function LiveTokenCounter({
         </span>
       </div>
 
-      <Button
-        variant="outline"
-        onClick={() => void refreshWallet(false)}
-        disabled={isRefreshing || isLoading}
-        className="h-10 rounded-lg border-white/10 bg-transparent px-4 text-white hover:bg-white/10"
-      >
-        {isRefreshing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-        {t('Refresh', 'Yenile')}
-      </Button>
+      <div className="inline-flex h-10 cursor-pointer items-center justify-center rounded-lg border border-blue-500/50 bg-blue-600/10 px-4 text-sm font-medium text-blue-400 transition hover:bg-blue-600/20">
+        <Plus className="mr-2 h-4 w-4" />
+        {t('Add Credit', 'Kredi Ekle')}
+      </div>
 
       {error ? <p className="w-full text-xs text-white/60">{error}</p> : null}
     </div>

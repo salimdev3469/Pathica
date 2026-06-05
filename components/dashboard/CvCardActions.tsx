@@ -138,8 +138,8 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
         <>
             <div className="flex flex-col gap-2 mt-4">
                 <Button
-                    variant="outline"
-                    className="h-10 w-full rounded-xl border-blue-500/30 bg-[#05070b] text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 text-sm font-medium"
+                    variant="ghost"
+                    className="h-10 w-full rounded-xl border border-blue-500/30 bg-blue-500/5 text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 hover:text-blue-400 text-sm font-medium"
                     asChild
                 >
                     <Link href={`/cv/${cvId}`}>

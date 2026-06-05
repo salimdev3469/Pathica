@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Sparkles, Wand2, FileText } from 'lucide-react';
+import { X, Wand2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { type Locale } from '@/lib/locale';
 import Link from 'next/link';
@@ -34,10 +34,7 @@ export default function DashboardWelcomeModal({ locale }: { locale: Locale }) {
         <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
         
         <div className="p-8 sm:p-10">
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-400">
-              <Sparkles className="h-8 w-8" />
-            </div>
+          <div className="flex justify-end mb-6">
             <button onClick={handleFinish} className="rounded-full bg-white/5 p-2 text-white/50 hover:bg-white/10 hover:text-white transition">
               <X className="h-5 w-5" />
             </button>

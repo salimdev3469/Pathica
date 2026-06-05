@@ -31,7 +31,7 @@ export default function DashboardShell({ active, userEmail, locale, wallet, bill
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
           <div className="flex items-center justify-between">
             <Link href="/" className="shrink-0">
-              <Image src="/logo_pathica_footer.png" alt={t('Pathica logo', 'Pathica logosu')} width={140} height={140} className="h-10 w-auto object-contain sm:h-12" />
+              <Image src="/logo_pathica_footer.png" alt={t('Pathica logo', 'Pathica logosu')} width={200} height={200} className="h-16 w-auto object-contain sm:h-20" />
             </Link>
 
             <div className="flex items-center gap-3">
@@ -41,7 +41,7 @@ export default function DashboardShell({ active, userEmail, locale, wallet, bill
                     locale={locale}
                     initialCredits={wallet.creditBalance}
                     initialFreeExports={wallet.freeExportsRemaining}
-                    compact={true}
+                    compact={false}
                   />
                 </Link>
               )}
