@@ -15,6 +15,7 @@ import {
   LockKeyhole,
   Megaphone,
   Palette,
+  Plus,
   Sparkles,
   Target,
   TrendingUp,

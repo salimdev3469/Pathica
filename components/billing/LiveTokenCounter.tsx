@@ -74,18 +74,18 @@ export default function LiveTokenCounter({
 
   return (
     <div className="flex min-w-0 flex-wrap items-center gap-2">
-      <div className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-        <Coins className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-        <span className="text-xs text-slate-500 dark:text-slate-400">{t('Available credits', 'Kullanılabilir kredi')}</span>
-        <span className="text-xl font-semibold leading-none tabular-nums text-slate-900 dark:text-slate-100">
+      <div className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-white">
+        <Coins className="h-4 w-4 text-white/50" />
+        <span className="text-xs text-white/50">{t('Available credits', 'Kullanılabilir kredi')}</span>
+        <span className="text-xl font-semibold leading-none tabular-nums text-white">
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : formatter.format(credits)}
         </span>
       </div>
 
-      <div className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-        <Download className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-        <span className="text-xs text-slate-500 dark:text-slate-400">{t('Free exports left', 'Kalan ücretsiz export')}</span>
-        <span className="text-xl font-semibold leading-none tabular-nums text-slate-900 dark:text-slate-100">
+      <div className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-white">
+        <Download className="h-4 w-4 text-white/50" />
+        <span className="text-xs text-white/50">{t('Free exports left', 'Kalan ücretsiz export')}</span>
+        <span className="text-xl font-semibold leading-none tabular-nums text-white">
           {isLoading ? '-' : formatter.format(freeExports)}
         </span>
       </div>
@@ -94,13 +94,13 @@ export default function LiveTokenCounter({
         variant="outline"
         onClick={() => void refreshWallet(false)}
         disabled={isRefreshing || isLoading}
-        className="h-10 rounded-lg border-slate-200 bg-white px-4 text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+        className="h-10 rounded-lg border-white/10 bg-transparent px-4 text-white hover:bg-white/10"
       >
         {isRefreshing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
         {t('Refresh', 'Yenile')}
       </Button>
 
-      {error ? <p className="w-full text-xs text-slate-600 dark:text-slate-300">{error}</p> : null}
+      {error ? <p className="w-full text-xs text-white/60">{error}</p> : null}
     </div>
   );
 }

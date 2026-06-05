@@ -1,27 +1,41 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { ChevronRight, FileEdit, LayoutTemplate, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ChevronRight, FileEdit, LayoutTemplate } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { type Locale } from '@/lib/locale';
 
-export default function NewCvOnboarding({ locale, children, className }: { locale: Locale; children?: React.ReactNode; className?: string }) {
+export function BuilderOnboardingModal({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const isTr = locale === 'tr';
 
   const t = (en: string, tr: string) => (isTr ? tr : en);
 
+  useEffect(() => {
+    const hasSeen = localStorage.getItem('pathica_builder_onboarding_v2');
+    if (!hasSeen) {
+      setOpen(true);
+    }
+  }, []);
+
+  const handleFinish = () => {
+    localStorage.setItem('pathica_builder_onboarding_v2', 'true');
+    setOpen(false);
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      handleFinish();
+    } else {
+      setOpen(true);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className={className || "h-11 gap-2 rounded-xl bg-blue-600 px-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-md"}>
-          {children || <><Plus className="h-4 w-4" /> {t('New CV', 'Yeni CV')}</>}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="flex h-full w-full max-w-none flex-col gap-0 overflow-hidden border-0 bg-[#05070b] p-0 text-white sm:h-[80vh] sm:w-[90vw] sm:max-w-4xl sm:rounded-[2rem] sm:border sm:border-white/10 sm:shadow-2xl">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="flex h-full w-full max-w-none flex-col gap-0 overflow-hidden border-0 bg-[#05070b] p-0 text-white sm:h-[80vh] sm:w-[90vw] sm:max-w-4xl sm:rounded-[2rem] sm:border sm:border-white/10 sm:shadow-2xl z-[100]">
         <DialogHeader className="shrink-0 border-b border-white/10 p-6 sm:p-8">
           <DialogTitle className="text-2xl font-black sm:text-3xl">
             {t('How to use the CV Builder', 'CV Oluşturucu Nasıl Kullanılır?')}
@@ -79,10 +93,10 @@ export default function NewCvOnboarding({ locale, children, className }: { local
               </Button>
             ) : (
               <Button
-                asChild
+                onClick={handleFinish}
                 className="h-12 w-full rounded-xl bg-emerald-600 text-lg font-bold text-white hover:bg-emerald-700 sm:w-auto sm:px-10"
               >
-                <Link href="/cv/new">{t("Let's Start", 'Hadi Başlayalım')}</Link>
+                {t("Let's Start", 'Hadi Başlayalım')}
               </Button>
             )}
           </div>
