@@ -63,11 +63,11 @@ export default async function CoverLettersDashboardPage() {
 
   return (
     <DashboardShell active="coverLetters" userEmail={user.email} locale={locale}>
-      <section className="mb-7 rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 sm:p-6">
+      <section className="mb-7 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{t('My Cover Letters', 'Ön Yazılarım')}</h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            <h1 className="text-3xl font-bold tracking-tight text-white">{t('My Cover Letters', 'Ön Yazılarım')}</h1>
+            <p className="mt-2 text-sm text-white/60">
               {t(
                 'Create and manage personalized cover letters for your job applications.',
                 'İş başvurularınız için kişiselleştirilmiş ön yazılar oluşturun ve yönetin.',
@@ -76,7 +76,7 @@ export default async function CoverLettersDashboardPage() {
           </div>
           <Button
             asChild
-            className="h-11 gap-2 rounded-xl bg-slate-900 px-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-black hover:shadow-md dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+            className="h-11 gap-2 rounded-xl bg-blue-600 px-5 text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
           >
             <Link href="/cover-letter/new">
               <Plus className="h-4 w-4" /> {t('New Cover Letter', 'Yeni Ön Yazı')}
@@ -92,13 +92,13 @@ export default async function CoverLettersDashboardPage() {
           {coverLetterList.map((coverLetter) => (
             <Card
               key={coverLetter.id}
-              className="group rounded-2xl border-slate-200 bg-white/95 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
+              className="group rounded-2xl border-white/10 bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               <CardHeader>
-                <CardTitle className="text-xl text-slate-900 dark:text-slate-100">
+                <CardTitle className="text-xl text-white">
                   <span className="truncate pr-2">{coverLetter.job_title || t('Untitled', 'İsimsiz')}</span>
                 </CardTitle>
-                <CardDescription className="flex flex-col gap-1 text-slate-500 dark:text-slate-400">
+                <CardDescription className="flex flex-col gap-1 text-white/60">
                   {coverLetter.company_name ? <span>{coverLetter.company_name}</span> : null}
                   <div className="flex items-center gap-1 text-xs">
                     <Calendar className="h-3 w-3" />
@@ -107,7 +107,7 @@ export default async function CoverLettersDashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild variant="outline" className="w-full text-sm font-medium">
+                <Button asChild variant="outline" className="h-10 w-full rounded-xl border-blue-500/30 bg-[#05070b] text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 text-sm font-medium">
                   <Link href={`/cover-letter/${coverLetter.id}`}>{t('Edit / View', 'Düzenle / Görüntüle')}</Link>
                 </Button>
               </CardContent>
@@ -115,15 +115,15 @@ export default async function CoverLettersDashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white/95 py-16 dark:border-slate-700 dark:bg-slate-900/80">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] py-16">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-white/50">
             <FileText className="h-8 w-8" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">{t('No Cover Letters', 'Ön Yazı Yok')}</h3>
-          <p className="mb-6 max-w-sm text-center text-sm text-slate-500 dark:text-slate-400">
+          <h3 className="mb-2 text-lg font-semibold text-white">{t('No Cover Letters', 'Ön Yazı Yok')}</h3>
+          <p className="mb-6 max-w-sm text-center text-sm text-white/60">
             {t('Create your first personalized cover letter for your dream job.', 'Hayalinizdeki iş için ilk kişiselleştirilmiş ön yazınızı oluşturun.')}
           </p>
-          <Button asChild className="h-11 rounded-xl bg-slate-900 px-5 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
+          <Button asChild className="h-11 rounded-xl bg-blue-600 px-5 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20">
             <Link href="/cover-letter/new">
               <Plus className="mr-2 h-4 w-4" />
               {t('Create Cover Letter', 'Ön Yazı Oluştur')}
