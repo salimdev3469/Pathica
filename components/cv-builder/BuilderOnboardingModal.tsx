@@ -16,20 +16,33 @@ export function BuilderOnboardingModal({ locale }: { locale: Locale }) {
   const { dispatch } = useCV();
 
   useEffect(() => {
-    const hasSeen = localStorage.getItem('pathica_builder_tour_v1');
+    const hasSeen = localStorage.getItem('pathica_builder_tour_v2');
     if (!hasSeen) {
       // Small delay to let the UI render
       const timer = setTimeout(() => {
         setOpen(true);
-        // Automatically type a demo name to show live preview
-        dispatch({ type: 'UPDATE_PERSONAL_INFO', payload: { fullName: 'Dexter Morgan' } });
+        // Automatically type a demo name to show live preview with animation
+        dispatch({ type: 'UPDATE_PERSONAL_INFO', payload: { fullName: '' } });
+        
+        const fullName = 'Dexter Morgan';
+        let currentIndex = 0;
+        
+        const typeInterval = setInterval(() => {
+          if (currentIndex <= fullName.length) {
+            dispatch({ type: 'UPDATE_PERSONAL_INFO', payload: { fullName: fullName.slice(0, currentIndex) } });
+            currentIndex++;
+          } else {
+            clearInterval(typeInterval);
+          }
+        }, 100);
+
       }, 1000);
       return () => clearTimeout(timer);
     }
   }, [dispatch]);
 
   const handleFinish = () => {
-    localStorage.setItem('pathica_builder_tour_v1', 'true');
+    localStorage.setItem('pathica_builder_tour_v2', 'true');
     setOpen(false);
   };
 

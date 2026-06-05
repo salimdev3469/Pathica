@@ -7,9 +7,9 @@ import { Calendar, FileText, Plus } from 'lucide-react';
 import AtsReason from '@/components/dashboard/AtsReason';
 import CvCardActions from '@/components/dashboard/CvCardActions';
 import CvShareActions from '@/components/dashboard/CvShareActions';
-import DashboardBillingBar from '@/components/dashboard/DashboardBillingBar';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import GenerateCvFromJobButton from '@/components/dashboard/GenerateCvFromJobButton';
+import DashboardWelcomeModal from '@/components/dashboard/DashboardWelcomeModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
   const atsByCvId = await buildAtsByCvId(supabase, cvList, cvIds);
 
   return (
-    <DashboardShell active="resumes" userEmail={user.email} locale={locale}>
+    <DashboardShell active="resumes" userEmail={user.email} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing}>
       <section className="mb-7 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -133,8 +133,6 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
-
-      <DashboardBillingBar locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing} />
 
       {cvList.length > 0 ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -205,6 +203,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+      <DashboardWelcomeModal locale={locale} />
     </DashboardShell>
   );
 }
