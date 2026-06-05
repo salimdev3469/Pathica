@@ -111,11 +111,11 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell active="resumes" userEmail={user.email} locale={locale}>
-      <section className="mb-7 rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 sm:p-6">
+      <section className="mb-7 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{t('My Resumes', 'Özgeçmişlerim')}</h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            <h1 className="text-3xl font-bold tracking-tight text-white">{t('My Resumes', 'Özgeçmişlerim')}</h1>
+            <p className="mt-2 text-sm text-white/60">
               {t(
                 'Manage your CVs, improve ATS score, and jump back into editing quickly.',
                 'CV’lerini yönet, ATS skorunu geliştir ve düzenlemeye hızlıca geri dön.',
@@ -127,7 +127,7 @@ export default async function DashboardPage() {
             <GenerateCvFromJobButton locale={locale} />
             <Button
               asChild
-              className="h-11 gap-2 rounded-xl bg-slate-900 px-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-black hover:shadow-md dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+              className="h-11 gap-2 rounded-xl bg-white px-5 text-slate-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md"
             >
               <Link href="/cv/new">
                 <Plus className="h-4 w-4" /> {t('New CV', 'Yeni CV')}
@@ -148,16 +148,16 @@ export default async function DashboardPage() {
             return (
               <Card
                 key={cv.id}
-                className="group rounded-2xl border-slate-200 bg-white/95 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
+                className="group rounded-2xl border-white/10 bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20"
               >
                 <CardHeader>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <CardTitle className="min-w-0 flex-1 text-xl leading-tight text-slate-900 dark:text-slate-100">
+                    <CardTitle className="min-w-0 flex-1 text-xl leading-tight text-white">
                       <span className="block break-words pr-1 [overflow-wrap:anywhere]">{cv.title}</span>
                     </CardTitle>
                     <CvShareActions cvId={cv.id} cvTitle={cv.title} atsScore={ats.score} />
                   </div>
-                  <CardDescription className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                  <CardDescription className="flex items-center gap-1 text-white/50">
                     <Calendar className="h-3 w-3" />
                     {t('Updated', 'Güncellendi')}{' '}
                     {formatDistanceToNow(new Date(cv.updated_at), locale === 'tr' ? { locale: trLocale } : undefined)}{' '}
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
                         ATS {t('Score', 'Skoru')}: {ats.score}/100
                       </span>
                     ) : (
-                      <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                      <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white/70">
                         ATS {t('Score', 'Skoru')}: {t('Pending', 'Bekleniyor')}
                       </span>
                     )}
@@ -184,12 +184,12 @@ export default async function DashboardPage() {
           })}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white/95 py-20 dark:border-slate-700 dark:bg-slate-900/80">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.02] py-20">
           <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
             <FileText className="h-10 w-10" />
           </div>
-          <h3 className="mb-2 text-xl font-semibold text-slate-900 dark:text-slate-100">{t('No CVs yet', 'Henüz CV yok')}</h3>
-          <p className="mb-6 max-w-sm text-center text-slate-500 dark:text-slate-400">
+          <h3 className="mb-2 text-xl font-semibold text-white">{t('No CVs yet', 'Henüz CV yok')}</h3>
+          <p className="mb-6 max-w-sm text-center text-white/60">
             {t(
               'Create your first CV and start optimizing it for ATS and recruiter readability.',
               'İlk CV’ni oluştur ve ATS ile insan kaynakları okunabilirliği için optimize etmeye başla.',

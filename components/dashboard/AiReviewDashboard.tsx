@@ -274,28 +274,21 @@ export default function AiReviewDashboard({
 
   return (
     <div className="space-y-7">
-      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 text-slate-950 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 sm:p-8">
+      <section className="rounded-[2rem] border border-white/10 bg-white/[0.02] p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-300">
               <Brain className="h-4 w-4" />
               {t('Deterministic ontology scoring', 'Deterministik ontoloji skoru')}
             </div>
-            <h1 className="text-4xl font-bold tracking-tight">{t('AI Resume Review', 'AI Resume Review')}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
+            <h1 className="text-4xl font-bold tracking-tight text-white">{t('AI Resume Review', 'AI Resume Review')}</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
               {t(
                 'Free analysis uses file extraction, schema normalization, ontology mapping, and weighted mathematical scoring. LLM is only used for paid CV fixes.',
                 'Ücretsiz analiz dosya okuma, şema normalizasyonu, ontoloji eşleme ve ağırlıklı matematiksel skorla çalışır. LLM sadece ücretli CV fix için kullanılır.',
               )}
             </p>
           </div>
-          <Button
-            onClick={openFilePicker}
-            className="h-12 rounded-2xl bg-slate-900 px-6 text-base font-bold text-white shadow-sm hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white"
-          >
-            <Upload className="mr-2 h-5 w-5" />
-            {t('Upload Resume', 'CV Yükle')}
-          </Button>
         </div>
       </section>
 
@@ -306,65 +299,46 @@ export default function AiReviewDashboard({
         <MetricCard icon={Sparkles} label={t('Avg Score', 'Ortalama')} value={stats.avgScore === null ? '--' : String(stats.avgScore)} hint="/100" tone="amber" />
       </section>
 
-      <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      {!activeReview && (
+        <section className="rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-6 shadow-sm">
           <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-300">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-300">
               <Upload className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-950 dark:text-slate-100">{t('Upload New Resume', 'Yeni CV Yükle')}</h2>
-              <p className="text-sm text-slate-500">PDF, DOCX, TXT · Max 10MB</p>
+              <h2 className="text-lg font-bold text-white">{t('Upload New Resume', 'Yeni CV Yükle')}</h2>
+              <p className="text-sm text-white/50">PDF, DOCX, TXT · Max 10MB</p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={openFilePicker}
-            className="flex min-h-48 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-center transition hover:border-blue-300 hover:bg-blue-50/50 dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-blue-400/40 dark:hover:bg-blue-400/5"
+            className="flex min-h-48 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-white/[0.01] text-center transition hover:border-blue-400/40 hover:bg-blue-400/5"
           >
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-500 shadow-sm dark:bg-slate-900">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/50 shadow-sm">
               <Upload className="h-7 w-7" />
             </div>
-            <span className="font-semibold text-slate-800 dark:text-slate-100">{t('Drag & drop or click to browse', 'Sürükle bırak ya da seçmek için tıkla')}</span>
-            <span className="mt-1 text-sm text-slate-500">PDF or DOCX - Max 10MB</span>
+            <span className="font-semibold text-white">{t('Drag & drop or click to browse', 'Sürükle bırak ya da seçmek için tıkla')}</span>
+            <span className="mt-1 text-sm text-white/50">PDF or DOCX - Max 10MB</span>
           </button>
-
-          <div className="mt-6 space-y-3">
-            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{t("What you'll get:", 'Neler alacaksın:')}</p>
-            {[
-              t('Overall score out of 100', '100 üzerinden toplam skor'),
-              t('ATS compatibility analysis', 'ATS uyumluluk analizi'),
-              t('Keyword optimization tips', 'Anahtar kelime optimizasyon önerileri'),
-              t('Section-by-section feedback', 'Bölüm bazlı geri bildirim'),
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                <Check className="h-4 w-4 text-emerald-500" />
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          {activeReview ? <ReviewSummary review={activeReview} locale={locale} onFix={fixActiveReview} isFixing={isPending} /> : <EmptyBenchmark locale={locale} onUpload={openFilePicker} />}
-        </div>
-      </section>
+        </section>
+      )}
 
       {activeReview ? (
-        <section className="grid grid-cols-1 gap-5 xl:grid-cols-[0.95fr_1.05fr]">
-          <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <section className="flex flex-col gap-5 xl:flex-row">
+          <div className="w-full xl:w-[45%] shrink-0 rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 text-white/50">
                   <FileText className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-950 dark:text-slate-100">{activeReview.fileName}</h3>
-                  <p className="text-xs text-slate-500">{new Date(activeReview.createdAt).toLocaleDateString(isTr ? 'tr-TR' : 'en-US')}</p>
+                  <h3 className="font-bold text-white">{activeReview.fileName}</h3>
+                  <p className="text-xs text-white/50">{new Date(activeReview.createdAt).toLocaleDateString(isTr ? 'tr-TR' : 'en-US')}</p>
                 </div>
               </div>
-              <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-300">Ready</span>
+              <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">Ready</span>
             </div>
             <ResumePreview review={activeReview} />
           </div>
@@ -373,15 +347,15 @@ export default function AiReviewDashboard({
         </section>
       ) : null}
 
-      <section className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <section className="rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-5 shadow-sm">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400">
               <FileText className="h-5 w-5" />
             </div>
-            <h2 className="text-lg font-bold text-slate-950 dark:text-slate-100">{t('Review History', 'Review Geçmişi')}</h2>
+            <h2 className="text-lg font-bold text-white">{t('Review History', 'Review Geçmişi')}</h2>
           </div>
-          <Button variant="outline" onClick={openFilePicker} className="rounded-xl">
+          <Button variant="outline" onClick={openFilePicker} className="rounded-xl border-white/10 text-white hover:bg-white/10">
             <Upload className="mr-2 h-4 w-4" />
             {t('New Review', 'Yeni Review')}
           </Button>
@@ -396,22 +370,22 @@ export default function AiReviewDashboard({
                 onClick={() => setActiveReview(review)}
                 className={`rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${
                   activeReview?.id === review.id
-                    ? 'border-blue-300 bg-blue-50 dark:border-blue-500/40 dark:bg-blue-500/10'
-                    : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/40'
+                    ? 'border-blue-500/40 bg-blue-500/10'
+                    : 'border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-bold text-slate-950 dark:text-slate-100">{review.fileName}</p>
-                    <p className="mt-1 text-xs text-slate-500">{review.headline}</p>
+                    <p className="font-bold text-white">{review.fileName}</p>
+                    <p className="mt-1 text-xs text-white/50">{review.headline}</p>
                   </div>
-                  <span className="rounded-full bg-slate-950 px-2.5 py-1 text-xs font-bold text-white dark:bg-slate-100 dark:text-slate-950">{review.score}/100</span>
+                  <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-bold text-white">{review.score}/100</span>
                 </div>
               </button>
             ))}
           </div>
         ) : (
-          <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500 dark:border-slate-700">
+          <p className="rounded-2xl border border-dashed border-white/20 p-8 text-center text-sm text-white/50">
             {t('Upload your first resume to create a deterministic review.', 'İlk deterministik review için CV yükleyin.')}
           </p>
         )}
@@ -474,14 +448,14 @@ function MetricCard({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
       <div className={`mb-5 flex h-11 w-11 items-center justify-center rounded-2xl ${toneClasses[tone]}`}>
         <Icon className="h-5 w-5" />
       </div>
       <p className="text-sm font-semibold text-slate-500">{label}</p>
       <div className="mt-6 flex items-end gap-2">
-        <span className="text-3xl font-black tracking-tight text-slate-950 dark:text-slate-100">{value}</span>
-        <span className="pb-1 text-sm font-semibold text-emerald-500">{hint}</span>
+        <span className="text-3xl font-black tracking-tight text-white">{value}</span>
+        <span className="pb-1 text-sm font-semibold text-emerald-400">{hint}</span>
       </div>
     </div>
   );
@@ -511,8 +485,8 @@ function ReviewWizard(props: {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent className="flex h-[92vh] max-h-[92vh] w-[94vw] max-w-6xl flex-col overflow-hidden rounded-[2rem] border-slate-200 bg-white p-0 text-slate-950 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
-        <DialogHeader className="shrink-0 border-b border-slate-200 p-7 dark:border-slate-800">
+      <DialogContent className="flex h-[92vh] max-h-[92vh] w-[94vw] max-w-6xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#05070b] p-0 text-white shadow-2xl">
+        <DialogHeader className="shrink-0 border-b border-white/10 p-7">
           <DialogTitle className="text-3xl font-black">{t('AI Resume Review', 'AI Resume Review')}</DialogTitle>
           <DialogDescription>{wizardSubtitle(props.step, props.locale)}</DialogDescription>
         </DialogHeader>
@@ -521,7 +495,7 @@ function ReviewWizard(props: {
           <StepIndicator step={props.step} locale={props.locale} />
 
           {props.selectedFile ? (
-            <div className="mx-auto mb-8 max-w-2xl rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+            <div className="mx-auto mb-8 max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
               <FileText className="mr-2 inline h-4 w-4" />
               {props.selectedFile.name} · {(props.selectedFile.size / 1024 / 1024).toFixed(2)} MB
             </div>
@@ -539,15 +513,15 @@ function ReviewWizard(props: {
                     onClick={() => props.onCategorySelect(item.id)}
                     className={`rounded-3xl border p-7 text-center transition hover:-translate-y-0.5 hover:shadow-lg ${
                       isSelected
-                        ? 'border-slate-900 bg-slate-900 text-white shadow-slate-200 dark:border-slate-100 dark:bg-slate-100 dark:text-slate-950 dark:shadow-none'
-                        : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900'
+                        ? 'border-white/30 bg-white/10 text-white shadow-xl'
+                        : 'border-white/10 bg-white/[0.02] hover:bg-white/5'
                     }`}
                   >
-                    <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-slate-500 shadow-sm dark:bg-slate-950 dark:text-slate-400">
+                    <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/5 text-white/50 shadow-sm">
                       <Icon className="h-9 w-9" />
                     </div>
-                    <h3 className="text-xl font-black">{item.label}</h3>
-                    <p className={`mt-2 text-sm ${isSelected ? 'text-slate-200 dark:text-slate-700' : 'text-slate-500'}`}>{item.description}</p>
+                    <h3 className="text-xl font-black text-white">{item.label}</h3>
+                    <p className={`mt-2 text-sm ${isSelected ? 'text-white/80' : 'text-white/50'}`}>{item.description}</p>
                   </button>
                 );
               })}
@@ -566,8 +540,8 @@ function ReviewWizard(props: {
                     onClick={() => props.onFieldSelect(item.id)}
                     className={`rounded-full border px-6 py-3 text-base font-bold transition ${
                       props.field === item.id
-                        ? 'border-slate-900 bg-slate-900 text-white shadow-sm dark:border-slate-100 dark:bg-slate-100 dark:text-slate-950'
-                        : 'border-slate-300 bg-transparent text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
+                        ? 'border-white/30 bg-white/10 text-white shadow-lg'
+                        : 'border-white/10 bg-transparent text-white/70 hover:border-white/30 hover:text-white'
                     }`}
                   >
                     {item.label}
@@ -587,8 +561,8 @@ function ReviewWizard(props: {
                     onClick={() => props.onExperienceSelect(level.id)}
                     className={`min-w-32 rounded-[2rem] border px-6 py-4 text-center transition ${
                       props.experienceLevel === level.id
-                        ? 'border-slate-900 bg-slate-900 text-white shadow-sm dark:border-slate-100 dark:bg-slate-100 dark:text-slate-950'
-                        : 'border-slate-300 bg-transparent text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
+                        ? 'border-white/30 bg-white/10 text-white shadow-lg'
+                        : 'border-white/10 bg-transparent text-white/70 hover:border-white/30 hover:text-white'
                     }`}
                   >
                     <span className="block text-lg font-black">{level.label}</span>
@@ -606,7 +580,7 @@ function ReviewWizard(props: {
                   value={props.jobDescription}
                   onChange={(event) => props.onJobDescriptionChange(event.target.value)}
                   rows={6}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-900/10 dark:border-slate-800 dark:bg-slate-900 dark:focus:border-slate-400"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition focus:border-white/30 focus:ring-4 focus:ring-white/10 placeholder:text-white/30"
                   placeholder={t('Paste the job description to score keyword coverage mathematically.', 'Anahtar kelime kapsamını matematiksel skorlamak için iş tanımını yapıştır.')}
                 />
               </label>
@@ -614,13 +588,13 @@ function ReviewWizard(props: {
           ) : null}
         </div>
 
-        <div className="shrink-0 border-t border-slate-200 bg-white p-4 shadow-[0_-12px_30px_rgba(15,23,42,0.06)] dark:border-slate-800 dark:bg-slate-950 sm:p-7">
+        <div className="shrink-0 border-t border-white/10 bg-[#05070b] p-4 shadow-[0_-12px_30px_rgba(0,0,0,0.5)] sm:p-7">
           <div className="flex items-center justify-between gap-3">
             <Button
               variant="outline"
               onClick={() => props.setStep(Math.max(0, props.step - 1))}
               disabled={props.step === 0}
-              className="h-12 rounded-xl px-5"
+              className="h-12 rounded-xl px-5 border-white/10 bg-transparent text-white hover:bg-white/10"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t('Back', 'Geri')}
@@ -630,13 +604,13 @@ function ReviewWizard(props: {
               <Button
                 onClick={() => props.setStep(Math.min(2, props.step + 1))}
                 disabled={!canGoNext}
-                className="h-12 rounded-xl bg-slate-900 px-7 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white"
+                className="h-12 rounded-xl bg-white px-7 text-slate-950 hover:bg-white/90"
               >
                 {t('Next', 'İleri')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button onClick={props.onStart} className="h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white">
+              <Button onClick={props.onStart} className="h-12 rounded-xl bg-white px-8 text-slate-950 hover:bg-white/90">
                 {t('Start Review', 'Review Başlat')}
               </Button>
             )}
@@ -662,16 +636,16 @@ function StepIndicator({ step, locale }: { step: number; locale: Locale }) {
               <div
                 className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-2xl font-black ${
                   isComplete || isActive
-                    ? 'bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-950'
-                    : 'bg-slate-200 text-slate-500 dark:bg-slate-800'
+                    ? 'bg-white text-slate-950 shadow-sm'
+                    : 'bg-white/5 text-white/30'
                 }`}
               >
                 {isComplete ? <Check className="h-7 w-7" /> : index + 1}
               </div>
-              <p className={`mt-3 text-sm font-bold ${isComplete || isActive ? 'text-slate-950 dark:text-slate-100' : 'text-slate-400'}`}>{label}</p>
+              <p className={`mt-3 text-sm font-bold ${isComplete || isActive ? 'text-white' : 'text-white/30'}`}>{label}</p>
             </div>
             {index < labels.length - 1 ? (
-              <div className={`mx-5 h-1 w-24 rounded-full ${index < step ? 'bg-slate-900 dark:bg-slate-100' : 'bg-slate-300 dark:bg-slate-700'} sm:w-36`} />
+              <div className={`mx-5 h-1 w-24 rounded-full ${index < step ? 'bg-white' : 'bg-white/10'} sm:w-36`} />
             ) : null}
           </div>
         );
@@ -768,11 +742,11 @@ function EmptyBenchmark({ locale, onUpload }: { locale: Locale; onUpload: () => 
         <h2 className="text-lg font-bold text-slate-950 dark:text-slate-100">{t('Industry Benchmark', 'Sektör Benchmark')}</h2>
       </div>
       <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-400 dark:bg-slate-800">
+        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-white/5 text-white/30">
           <TrendingUp className="h-8 w-8" />
         </div>
-        <p className="text-slate-500">{t('Complete an AI review to see how you compare', 'Karşılaştırmayı görmek için ilk review’ünü tamamla')}</p>
-        <button type="button" onClick={onUpload} className="mt-6 font-bold text-slate-900 hover:text-blue-700 dark:text-slate-100 dark:hover:text-blue-300">
+        <p className="text-white/50">{t('Complete an AI review to see how you compare', 'Karşılaştırmayı görmek için ilk review’ünü tamamla')}</p>
+        <button type="button" onClick={onUpload} className="mt-6 font-bold text-white hover:text-white/80">
           {t('Get your first review', 'İlk review’ünü al')} →
         </button>
       </div>
@@ -787,10 +761,10 @@ function ReviewSummary({ review, locale, onFix, isFixing }: { review: AiReviewCl
 
   return (
     <div className="flex min-h-[390px] flex-col">
-      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
+      <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-bold text-slate-800 dark:text-slate-100">{t("We'll help rebuild fast - unlock your job-ready plan", 'Job-ready planı açarak hızlıca iyileştirelim')}</p>
-          <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-slate-900 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white">
+          <p className="font-bold text-white">{t("We'll help rebuild fast - unlock your job-ready plan", 'Job-ready planı açarak hızlıca iyileştirelim')}</p>
+          <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-white text-slate-950 hover:bg-white/90">
             {isFixing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LockKeyhole className="mr-2 h-4 w-4" />}
             {t('Fix CV', 'CV’yi Fixle')}
           </Button>
@@ -800,7 +774,7 @@ function ReviewSummary({ review, locale, onFix, isFixing }: { review: AiReviewCl
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <ScoreDonut score={review.score} />
         <h3 className={`mt-6 text-2xl font-black ${scoreTone}`}>{review.analysis.rating} - {review.headline}</h3>
-        <p className="mt-3 max-w-md text-sm text-slate-500">
+        <p className="mt-3 max-w-md text-sm text-white/50">
           {t(
             'Unlock deterministic findings into rewritten bullets, structure fixes, and a clean editable CV.',
             'Deterministik bulguları rewritten bullet, yapı düzeltmeleri ve temiz düzenlenebilir CV’ye dönüştür.',
@@ -828,14 +802,14 @@ function ResultPanel({
   const t = (en: string, tr: string) => (isTr ? tr : en);
 
   return (
-    <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-7 rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
+    <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-6 shadow-sm">
+      <div className="mb-7 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-black text-slate-950 dark:text-slate-100">{t('Unlock Full Review', 'Full Review Aç')}</p>
-            <p className="text-sm text-slate-500">{fixCreditCost} {t('credits for a new fixed CV', 'kredi ile yeni düzeltilmiş CV')}</p>
+            <p className="font-black text-white">{t('Unlock Full Review', 'Full Review Aç')}</p>
+            <p className="text-sm text-white/50">{fixCreditCost} {t('credits for a new fixed CV', 'kredi ile yeni düzeltilmiş CV')}</p>
           </div>
-          <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-slate-900 px-5 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white">
+          <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-white px-5 text-slate-950 hover:bg-white/90">
             {isFixing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
             {t('Get Job-Ready Review', 'Job-Ready Review Al')}
           </Button>
@@ -844,12 +818,12 @@ function ResultPanel({
 
       <div className="flex flex-col items-center">
         <ScoreDonut score={review.score} />
-        <h2 className="mt-6 text-center text-2xl font-black text-slate-950 dark:text-slate-100">{review.analysis.rating}</h2>
-        <p className="mt-2 text-center text-sm text-slate-500">{review.headline}</p>
+        <h2 className="mt-6 text-center text-2xl font-black text-white">{review.analysis.rating}</h2>
+        <p className="mt-2 text-center text-sm text-white/50">{review.headline}</p>
       </div>
 
       <div className="mt-8">
-        <div className="mb-4 flex items-center gap-2 font-black text-slate-950 dark:text-slate-100">
+        <div className="mb-4 flex items-center gap-2 font-black text-white">
           <BarChart3 className="h-5 w-5" />
           {t('Category Breakdown', 'Kategori Dağılımı')}
         </div>
@@ -859,11 +833,11 @@ function ResultPanel({
             const max = review.analysis.maxBreakdown[typedKey];
             return (
               <div key={key} className="grid grid-cols-[92px_1fr_56px] items-center gap-3 text-sm">
-                <span className="text-slate-500">{BREAKDOWN_LABELS[typedKey]}</span>
-                <div className="h-2.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-                  <div className="h-full rounded-full bg-slate-900 dark:bg-slate-100" style={{ width: `${Math.round((value / max) * 100)}%` }} />
+                <span className="text-white/50">{BREAKDOWN_LABELS[typedKey]}</span>
+                <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full rounded-full bg-white" style={{ width: `${Math.round((value / max) * 100)}%` }} />
                 </div>
-                <span className="text-right font-bold text-slate-700 dark:text-slate-200">{value}/{max}</span>
+                <span className="text-right font-bold text-white/80">{value}/{max}</span>
               </div>
             );
           })}
@@ -871,17 +845,17 @@ function ResultPanel({
       </div>
 
       <div className="mt-8">
-        <h3 className="mb-3 font-black text-slate-950 dark:text-slate-100">{t('Deterministic Findings', 'Deterministik Bulgular')}</h3>
+        <h3 className="mb-3 font-black text-white">{t('Deterministic Findings', 'Deterministik Bulgular')}</h3>
         <div className="space-y-3">
           {review.analysis.findings.slice(0, 6).map((finding) => (
-            <div key={finding.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/40">
+            <div key={finding.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="mb-1 flex items-center justify-between gap-3">
-                <p className="font-bold text-slate-950 dark:text-slate-100">{finding.title}</p>
+                <p className="font-bold text-white">{finding.title}</p>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${finding.severity === 'critical' ? 'bg-rose-500/10 text-rose-500' : finding.severity === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-blue-500/10 text-blue-500'}`}>
                   {finding.severity}
                 </span>
               </div>
-              <p className="text-sm text-slate-500">{finding.detail}</p>
+              <p className="text-sm text-white/50">{finding.detail}</p>
             </div>
           ))}
         </div>
@@ -896,9 +870,9 @@ function ScoreDonut({ score }: { score: number }) {
       className="relative flex h-40 w-40 items-center justify-center rounded-full"
       style={{ background: `conic-gradient(#0f172a ${score * 3.6}deg, #dbe4ef 0deg)` }}
     >
-      <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-white dark:bg-slate-900">
-        <span className="text-5xl font-black text-slate-950 dark:text-slate-100">{score}</span>
-        <span className="text-sm font-semibold text-slate-500">/ 100</span>
+      <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-[#05070b]">
+        <span className="text-5xl font-black text-white">{score}</span>
+        <span className="text-sm font-semibold text-white/50">/ 100</span>
       </div>
     </div>
   );
@@ -947,10 +921,10 @@ function BillingModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-[2rem] border-slate-200 bg-white p-0 dark:border-slate-800 dark:bg-slate-950">
-        <DialogHeader className="border-b border-slate-200 p-7 dark:border-slate-800">
+      <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-[2rem] border border-white/10 bg-[#05070b] p-0 text-white shadow-2xl">
+        <DialogHeader className="border-b border-white/10 p-7">
           <DialogTitle className="text-3xl font-black">{t('Unlock Full Review', 'Full Review Aç')}</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-white/60">
             {t('You need credits to create a new fixed CV.', 'Yeni düzeltilmiş CV oluşturmak için kredi gerekir.')} {fixCreditCost} {t('credits required.', 'kredi gerekli.')}
           </DialogDescription>
         </DialogHeader>
@@ -968,21 +942,22 @@ function BillingModal({
                 key={pkg.code}
                 className={`rounded-3xl border p-5 ${
                   pkg.highlight
-                    ? 'border-slate-900 bg-slate-50 shadow-lg shadow-slate-200 dark:border-slate-100 dark:bg-slate-900 dark:shadow-none'
-                    : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900'
+                    ? 'border-white/30 bg-white/10 shadow-xl'
+                    : 'border-white/10 bg-white/[0.02]'
                 }`}
               >
                 <div className="mb-5 flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-xl font-black text-slate-950 dark:text-slate-100">{pkg.name}</h3>
-                    <p className="mt-1 text-sm text-slate-500">{pkg.credits} credits</p>
+                    <h3 className="text-xl font-black text-white">{pkg.name}</h3>
+                    <p className="mt-1 text-sm text-white/50">{pkg.credits} credits</p>
                   </div>
-                  <span className="text-lg font-black text-slate-950 dark:text-slate-100">{pkg.priceLabel}</span>
+                  <span className="text-lg font-black text-white">{pkg.priceLabel}</span>
                 </div>
                 <CheckoutButton
                   packageCode={pkg.code}
                   label={t('Buy Credits', 'Kredi Satın Al')}
-                  className="w-full rounded-xl bg-slate-900 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white"
+                  theme="dark"
+                  className="w-full rounded-xl bg-white text-slate-950 hover:bg-white/90"
                 />
               </div>
             ))}
