@@ -12,6 +12,7 @@ type CheckoutButtonProps = {
   disabled?: boolean;
   className?: string;
   label?: string;
+  theme?: 'light' | 'dark';
 };
 
 type CheckoutResponse = {
@@ -22,7 +23,7 @@ type CheckoutResponse = {
 
 const LEGAL_WARNING_MESSAGE = 'Ödemeye devam etmek için gerekli sözleşme ve bilgilendirme metinlerini kabul etmelisiniz.';
 
-export default function CheckoutButton({ packageCode, disabled = false, className, label = 'Buy Credits' }: CheckoutButtonProps) {
+export default function CheckoutButton({ packageCode, disabled = false, className, label = 'Buy Credits', theme = 'light' }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConsentChecked, setIsConsentChecked] = useState(false);
   const consentId = `checkout-consent-${packageCode}`;
@@ -69,37 +70,37 @@ export default function CheckoutButton({ packageCode, disabled = false, classNam
 
   return (
     <div className="space-y-3">
-      <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+      <div className={`rounded-lg border p-3 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-slate-200 bg-slate-50/70'}`}>
         <div className="flex items-start gap-2.5">
           <input
             id={consentId}
             type="checkbox"
             checked={isConsentChecked}
             onChange={(event) => setIsConsentChecked(event.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+            className={`mt-0.5 h-4 w-4 rounded focus:ring-1 ${theme === 'dark' ? 'border-white/20 bg-transparent text-[#9bd5ff] focus:ring-[#9bd5ff]' : 'border-slate-300 text-slate-900 focus:ring-slate-900'}`}
           />
-          <label htmlFor={consentId} className="text-xs leading-5 text-slate-700">
-            <Link href="/on-bilgilendirme-formu" className="font-medium text-slate-900 underline underline-offset-2">
+          <label htmlFor={consentId} className={`text-xs leading-5 ${theme === 'dark' ? 'text-white/60' : 'text-slate-700'}`}>
+            <Link href="/on-bilgilendirme-formu" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
               Ön Bilgilendirme Formu
             </Link>
             {"'nu, "}
-            <Link href="/mesafeli-satis-sozlesmesi" className="font-medium text-slate-900 underline underline-offset-2">
+            <Link href="/mesafeli-satis-sozlesmesi" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
               Mesafeli Satış Sözleşmesi
             </Link>
             {"'ni, "}
-            <Link href="/kullanim-kosullari" className="font-medium text-slate-900 underline underline-offset-2">
+            <Link href="/kullanim-kosullari" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
               Kullanım Koşulları
             </Link>
             {"'nı, "}
-            <Link href="/gizlilik-politikasi" className="font-medium text-slate-900 underline underline-offset-2">
+            <Link href="/gizlilik-politikasi" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
               Gizlilik Politikası
             </Link>
             {"'nı, "}
-            <Link href="/cerez-politikasi" className="font-medium text-slate-900 underline underline-offset-2">
+            <Link href="/cerez-politikasi" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
               Çerez Politikası
             </Link>
             {"'nı ve "}
-            <Link href="/kvkk-aydinlatma-metni" className="font-medium text-slate-900 underline underline-offset-2">
+            <Link href="/kvkk-aydinlatma-metni" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
               KVKK Aydınlatma Metni
             </Link>
             {"'ni okudum, anladım ve kabul ediyorum."}

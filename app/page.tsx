@@ -8,6 +8,8 @@ import {
   FREE_SIGNUP_AI_CREDITS,
   FREE_SIGNUP_EXPORTS,
   PDF_EXPORT_CREDIT_COST,
+  formatUsd,
+  getShopierCheckoutUrl,
 } from '@/lib/billing-config';
 import { getBillingSummaryText } from '@/lib/billing';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
@@ -184,12 +186,14 @@ export default async function Home() {
 
   const pricingPackages = BILLING_PACKAGES.map((pkg) => {
     const href = isAuthenticated ? '/billing' : '/register';
+    const isConfigured = Boolean(getShopierCheckoutUrl(pkg));
 
-    if (pkg.id === 'starter') {
+    if (pkg.code === 'starter') {
       return {
-        id: pkg.id,
+        id: pkg.code,
+        code: pkg.code,
         name: t('Starter', 'Starter'),
-        displayPrice: pkg.displayPrice,
+        displayPrice: formatUsd(pkg.priceUsd),
         description: t(
           'A focused pack for one or two strong application passes.',
           'Bir veya iki güçlü başvuru turu için odaklı paket.',
@@ -199,17 +203,19 @@ export default async function Home() {
           t('Good fit for one resume plus a few role adjustments', 'Bir CV ve birkaç rol özelleştirmesi için uygun'),
           t('One-time purchase, no subscription pressure', 'Tek seferlik ödeme, abonelik baskısı yok'),
         ],
-        isPopular: pkg.isPopular,
+        isPopular: pkg.highlight,
+        isConfigured,
         ctaLabel: t('Choose Starter', 'Starter’ı Seç'),
         href,
       };
     }
 
-    if (pkg.id === 'pro') {
+    if (pkg.code === 'pro') {
       return {
-        id: pkg.id,
+        id: pkg.code,
+        code: pkg.code,
         name: t('Pro', 'Pro'),
-        displayPrice: pkg.displayPrice,
+        displayPrice: formatUsd(pkg.priceUsd),
         description: t(
           'Best balance for active search, repeated tailoring, and export.',
           'Aktif iş arayışı, tekrar tekrar özelleştirme ve export için en dengeli paket.',
@@ -219,16 +225,18 @@ export default async function Home() {
           t('Covers repeated ATS checks and stronger content passes', 'Tekrarlı ATS kontrolleri ve güçlü içerik turunu kapsar'),
           t('Most practical pack for multi-role applications', 'Birden fazla role başvuranlar için en pratik paket'),
         ],
-        isPopular: pkg.isPopular,
+        isPopular: pkg.highlight,
+        isConfigured,
         ctaLabel: t('Choose Pro', 'Pro’yu Seç'),
         href,
       };
     }
 
     return {
-      id: pkg.id,
-      name: t('Business', 'Business'),
-      displayPrice: pkg.displayPrice,
+      id: pkg.code,
+      code: pkg.code,
+      name: t('Mega', 'Mega'),
+      displayPrice: formatUsd(pkg.priceUsd),
       description: t(
         'A larger pack for heavy iteration, cover letters, and broad search.',
         'Yoğun iterasyon, ön yazı üretimi ve geniş arama için daha büyük paket.',
@@ -238,8 +246,9 @@ export default async function Home() {
         t('Good fit for broad search or multiple application tracks', 'Geniş arama veya paralel başvuru akışları için uygun'),
         t('One-time checkout, credits stay in your account', 'Tek seferlik ödeme, krediler hesabında kalır'),
       ],
-      isPopular: pkg.isPopular,
-      ctaLabel: t('Choose Business', 'Business’i Seç'),
+      isPopular: pkg.highlight,
+      isConfigured,
+      ctaLabel: t('Choose Mega', 'Mega’yı Seç'),
       href,
     };
   });

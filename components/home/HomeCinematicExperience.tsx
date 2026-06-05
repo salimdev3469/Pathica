@@ -17,6 +17,7 @@ import {
 import { CVTemplate } from '@/components/pdf/CVTemplate';
 import { Button } from '@/components/ui/button';
 import LanguageToggle from '@/components/language-toggle';
+import CheckoutButton from '@/components/billing/CheckoutButton';
 import type { CVState } from '@/context/CVContext';
 import { CV_PAGE_HEIGHT_PX, CV_PAGE_WIDTH_PX } from '@/lib/cv-layout';
 import { buildCvStateFromTemplate, getCvTemplateSeed } from '@/lib/cv-templates';
@@ -39,11 +40,13 @@ type WorkflowStep = {
 
 type PricingPackage = {
   id: string;
+  code?: string;
   name: string;
   displayPrice: string;
   description: string;
   features: string[];
-  isPopular: boolean;
+  isPopular?: boolean;
+  isConfigured?: boolean;
   ctaLabel: string;
   href: string;
 };
@@ -175,6 +178,15 @@ export function HomeCinematicExperience({
   const [postProgressIndex, setPostProgressIndex] = useState(0);
   const [activeSlideId, setActiveSlideId] = useState<(typeof SLIDE_IDS)[number]>('proof');
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(1080);
   const [heroAccentIndex, setHeroAccentIndex] = useState(0);
@@ -323,23 +335,33 @@ export function HomeCinematicExperience({
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
   };
 
-  const scrollToSlide = (id: (typeof SLIDE_IDS)[number]) => {
+  const scrollToSlide = (slideId: (typeof SLIDE_IDS)[number]) => {
+    if (!isDesktop) {
+      const el = document.getElementById(slideId);
+      if (el) {
+        // Adjust for header height
+        const top = el.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      }
+      return;
+    }
+
     if (typeof window === 'undefined') return;
 
     let top = 0;
 
-    if (id === 'proof') {
+    if (slideId === 'proof') {
       const el = document.getElementById('proof');
       if (el) {
         top = el.getBoundingClientRect().top + window.scrollY - 80;
       }
-    } else if (PRE_PRICING_SLIDE_IDS.includes(id as (typeof PRE_PRICING_SLIDE_IDS)[number]) && preStackRef.current) {
-      const slideIndex = PRE_PRICING_SLIDE_IDS.findIndex((slideId) => slideId === id);
+    } else if (PRE_PRICING_SLIDE_IDS.includes(slideId as (typeof PRE_PRICING_SLIDE_IDS)[number]) && preStackRef.current) {
+      const slideIndex = PRE_PRICING_SLIDE_IDS.findIndex((s) => s === slideId);
       top = preStackRef.current.getBoundingClientRect().top + window.scrollY + slideIndex * window.innerHeight * PRE_PINNED_SCROLL_STEP_VH;
-    } else if (id === 'pricing' && pricingSectionRef.current) {
+    } else if (slideId === 'pricing' && pricingSectionRef.current) {
       top = pricingSectionRef.current.getBoundingClientRect().top + window.scrollY;
-    } else if (POST_PRICING_SLIDE_IDS.includes(id as (typeof POST_PRICING_SLIDE_IDS)[number]) && postStackRef.current) {
-      const slideIndex = POST_PRICING_SLIDE_IDS.findIndex((slideId) => slideId === id);
+    } else if (POST_PRICING_SLIDE_IDS.includes(slideId as (typeof POST_PRICING_SLIDE_IDS)[number]) && postStackRef.current) {
+      const slideIndex = POST_PRICING_SLIDE_IDS.findIndex((s) => s === slideId);
       top = postStackRef.current.getBoundingClientRect().top + window.scrollY + slideIndex * window.innerHeight * POST_PINNED_SCROLL_STEP_VH;
     } else {
       return;
@@ -368,7 +390,7 @@ export function HomeCinematicExperience({
       return <StatsSlide stats={stats} density={viewportDensity} />;
     }
     if (slideId === 'pricing') {
-      return <PricingSlide locale={locale} pricing={pricing} density={viewportDensity} />;
+      return <PricingSlide locale={locale} pricing={pricing} density={viewportDensity} isAuthenticated={isAuthenticated} />;
     }
     return <FaqSlide faq={faq} openFaqIndex={openFaqIndex} onOpenFaq={setOpenFaqIndex} density={viewportDensity} />;
   };
@@ -511,16 +533,18 @@ export function HomeCinematicExperience({
           </div>
         </section>
 
-        <div ref={preStackRef} className="relative" style={{ height: `${preStackViewportCount * 100}vh` }}>
-          <div className="sticky top-0 h-screen overflow-hidden [perspective:1800px]">
+        <div ref={preStackRef} className="relative" style={{ height: isDesktop ? `${preStackViewportCount * 100}vh` : 'auto' }}>
+          <div className={cn(isDesktop ? "sticky top-0 h-screen overflow-hidden [perspective:1800px]" : "flex flex-col gap-24 py-16")}>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(155,213,255,0.1),transparent_24%),linear-gradient(180deg,#06070b_0%,#05070b_100%)]" />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:110px_110px] opacity-[0.05]" />
 
-            <div className="pointer-events-none absolute right-5 top-36 z-30 hidden text-right font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.36em] text-white/35 lg:block">
-              <span>{String(activeSlideIndex + 1).padStart(2, '0')}</span>
-              <span className="mx-2 text-white/18">/</span>
-              <span>{String(SLIDE_IDS.length).padStart(2, '0')}</span>
-            </div>
+            {isDesktop && (
+              <div className="pointer-events-none absolute right-5 top-36 z-30 hidden text-right font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.36em] text-white/35 lg:block">
+                <span>{String(activeSlideIndex + 1).padStart(2, '0')}</span>
+                <span className="mx-2 text-white/18">/</span>
+                <span>{String(SLIDE_IDS.length).padStart(2, '0')}</span>
+              </div>
+            )}
 
             {PRE_PRICING_SLIDE_IDS.map((slideId, index) => {
               const isActive = index === activePreSlideIndex;
@@ -530,9 +554,10 @@ export function HomeCinematicExperience({
               return (
                 <section
                   key={slideId}
+                  id={slideId}
                   data-slide={slideId}
-                  className="absolute inset-x-0 bottom-0 top-32 flex items-center px-0"
-                  style={{
+                  className={cn(isDesktop ? "absolute inset-x-0 bottom-0 top-32 flex items-center px-0" : "relative w-full")}
+                  style={isDesktop ? {
                     opacity: isActive ? 1 : 0,
                     transform: isActive
                       ? 'translate3d(0, 0, 0) scale(1)'
@@ -544,13 +569,13 @@ export function HomeCinematicExperience({
                     transition: prefersReducedMotion
                       ? 'none'
                       : 'opacity 600ms cubic-bezier(0.22, 1, 0.36, 1), transform 600ms cubic-bezier(0.22, 1, 0.36, 1), visibility 600ms',
-                  }}
+                  } : undefined}
                 >
                   <div
-                    className="mx-auto flex w-full max-w-7xl items-center overflow-hidden px-5 sm:px-6 lg:px-8"
-                    style={{ height: `${slideCanvasHeight}px` }}
+                    className={cn("mx-auto flex w-full max-w-7xl items-center px-5 sm:px-6 lg:px-8", isDesktop && "overflow-hidden")}
+                    style={{ height: isDesktop ? `${slideCanvasHeight}px` : 'auto' }}
                   >
-                    <PinnedSlideFrame active={isActive} prefersReducedMotion={prefersReducedMotion}>
+                    <PinnedSlideFrame active={isDesktop ? isActive : true} prefersReducedMotion={prefersReducedMotion}>
                       {renderSlide(slideId)}
                     </PinnedSlideFrame>
                   </div>
@@ -558,15 +583,18 @@ export function HomeCinematicExperience({
               );
             })}
 
-            <SlideDots
-              activeSlideId={activeSlideId}
-              viewportDensity={viewportDensity}
-              onSelect={scrollToSlide}
-            />
+            {isDesktop && (
+              <SlideDots
+                activeSlideId={activeSlideId}
+                viewportDensity={viewportDensity}
+                onSelect={scrollToSlide}
+              />
+            )}
           </div>
         </div>
 
         <section
+          id="pricing"
           ref={pricingSectionRef}
           className="relative overflow-hidden border-y border-slate-700/30 py-20 lg:py-24"
         >
@@ -577,32 +605,36 @@ export function HomeCinematicExperience({
             <span className="mx-2 text-white/18">/</span>
             <span>{String(SLIDE_IDS.length).padStart(2, '0')}</span>
           </div>
-          <div className="relative mx-auto flex w-full max-w-7xl items-center px-5 sm:px-6 lg:px-8" style={{ minHeight: `${slideCanvasHeight}px` }}>
+          <div className="relative mx-auto flex w-full max-w-7xl items-center px-5 sm:px-6 lg:px-8" style={{ minHeight: isDesktop ? `${slideCanvasHeight}px` : 'auto' }}>
             {renderSlide('pricing')}
           </div>
         </section>
 
-        <div ref={postStackRef} className="relative" style={{ height: `${postStackViewportCount * 100}vh` }}>
-          <div className="sticky top-0 h-screen overflow-hidden [perspective:1800px]">
+        <div ref={postStackRef} className="relative" style={{ height: isDesktop ? `${postStackViewportCount * 100}vh` : 'auto' }}>
+          <div className={cn(isDesktop ? "sticky top-0 h-screen overflow-hidden [perspective:1800px]" : "flex flex-col gap-24 py-16 border-b border-slate-700/30")}>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(155,213,255,0.08),transparent_24%),linear-gradient(180deg,#06070b_0%,#05070b_100%)]" />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:110px_110px] opacity-[0.04]" />
 
-            <div className="pointer-events-none absolute right-5 top-36 z-30 hidden text-right font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.36em] text-white/35 lg:block">
-              <span>{String(activeSlideIndex + 1).padStart(2, '0')}</span>
-              <span className="mx-2 text-white/18">/</span>
-              <span>{String(SLIDE_IDS.length).padStart(2, '0')}</span>
-            </div>
+            {isDesktop && (
+              <div className="pointer-events-none absolute right-5 top-36 z-30 hidden text-right font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.36em] text-white/35 lg:block">
+                <span>{String(activeSlideIndex + 1).padStart(2, '0')}</span>
+                <span className="mx-2 text-white/18">/</span>
+                <span>{String(SLIDE_IDS.length).padStart(2, '0')}</span>
+              </div>
+            )}
 
             {POST_PRICING_SLIDE_IDS.map((slideId, index) => {
               const isActive = index === activePostSlideIndex;
-              const isPast = index < activePostSlideIndex;
+              const globalIndex = SLIDE_IDS.indexOf(slideId);
+              const isPast = globalIndex < activeSlideIndex;
 
               return (
                 <section
                   key={slideId}
+                  id={slideId}
                   data-slide={slideId}
-                  className="absolute inset-x-0 bottom-0 top-32 flex items-center px-0"
-                  style={{
+                  className={cn(isDesktop ? "absolute inset-x-0 bottom-0 top-32 flex items-center px-0" : "relative w-full")}
+                  style={isDesktop ? {
                     opacity: isActive ? 1 : 0,
                     transform: isActive
                       ? 'translate3d(0, 0, 0) scale(1)'
@@ -614,13 +646,13 @@ export function HomeCinematicExperience({
                     transition: prefersReducedMotion
                       ? 'none'
                       : 'opacity 600ms cubic-bezier(0.22, 1, 0.36, 1), transform 600ms cubic-bezier(0.22, 1, 0.36, 1), visibility 600ms',
-                  }}
+                  } : undefined}
                 >
                   <div
-                    className="mx-auto flex w-full max-w-7xl items-center overflow-hidden px-5 sm:px-6 lg:px-8"
-                    style={{ height: `${slideCanvasHeight}px` }}
+                    className={cn("mx-auto flex w-full max-w-7xl items-center px-5 sm:px-6 lg:px-8", isDesktop && "overflow-hidden")}
+                    style={{ height: isDesktop ? `${slideCanvasHeight}px` : 'auto' }}
                   >
-                    <PinnedSlideFrame active={isActive} prefersReducedMotion={prefersReducedMotion}>
+                    <PinnedSlideFrame active={isDesktop ? isActive : true} prefersReducedMotion={prefersReducedMotion}>
                       {renderSlide(slideId)}
                     </PinnedSlideFrame>
                   </div>
@@ -628,11 +660,13 @@ export function HomeCinematicExperience({
               );
             })}
 
-            <SlideDots
-              activeSlideId={activeSlideId}
-              viewportDensity={viewportDensity}
-              onSelect={scrollToSlide}
-            />
+            {isDesktop && (
+              <SlideDots
+                activeSlideId={activeSlideId}
+                viewportDensity={viewportDensity}
+                onSelect={scrollToSlide}
+              />
+            )}
           </div>
         </div>
       </main>
@@ -1200,10 +1234,12 @@ function PricingSlide({
   locale,
   pricing,
   density,
+  isAuthenticated,
 }: {
   locale: Locale;
   pricing: HomeCinematicExperienceProps['pricing'];
   density: ViewportDensity;
+  isAuthenticated: boolean;
 }) {
   return (
     <div className="flex h-full w-full items-center overflow-hidden">
@@ -1308,21 +1344,37 @@ function PricingSlide({
                 </ul>
               </div>
 
-              <Button
-                asChild
-                className={cn(
-                  'mt-5 rounded-full text-sm font-semibold',
-                  density === 'tight' ? 'h-10' : 'h-11',
-                  pkg.isPopular
-                    ? 'bg-[#9bd5ff] text-slate-950 shadow-[0_20px_60px_-32px_rgba(155,213,255,0.85)] hover:bg-[#b5e2ff]'
-                    : 'border border-white/12 bg-transparent text-white hover:bg-white/[0.05]',
-                )}
-              >
-                <Link href={pkg.href}>
-                  {pkg.ctaLabel}
-                  <ChevronRight className="h-5 w-5" />
-                </Link>
-              </Button>
+              {isAuthenticated && pkg.code ? (
+                <CheckoutButton
+                  packageCode={pkg.code}
+                  disabled={!pkg.isConfigured}
+                  className={cn(
+                    'mt-5 w-full rounded-full text-sm font-semibold',
+                    density === 'tight' ? 'h-10' : 'h-11',
+                    pkg.isPopular
+                      ? 'bg-[#9bd5ff] text-slate-950 shadow-[0_20px_60px_-32px_rgba(155,213,255,0.85)] hover:bg-[#b5e2ff]'
+                      : 'border border-white/12 bg-transparent text-white hover:bg-white/[0.05]',
+                  )}
+                  label={pkg.isConfigured ? (locale === 'tr' ? 'Shopier ile Satın Al' : 'Buy with Shopier') : (locale === 'tr' ? 'Yapılandırılmadı' : 'Not Configured')}
+                  theme="dark"
+                />
+              ) : (
+                <Button
+                  asChild
+                  className={cn(
+                    'mt-5 rounded-full text-sm font-semibold',
+                    density === 'tight' ? 'h-10' : 'h-11',
+                    pkg.isPopular
+                      ? 'bg-[#9bd5ff] text-slate-950 shadow-[0_20px_60px_-32px_rgba(155,213,255,0.85)] hover:bg-[#b5e2ff]'
+                      : 'border border-white/12 bg-transparent text-white hover:bg-white/[0.05]',
+                  )}
+                >
+                  <Link href={pkg.href}>
+                    {pkg.ctaLabel}
+                    <ChevronRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+              )}
             </div>
           ))}
         </div>
