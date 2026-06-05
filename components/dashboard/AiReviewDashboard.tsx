@@ -275,13 +275,10 @@ export default function AiReviewDashboard({
 
   return (
     <div className="space-y-7">
-      <section className="rounded-[2rem] border border-white/10 bg-white/[0.02] p-6 shadow-sm sm:p-8">
+      <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-300">
-              <Brain className="h-4 w-4" />
-              {t('Deterministic ontology scoring', 'Deterministik ontoloji skoru')}
-            </div>
+
             <h1 className="text-4xl font-bold tracking-tight text-white">{t('AI Resume Review', 'AI Resume Review')}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
               {t(
@@ -309,7 +306,7 @@ export default function AiReviewDashboard({
       </section>
 
       {!activeReview && (
-        <section className="rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-6 shadow-sm">
+        <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-sm">
           <div className="mb-5 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-300">
               <Upload className="h-5 w-5" />
@@ -336,7 +333,7 @@ export default function AiReviewDashboard({
 
       {activeReview ? (
         <section className="flex flex-col gap-5 xl:flex-row">
-          <div className="w-full xl:w-[45%] shrink-0 rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-5 shadow-sm">
+          <div className="w-full xl:w-[45%] shrink-0 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 text-white/50">
@@ -356,7 +353,7 @@ export default function AiReviewDashboard({
         </section>
       ) : null}
 
-      <section className="rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-5 shadow-sm">
+      <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400">
@@ -457,13 +454,10 @@ function MetricCard({
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
-      <div className={`mb-5 flex h-11 w-11 items-center justify-center rounded-2xl ${toneClasses[tone]}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <p className="text-sm font-semibold text-slate-500">{label}</p>
-      <div className="mt-6 flex items-end gap-2">
-        <span className="text-3xl font-black tracking-tight text-white">{value}</span>
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] p-8 shadow-sm text-center">
+      <p className="mb-2 text-sm font-semibold text-white/60">{label}</p>
+      <div className="flex items-end justify-center gap-2">
+        <span className="text-5xl font-black tracking-tight text-white">{value}</span>
         <span className="pb-1 text-sm font-semibold text-emerald-400">{hint}</span>
       </div>
     </div>
@@ -494,7 +488,7 @@ function ReviewWizard(props: {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent className="flex h-full w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-[#05070b] p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-[2rem] sm:border sm:border-white/10 sm:shadow-2xl">
+      <DialogContent className="flex h-full w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-[#05070b] p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-2xl">
         <DialogHeader className="shrink-0 border-b border-white/10 p-5 sm:p-8">
           <DialogTitle className="text-3xl font-black">{t('AI Resume Review', 'AI Resume Review')}</DialogTitle>
           <DialogDescription>{wizardSubtitle(props.step, props.locale)}</DialogDescription>
@@ -520,7 +514,7 @@ function ReviewWizard(props: {
                     key={item.id}
                     type="button"
                     onClick={() => props.onCategorySelect(item.id)}
-                    className={`rounded-3xl border p-7 text-center transition hover:-translate-y-0.5 hover:shadow-lg ${
+                    className={`rounded-2xl border p-7 text-center transition hover:-translate-y-0.5 hover:shadow-lg ${
                       isSelected
                         ? 'border-white/30 bg-white/10 text-white shadow-xl'
                         : 'border-white/10 bg-white/[0.02] hover:bg-white/5'
@@ -568,7 +562,7 @@ function ReviewWizard(props: {
                     key={level.id}
                     type="button"
                     onClick={() => props.onExperienceSelect(level.id)}
-                    className={`min-w-32 rounded-[2rem] border px-6 py-4 text-center transition ${
+                    className={`min-w-32 rounded-2xl border px-6 py-4 text-center transition ${
                       props.experienceLevel === level.id
                         ? 'border-white/30 bg-white/10 text-white shadow-lg'
                         : 'border-white/10 bg-transparent text-white/70 hover:border-white/30 hover:text-white'
@@ -690,9 +684,9 @@ function AnalyzingOverlay({ locale, progress }: { locale: Locale; progress: numb
         <div className="h-full bg-gradient-to-r from-slate-900 via-blue-600 to-emerald-500 transition-all duration-500 dark:from-slate-100 dark:via-blue-400 dark:to-emerald-400" style={{ width: `${progress}%` }} />
       </div>
       <div className="flex flex-col items-center gap-6 text-center">
-        <div className="relative flex h-28 w-28 items-center justify-center rounded-[2rem] bg-blue-500/10 text-blue-600 dark:text-blue-300">
+        <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-300">
           <Brain className="h-12 w-12 animate-pulse" />
-          <div className="absolute inset-0 animate-ping rounded-[2rem] border border-blue-500/30" />
+          <div className="absolute inset-0 animate-ping rounded-2xl border border-blue-500/30" />
         </div>
         <TextShimmer
           key={lines[index]}
@@ -724,9 +718,9 @@ function FixingOverlay({ locale }: { locale: Locale }) {
         <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-500 via-blue-600 to-indigo-500 transition-all duration-500 dark:from-emerald-400 dark:via-blue-400 dark:to-indigo-400" />
       </div>
       <div className="flex flex-col items-center gap-6 text-center">
-        <div className="relative flex h-28 w-28 items-center justify-center rounded-[2rem] bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+        <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
           <Sparkles className="h-12 w-12 animate-pulse" />
-          <div className="absolute inset-0 animate-ping rounded-[2rem] border border-emerald-500/30" />
+          <div className="absolute inset-0 animate-ping rounded-2xl border border-emerald-500/30" />
         </div>
         <TextShimmer
           key={lines[index]}
@@ -814,7 +808,7 @@ function ResultPanel({
   const t = (en: string, tr: string) => (isTr ? tr : en);
 
   return (
-    <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-6 shadow-sm">
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-sm">
       <div className="mb-7 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -933,7 +927,7 @@ function BillingModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-[2rem] border border-white/10 bg-[#05070b] p-0 text-white shadow-2xl">
+      <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-[#05070b] p-0 text-white shadow-2xl">
         <DialogHeader className="border-b border-white/10 p-7">
           <DialogTitle className="text-3xl font-black">{t('Unlock Full Review', 'Full Review Aç')}</DialogTitle>
           <DialogDescription className="text-white/60">
@@ -952,7 +946,7 @@ function BillingModal({
             {packages.map((pkg) => (
               <div
                 key={pkg.code}
-                className={`rounded-3xl border p-5 ${
+                className={`rounded-2xl border p-5 ${
                   pkg.highlight
                     ? 'border-white/30 bg-white/10 shadow-xl'
                     : 'border-white/10 bg-white/[0.02]'

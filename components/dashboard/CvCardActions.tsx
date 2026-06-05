@@ -139,7 +139,7 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
             <div className="flex flex-col gap-2 mt-4">
                 <Button
                     variant="outline"
-                    className="h-10 w-full rounded-xl border-slate-200 bg-white text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 text-sm font-medium"
+                    className="h-10 w-full rounded-xl border-blue-500/30 bg-[#05070b] text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 text-sm font-medium"
                     asChild
                 >
                     <Link href={`/cv/${cvId}`}>
@@ -151,7 +151,7 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-slate-200 bg-slate-50 px-2 text-[11px] font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800 sm:text-xs"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-blue-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 sm:text-xs"
                         onClick={handleDownload}
                         disabled={isDownloading}
                         title={t('Download PDF', 'PDF İndir')}
@@ -167,7 +167,7 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-slate-200 bg-slate-50 px-2 text-[11px] font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800 sm:text-xs"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-blue-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 sm:text-xs"
                         onClick={openPreview}
                         disabled={isPreviewLoading}
                         title={t('Preview', 'Önizle')}
@@ -183,7 +183,7 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-rose-200 bg-rose-50 px-2 text-[11px] font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-900/40 sm:text-xs"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-rose-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-rose-500 transition hover:bg-rose-500/10 hover:border-rose-500/50 sm:text-xs"
                         onClick={openDeleteDialog}
                         disabled={isDeleting}
                         title={t('Delete CV', 'CV Sil')}

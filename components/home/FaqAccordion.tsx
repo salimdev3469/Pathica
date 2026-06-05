@@ -27,7 +27,7 @@ export function FaqAccordion({ items }: FaqAccordionProps) {
           <div
             key={item.question}
             className={cn(
-              'rounded-3xl border border-slate-200/80 bg-white/90 shadow-[0_18px_40px_-34px_rgba(15,23,42,0.35)] transition-colors dark:border-slate-800 dark:bg-slate-900/80',
+              'rounded-2xl border border-slate-200/80 bg-white/90 shadow-[0_18px_40px_-34px_rgba(15,23,42,0.35)] transition-colors dark:border-slate-800 dark:bg-slate-900/80',
               isOpen && 'border-blue-200 bg-blue-50/50 dark:border-blue-500/30 dark:bg-blue-500/5',
             )}
           >

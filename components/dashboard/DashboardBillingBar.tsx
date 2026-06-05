@@ -15,7 +15,7 @@ export default function DashboardBillingBar({ locale, wallet, billingSchemaMissi
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
 
   return (
-    <section className="mb-5 rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-4 shadow-sm sm:p-5">
+    <section className="mb-5 rounded-2xl border border-white/10 bg-white/[0.02] p-4 shadow-sm sm:p-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <LiveTokenCounter
           locale={locale}
