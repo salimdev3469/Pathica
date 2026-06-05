@@ -289,6 +289,14 @@ export default function AiReviewDashboard({
               )}
             </p>
           </div>
+          <div className="shrink-0">
+            <Button
+              onClick={() => setWizardOpen(true)}
+              className="h-11 rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl"
+            >
+              <Plus className="mr-2 h-4 w-4" /> {t('New Review', 'Yeni İnceleme')}
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -355,7 +363,7 @@ export default function AiReviewDashboard({
             </div>
             <h2 className="text-lg font-bold text-white">{t('Review History', 'Review Geçmişi')}</h2>
           </div>
-          <Button variant="outline" onClick={openFilePicker} className="rounded-xl border-white/10 text-white hover:bg-white/10">
+          <Button onClick={openFilePicker} className="rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700">
             <Upload className="mr-2 h-4 w-4" />
             {t('New Review', 'Yeni Review')}
           </Button>
@@ -485,8 +493,8 @@ function ReviewWizard(props: {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent className="flex h-[92vh] max-h-[92vh] w-[94vw] max-w-6xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#05070b] p-0 text-white shadow-2xl">
-        <DialogHeader className="shrink-0 border-b border-white/10 p-7">
+      <DialogContent className="flex h-full w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-[#05070b] p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-[2rem] sm:border sm:border-white/10 sm:shadow-2xl">
+        <DialogHeader className="shrink-0 border-b border-white/10 p-5 sm:p-8">
           <DialogTitle className="text-3xl font-black">{t('AI Resume Review', 'AI Resume Review')}</DialogTitle>
           <DialogDescription>{wizardSubtitle(props.step, props.locale)}</DialogDescription>
         </DialogHeader>
@@ -604,13 +612,16 @@ function ReviewWizard(props: {
               <Button
                 onClick={() => props.setStep(Math.min(2, props.step + 1))}
                 disabled={!canGoNext}
-                className="h-12 rounded-xl bg-white px-7 text-slate-950 hover:bg-white/90"
+                className="h-12 rounded-xl bg-blue-600 px-7 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
               >
                 {t('Next', 'İleri')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button onClick={props.onStart} className="h-12 rounded-xl bg-white px-8 text-slate-950 hover:bg-white/90">
+              <Button
+                onClick={props.onStart}
+                className="h-12 rounded-xl bg-blue-600 px-8 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+              >
                 {t('Start Review', 'Review Başlat')}
               </Button>
             )}
@@ -884,7 +895,7 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
 
   if (review.filePath && review.fileType === 'pdf') {
     return (
-      <div className="h-[620px] overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-950">
+      <div className="h-[620px] overflow-hidden rounded-2xl border border-white/10 bg-[#05070b]">
         <iframe src={`/api/ai-review/${review.id}/file`} className="h-full w-full border-0" title={review.fileName} />
       </div>
     );

@@ -10,6 +10,7 @@ import CvShareActions from '@/components/dashboard/CvShareActions';
 import DashboardBillingBar from '@/components/dashboard/DashboardBillingBar';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import GenerateCvFromJobButton from '@/components/dashboard/GenerateCvFromJobButton';
+import NewCvOnboarding from '@/components/dashboard/NewCvOnboarding';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
@@ -125,14 +126,7 @@ export default async function DashboardPage() {
 
           <div className="flex flex-col gap-2 sm:flex-row">
             <GenerateCvFromJobButton locale={locale} />
-            <Button
-              asChild
-              className="h-11 gap-2 rounded-xl bg-white px-5 text-slate-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md"
-            >
-              <Link href="/cv/new">
-                <Plus className="h-4 w-4" /> {t('New CV', 'Yeni CV')}
-              </Link>
-            </Button>
+            <NewCvOnboarding locale={locale} />
           </div>
         </div>
       </section>
@@ -200,15 +194,12 @@ export default async function DashboardPage() {
               locale={locale}
               triggerClassName="h-12 rounded-xl border-slate-300 px-5 text-sm font-semibold"
             />
-            <Button
-              size="lg"
-              className="h-12 rounded-xl bg-slate-900 text-white hover:bg-black dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-              asChild
+            <NewCvOnboarding
+              locale={locale}
+              className="h-12 rounded-xl bg-blue-600 px-6 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20"
             >
-              <Link href="/cv/new">
-                <Plus className="mr-2 h-5 w-5" /> {t('Create Your First CV', 'İlk CV’ni Oluştur')}
-              </Link>
-            </Button>
+              <Plus className="mr-2 h-5 w-5" /> {t('Create Your First CV', 'İlk CV’ni Oluştur')}
+            </NewCvOnboarding>
           </div>
         </div>
       )}
