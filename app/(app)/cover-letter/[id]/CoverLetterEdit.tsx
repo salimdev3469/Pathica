@@ -92,19 +92,16 @@ export default function CoverLetterEdit({ coverLetter, locale }: { coverLetter: 
                 </div>
             </div>
 
-            <Card className="shadow-sm border-slate-200 dark:border-slate-800">
-                <CardHeader>
-                    <CardTitle className="text-lg">{t('Edit Cover Letter', 'Ön Yazıyı Düzenle')}</CardTitle>
-                    <CardDescription>{t('You can freely modify the generated text below.', 'Aşağıdaki oluşturulan metni özgürce düzenleyebilirsiniz.')}</CardDescription>
-                </CardHeader>
-                <CardContent>
+            <div className="mt-8 mx-auto w-full max-w-[820px] rounded bg-white shadow-2xl ring-1 ring-slate-900/5">
+                <div className="px-8 py-12 sm:px-16 sm:py-24">
                     <Textarea 
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="min-h-[500px] resize-y bg-slate-50/50 dark:bg-slate-900/50 p-6 leading-relaxed"
+                        className="min-h-[800px] w-full resize-y border-0 bg-transparent p-0 font-serif text-[15px] leading-loose text-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-400"
+                        placeholder={t('Type your cover letter here...', 'Ön yazınızı buraya yazın...')}
                     />
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     );
 }

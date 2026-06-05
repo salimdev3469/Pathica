@@ -113,19 +113,12 @@ export default async function CoverLettersDashboardPage() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] py-16">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-white/50">
-            <FileText className="h-8 w-8" />
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-white/50">
+            <FileText className="h-6 w-6" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-white">{t('No Cover Letters', 'Ön Yazı Yok')}</h3>
-          <p className="mb-6 max-w-sm text-center text-sm text-white/60">
-            {t('Create your first personalized cover letter for your dream job.', 'Hayalinizdeki iş için ilk kişiselleştirilmiş ön yazınızı oluşturun.')}
+          <p className="text-sm text-white/50">
+            {t('No cover letters generated yet.', 'Henüz oluşturulmuş ön yazı yok.')}
           </p>
-          <Button asChild className="h-11 rounded-xl bg-blue-600 px-5 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20">
-            <Link href="/cover-letter/new">
-              <Plus className="mr-2 h-4 w-4" />
-              {t('Create Cover Letter', 'Ön Yazı Oluştur')}
-            </Link>
-          </Button>
         </div>
       )}
     </DashboardShell>
