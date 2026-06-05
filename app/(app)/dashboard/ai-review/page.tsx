@@ -1,7 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import AiReviewDashboard, { type AiReviewClientReview } from '@/components/dashboard/AiReviewDashboard';
-import DashboardBillingBar from '@/components/dashboard/DashboardBillingBar';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { serializeReviewForClient, type ResumeReviewRecord } from '@/lib/ai-review/report';
 import { getWalletSnapshot } from '@/lib/billing';
@@ -124,8 +123,7 @@ export default async function AiReviewDashboardPage() {
   }));
 
   return (
-    <DashboardShell active="aiReview" userEmail={user.email} locale={locale}>
-      <DashboardBillingBar locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing || reviewSchemaMissing} />
+    <DashboardShell active="aiReview" userEmail={user.email} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing || reviewSchemaMissing}>
       <AiReviewDashboard
         locale={locale}
         initialReviews={initialReviews}

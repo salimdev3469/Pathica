@@ -289,7 +289,7 @@ export default function AiReviewDashboard({
           </div>
           <div className="shrink-0">
             <Button
-              onClick={() => setWizardOpen(true)}
+              onClick={openFilePicker}
               className="h-11 rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl"
             >
               <Plus className="mr-2 h-4 w-4" /> {t('New Review', 'Yeni İnceleme')}
@@ -305,31 +305,7 @@ export default function AiReviewDashboard({
         <MetricCard icon={Sparkles} label={t('Avg Score', 'Ortalama')} value={stats.avgScore === null ? '--' : String(stats.avgScore)} hint="/100" tone="amber" />
       </section>
 
-      {!activeReview && (
-        <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-sm">
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-300">
-              <Upload className="h-5 w-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">{t('Upload New Resume', 'Yeni CV Yükle')}</h2>
-              <p className="text-sm text-white/50">PDF, DOCX, TXT · Max 10MB</p>
-            </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={openFilePicker}
-            className="flex min-h-48 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-white/[0.01] text-center transition hover:border-blue-400/40 hover:bg-blue-400/5"
-          >
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/50 shadow-sm">
-              <Upload className="h-7 w-7" />
-            </div>
-            <span className="font-semibold text-white">{t('Drag & drop or click to browse', 'Sürükle bırak ya da seçmek için tıkla')}</span>
-            <span className="mt-1 text-sm text-white/50">PDF or DOCX - Max 10MB</span>
-          </button>
-        </section>
-      )}
 
       {activeReview ? (
         <section className="flex flex-col gap-5 xl:flex-row">
@@ -361,10 +337,6 @@ export default function AiReviewDashboard({
             </div>
             <h2 className="text-lg font-bold text-white">{t('Review History', 'Review Geçmişi')}</h2>
           </div>
-          <Button onClick={openFilePicker} className="rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700">
-            <Upload className="mr-2 h-4 w-4" />
-            {t('New Review', 'Yeni Review')}
-          </Button>
         </div>
 
         {reviews.length > 0 ? (
