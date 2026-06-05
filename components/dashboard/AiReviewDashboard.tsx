@@ -862,9 +862,42 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
 
   if (review.filePath && review.fileType === 'pdf') {
     return (
-      <div className="h-[620px] overflow-hidden rounded-2xl border border-white/10 bg-[#05070b]">
-        <iframe src={`/api/ai-review/${review.id}/file`} className="h-full w-full border-0" title={review.fileName} />
-      </div>
+      <>
+        {/* Desktop View */}
+        <div className="hidden h-[620px] overflow-hidden rounded-2xl border border-white/10 bg-[#05070b] md:block">
+          <iframe src={`/api/ai-review/${review.id}/file`} className="h-full w-full border-0" title={review.fileName} />
+        </div>
+        
+        {/* Mobile View Fallback */}
+        <div className="flex flex-col gap-4 md:hidden">
+          <div className="flex items-center justify-between rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-white">Orijinal PDF</p>
+                <p className="truncate text-xs text-white/50">{review.fileName}</p>
+              </div>
+            </div>
+            <a 
+              href={`/api/ai-review/${review.id}/file`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-700"
+            >
+              PDF'i Aç
+            </a>
+          </div>
+          <div className="h-[500px] overflow-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-950">
+            <div style={{ width: CV_PAGE_WIDTH_PX * scale, height: CV_PAGE_HEIGHT_PX * scale }}>
+              <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: CV_PAGE_WIDTH_PX }}>
+                <CVTemplate cv={cvState} previewMode />
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 

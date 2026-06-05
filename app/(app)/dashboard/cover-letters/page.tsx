@@ -62,7 +62,7 @@ export default async function CoverLettersDashboardPage() {
 
   return (
     <DashboardShell active="coverLetters" userEmail={user.email} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing}>
-      <section className="mb-7 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
+      <section className="mb-7 rounded-xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white">{t('My Cover Letters', 'Ön Yazılarım')}</h1>
@@ -89,7 +89,7 @@ export default async function CoverLettersDashboardPage() {
           {coverLetterList.map((coverLetter) => (
             <Card
               key={coverLetter.id}
-              className="group rounded-2xl border-white/10 bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group rounded-xl border-white/10 bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               <CardHeader>
                 <CardTitle className="text-xl text-white">
@@ -112,7 +112,7 @@ export default async function CoverLettersDashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] py-16">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/[0.02] py-16">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-white/50">
             <FileText className="h-6 w-6" />
           </div>

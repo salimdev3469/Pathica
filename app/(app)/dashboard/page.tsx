@@ -111,7 +111,7 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell active="resumes" userEmail={user.email} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing}>
-      <section className="mb-7 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
+      <section className="mb-7 rounded-xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white">{t('My Resumes', 'Özgeçmişlerim')}</h1>
@@ -143,7 +143,7 @@ export default async function DashboardPage() {
             return (
               <Card
                 key={cv.id}
-                className="group rounded-2xl border-white/10 bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20"
+                className="group rounded-xl border-white/10 bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20"
               >
                 <CardHeader>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -179,7 +179,7 @@ export default async function DashboardPage() {
           })}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.02] py-20">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/20 bg-white/[0.02] py-20">
           <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
             <FileText className="h-10 w-10" />
           </div>
