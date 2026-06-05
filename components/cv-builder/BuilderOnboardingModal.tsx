@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ChevronRight, FileEdit, LayoutTemplate, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { type Locale } from '@/lib/locale';
+import { useCV } from '@/context/CVContext';
 
 export function BuilderOnboardingModal({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
@@ -12,14 +13,20 @@ export function BuilderOnboardingModal({ locale }: { locale: Locale }) {
 
   const t = (en: string, tr: string) => (isTr ? tr : en);
 
+  const { dispatch } = useCV();
+
   useEffect(() => {
     const hasSeen = localStorage.getItem('pathica_builder_tour_v1');
     if (!hasSeen) {
       // Small delay to let the UI render
-      const timer = setTimeout(() => setOpen(true), 1000);
+      const timer = setTimeout(() => {
+        setOpen(true);
+        // Automatically type a demo name to show live preview
+        dispatch({ type: 'UPDATE_PERSONAL_INFO', payload: { fullName: 'Dexter Morgan' } });
+      }, 1000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [dispatch]);
 
   const handleFinish = () => {
     localStorage.setItem('pathica_builder_tour_v1', 'true');
