@@ -75,14 +75,16 @@ export async function GET(req: NextRequest) {
             const dodoPayment = await retrieveDodoPayment(paymentId);
             debugInfo = { fetchedDodoPayment: dodoPayment };
             if (dodoPayment) { // Removed status check for debugging
-              const { data: pending } = await supabase
-                .from('dodo_payments')
-                .select('*')
-                .eq('user_id', user.id)
-                .eq('status', 'pending')
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .single();
+              const checkoutSessionId = dodoPayment.checkout_session_id;
+              let pending = null;
+              if (checkoutSessionId) {
+                const { data } = await supabase
+                  .from('dodo_payments')
+                  .select('*')
+                  .eq('dodo_session_id', checkoutSessionId)
+                  .maybeSingle();
+                pending = data;
+              }
               debugInfo.pending = pending;
               if (pending) {
                 const { supabaseAdmin } = await import('@/lib/supabase');

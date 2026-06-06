@@ -274,23 +274,15 @@ export async function findDodoPaymentBySessionId(sessionId: string): Promise<Dod
 
 export async function markDodoPaymentPaid(input: {
   providerPaymentId: string;
+  providerSessionId?: string;
   providerCustomerId?: string;
   amount?: number;
   currency?: string;
 }): Promise<DodoPayment | null> {
   let payment = await findDodoPaymentByProviderPaymentId(input.providerPaymentId);
   
-  if (!payment) {
-    const { data: pendingPayments } = await supabaseAdmin
-      .from('dodo_payments')
-      .select('*')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    if (pendingPayments && pendingPayments.length === 1) {
-      payment = pendingPayments[0] as DodoPayment;
-    }
+  if (!payment && input.providerSessionId) {
+    payment = await findDodoPaymentBySessionId(input.providerSessionId);
   }
 
   if (!payment) {
