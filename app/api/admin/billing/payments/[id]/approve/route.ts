@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   getBillingPaymentById,
   getWalletSnapshot,
-  grantCreditsForPayment,
+  grantCreditsForDodoPayment,
   isBillingAdminEmail,
   markPaymentManualApproved,
   resolveUserIdForBillingEmail,
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         dodoPaymentId: payload.dodoPaymentId,
       });
 
-      const grantResult = await grantCreditsForPayment(paymentId, 'admin_manual_approval');
+      const grantResult = await grantCreditsForDodoPayment(paymentId, 'admin_manual_approval');
       if (!grantResult.success) {
         return NextResponse.json(
           {

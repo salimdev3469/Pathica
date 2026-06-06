@@ -27,33 +27,34 @@ export const RETURN_RECONCILE_WINDOW_MINUTES = numberFromEnv('BILLING_RETURN_REC
 export const BILLING_PACKAGES: BillingPackage[] = [
   {
     code: 'starter',
-    name: 'Starter',
-    credits: 100,
-    priceUsd: 79,
+    name: 'Starter Pack',
+    credits: 150,
+    priceUsd: 9.99,
     dodoProductIdEnv: 'DODO_PRODUCT_ID_STARTER',
   },
   {
     code: 'pro',
-    name: 'Pro',
-    credits: 300,
-    priceUsd: 129,
+    name: 'Job Hunter Pack',
+    credits: 500,
+    priceUsd: 24.99,
     highlight: true,
     dodoProductIdEnv: 'DODO_PRODUCT_ID_PRO',
   },
   {
     code: 'mega',
-    name: 'Mega',
-    credits: 1000,
-    priceUsd: 259,
+    name: 'Career Boost Pack',
+    credits: 1200,
+    priceUsd: 49.99,
     dodoProductIdEnv: 'DODO_PRODUCT_ID_MEGA',
   },
 ];
 
 export function formatUsd(value: number): string {
-  return new Intl.NumberFormat('tr-TR', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'TRY',
-    maximumFractionDigits: 0,
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 

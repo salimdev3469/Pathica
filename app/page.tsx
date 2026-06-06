@@ -163,13 +163,13 @@ export default async function Home() {
       return {
         id: pkg.code,
         code: pkg.code,
-        name: 'Starter',
+        name: 'Starter Pack',
         displayPrice: formatUsd(pkg.priceUsd),
-        description: 'A focused pack for one or two strong application passes.',
+        description: 'A simple and affordable way to try Pathica and create a stronger job application without committing to a subscription.',
         features: [
-          '100 AI credits for tailoring and rewrite tools',
-          'Good fit for one resume plus a few role adjustments',
-          'One-time purchase, no subscription pressure',
+          '150 AI credits loaded instantly',
+          'Ideal for 2–4 targeted job applications',
+          'One-time payment — no monthly subscription',
         ],
         isPopular: pkg.highlight,
         isConfigured,
@@ -182,17 +182,17 @@ export default async function Home() {
       return {
         id: pkg.code,
         code: pkg.code,
-        name: 'Pro',
+        name: 'Job Hunter Pack',
         displayPrice: formatUsd(pkg.priceUsd),
-        description: 'Best balance for active search, repeated tailoring, and export.',
+        description: 'The best-value pack for professionals actively applying to jobs and wanting to send tailored, high-quality applications.',
         features: [
-          '300 AI credits for multiple job-specific rewrites',
-          'Covers repeated ATS checks and stronger content passes',
-          'Most practical pack for multi-role applications',
+          '500 AI credits loaded instantly',
+          'Best value for active job seekers',
+          'Tailor your resume for many different job descriptions',
         ],
         isPopular: pkg.highlight,
         isConfigured,
-        ctaLabel: 'Choose Pro',
+        ctaLabel: 'Choose Job Hunter',
         href,
       };
     }
@@ -200,17 +200,17 @@ export default async function Home() {
     return {
       id: pkg.code,
       code: pkg.code,
-      name: 'Mega',
+      name: 'Career Boost Pack',
       displayPrice: formatUsd(pkg.priceUsd),
-      description: 'A larger pack for heavy iteration, cover letters, and broad search.',
+      description: 'A powerful credit pack for serious job seekers who want to maximize their chances by creating highly tailored applications.',
       features: [
-        '1000 AI credits for heavier resume and cover letter work',
-        'Good fit for broad search or multiple application tracks',
-        'One-time checkout, credits stay in your account',
+        '1200 AI credits loaded instantly',
+        'Lowest cost per credit',
+        'Ideal for intensive job search periods',
       ],
       isPopular: pkg.highlight,
       isConfigured,
-      ctaLabel: 'Choose Mega',
+      ctaLabel: 'Choose Career Boost',
       href,
     };
   });
