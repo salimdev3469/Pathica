@@ -19,7 +19,7 @@ export default function TemplatePreviewPage({ searchParams }: TemplatePreviewPag
     <main className="min-h-screen bg-slate-100 px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-16">
         {cvTemplateSeeds.map((template) => {
-          const previewState = buildCvStateFromTemplate(template, locale);
+          const previewState = buildCvStateFromTemplate(template, 'en');
 
           return (
             <section key={template.slug} className="space-y-4">

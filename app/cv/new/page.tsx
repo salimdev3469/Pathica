@@ -37,7 +37,7 @@ export default async function NewCVPage({ searchParams }: NewCVPageProps) {
     redirect(`/cv/guest${guestForwardSuffix}`);
   }
 
-  const title = templateSeed ? `${locale === 'tr' ? templateSeed.name.tr : templateSeed.name.en} CV` : locale === 'tr' ? 'Başlıksız CV' : 'Untitled CV';
+  const title = templateSeed ? `${templateSeed.name.en} CV` : 'Untitled CV';
 
   const { data: cv, error } = await supabase
     .from('cvs')
@@ -51,7 +51,7 @@ export default async function NewCVPage({ searchParams }: NewCVPageProps) {
   }
 
   if (templateSeed && !shouldRestoreGuest) {
-    const templateState = buildCvStateFromTemplate(templateSeed, locale);
+    const templateState = buildCvStateFromTemplate(templateSeed, 'en');
 
     const { data: personalInfoSection, error: personalInfoSectionError } = await supabase
       .from('cv_sections')

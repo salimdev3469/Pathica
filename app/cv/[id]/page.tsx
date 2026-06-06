@@ -77,7 +77,7 @@ export default async function CVBuilderPage({ params, searchParams }: { params: 
 
     // Parse summary
     let summary = '';
-    let summaryTitle = locale === 'tr' ? 'Profil Özeti' : 'Profile Summary';
+    let summaryTitle = 'Profile Summary';
     let summaryTitleFontSize: number | undefined;
     let summaryFontSize: number | undefined;
     let letterSpacing: number | undefined;

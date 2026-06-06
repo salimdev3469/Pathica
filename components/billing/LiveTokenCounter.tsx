@@ -26,7 +26,7 @@ export default function LiveTokenCounter({
 }: LiveTokenCounterProps) {
   const hasInitialValues = typeof initialCredits === 'number' && typeof initialFreeExports === 'number';
   const fetchErrorText = 'Could not fetch token counter.';
-  const formatter = new Intl.NumberFormat(isTr ? 'tr-TR' : 'en-US');
+  const formatter = new Intl.NumberFormat(false ? 'tr-TR' : 'en-US');
 
   const [credits, setCredits] = useState<number>(initialCredits ?? 0);
   const [freeExports, setFreeExports] = useState<number>(initialFreeExports ?? 0);
