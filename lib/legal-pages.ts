@@ -28,7 +28,7 @@ export type LegalPageContent = {
 const LEGAL_PAGE_LINKS_TR: Array<{ href: `/${LegalPageSlug}`; label: string }> = [
   { href: '/gizlilik-politikasi', label: 'Gizlilik Politikası' },
   { href: '/cerez-politikasi', label: 'Çerez Politikası' },
-  { href: '/kvkk-aydinlatma-metni', label: 'KVKK Aydınlatma Metni' },
+  { href: '/kvkk-aydinlatma-metni', label: 'GDPR Aydınlatma Metni' },
   { href: '/kullanim-kosullari', label: 'Kullanım Koşulları' },
   { href: '/mesafeli-satis-sozlesmesi', label: 'Mesafeli Satış Sözleşmesi' },
   { href: '/on-bilgilendirme-formu', label: 'Ön Bilgilendirme Formu' },
@@ -39,7 +39,7 @@ const LEGAL_PAGE_LINKS_TR: Array<{ href: `/${LegalPageSlug}`; label: string }> =
 const LEGAL_PAGE_LINKS_EN: Array<{ href: `/${LegalPageSlug}`; label: string }> = [
   { href: '/gizlilik-politikasi', label: 'Privacy Policy' },
   { href: '/cerez-politikasi', label: 'Cookie Policy' },
-  { href: '/kvkk-aydinlatma-metni', label: 'KVKK Disclosure Notice' },
+  { href: '/kvkk-aydinlatma-metni', label: 'GDPR Privacy Notice' },
   { href: '/kullanim-kosullari', label: 'Terms and Conditions' },
   { href: '/mesafeli-satis-sozlesmesi', label: 'Distance Sales Agreement' },
   { href: '/on-bilgilendirme-formu', label: 'Pre-Information Form' },
@@ -59,7 +59,7 @@ export const CHECKOUT_CONSENT_DOCUMENTS: Array<{ href: string; label: string; su
   { href: '/kullanim-kosullari', label: 'Kullanım Koşulları', suffix: "'nı" },
   { href: '/gizlilik-politikasi', label: 'Gizlilik Politikası', suffix: "'nı" },
   { href: '/cerez-politikasi', label: 'Çerez Politikası', suffix: "'nı" },
-  { href: '/kvkk-aydinlatma-metni', label: 'KVKK Aydınlatma Metni', suffix: "'ni" },
+  { href: '/kvkk-aydinlatma-metni', label: 'GDPR Privacy Notice', suffix: "" },
 ];
 
 const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
@@ -88,9 +88,9 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         ],
       },
       {
-        title: '3. Ödeme Süreci (Lemon Squeezy)',
+        title: '3. Ödeme Süreci',
         paragraphs: [
-          'Ödeme işlemleri Lemon Squeezy altyapısı üzerinden yürütülür. Kart numarası, son kullanma tarihi, CVV gibi ödeme kartı verileri tarafımızca saklanmaz ve işlenmez.',
+          'Ödeme işlemleri güvenli altyapı üzerinden yürütülür. Kart numarası, son kullanma tarihi, CVV gibi ödeme kartı verileri tarafımızca saklanmaz ve işlenmez.',
           'Ödeme sırasında paylaşılan işlem bilgileri, sipariş doğrulama ve finansal kayıt süreçleri kapsamında sınırlı olarak işlenebilir.',
         ],
       },
@@ -209,10 +209,10 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
   },
   'kvkk-aydinlatma-metni': {
     slug: 'kvkk-aydinlatma-metni',
-    title: 'KVKK Aydınlatma Metni',
-    description: '6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin genel aydınlatma metni.',
+    title: 'GDPR Aydınlatma Metni',
+    description: 'GDPR kapsamında kişisel verilerin işlenmesine ilişkin genel aydınlatma metni.',
     intro: [
-      'Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında veri sorumlusunun bilgilendirme yükümlülüğünü yerine getirmek amacıyla hazırlanmıştır.',
+      'Bu aydınlatma metni, GDPR (Genel Veri Koruma Yönetmeliği) kapsamında veri sorumlusunun bilgilendirme yükümlülüğünü yerine getirmek amacıyla hazırlanmıştır.',
       'Metin genel taslak niteliğindedir ve şirketinize özel güncellemeler gerektirebilir.',
     ],
     sections: [
@@ -220,7 +220,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         title: '1. Veri Sorumlusu',
         paragraphs: [
           'Veri sorumlusu: AKA YAZILIM',
-          'MERSİS No: [MERSIS_NO] | Vergi Dairesi/No: [VERGI_DAIRESI] / [VERGI_NO]',
+          
           'E-posta: akasalimserhat@gmail.com',
         ],
       },
@@ -251,7 +251,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '5. Aktarım Yapılabilecek Taraflar',
         bullets: [
-          'Ödeme altyapısı sağlayıcıları (örn. Lemon Squeezy) ve finansal operasyon tarafları.',
+          'Ödeme altyapısı sağlayıcıları ve finansal operasyon tarafları.',
           'Barındırma, yazılım, güvenlik, analitik ve e-posta hizmet sağlayıcıları.',
           'Kanunen yetkili kamu kurum ve kuruluşları ile yargı mercileri.',
         ],
@@ -263,21 +263,21 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         ],
       },
       {
-        title: '7. KVKK Kapsamındaki Haklar',
+        title: '7. GDPR Kapsamındaki Haklar',
         bullets: [
           'Kişisel verilerin işlenip işlenmediğini öğrenme.',
           'İşlenmişse bilgi talep etme.',
           'İşleme amacını ve amaca uygun kullanılıp kullanılmadığını öğrenme.',
           'Yurtiçinde/yurtdışında aktarıldığı üçüncü kişileri bilme.',
           'Eksik/yanlış işlenmiş verilerin düzeltilmesini isteme.',
-          'KVKK madde 7 kapsamında silinmesini/yok edilmesini isteme.',
+          'İlgili mevzuat kapsamında silinmesini/yok edilmesini isteme.',
           'Kanuna aykırı işleme nedeniyle zarara uğranması halinde tazminat talep etme.',
         ],
       },
       {
         title: '8. Başvuru ve İletişim Yöntemi',
         paragraphs: [
-          'KVKK başvurularınızı akasalimserhat@gmail.com adresine iletebilirsiniz.',
+          'GDPR başvurularınızı akasalimserhat@gmail.com adresine iletebilirsiniz.',
           'Başvurularda ad-soyad, iletişim bilgisi, talep konusu ve kimlik doğrulama bilgileri açık şekilde belirtilmelidir.',
         ],
       },
@@ -325,7 +325,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         title: '5. Ücretlendirme',
         paragraphs: [
           'Ücretli paketler, fiyatlandırma sayfasında ilan edilen tutarlar üzerinden sunulur.',
-          'Ödeme hizmeti Lemon Squeezy altyapısıyla yürütülür; ödeme tamamlanmadan ücretli haklar aktive edilmeyebilir.',
+          'Ödeme hizmeti güvenli altyapılarla yürütülür; ödeme tamamlanmadan ücretli haklar aktive edilmeyebilir.',
         ],
       },
       {
@@ -369,7 +369,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '1. Taraflar',
         paragraphs: [
-          'Satıcı: AKA YAZILIM, [VERGI_DAIRESI], [VERGI_NO], akasalimserhat@gmail.com',
+          'Satıcı: AKA YAZILIM, akasalimserhat@gmail.com',
           'Alıcı: [ALICI_AD_SOYAD], [ALICI_EPOSTA], [ALICI_ADRES] (ödeme ve hesap kayıtlarından alınır).',
         ],
       },
@@ -383,7 +383,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         title: '3. Fiyat ve Ödeme Bilgisi',
         paragraphs: [
           'Satış fiyatı sipariş özetinde belirtilen toplam tutardır.',
-          'Ödeme, Lemon Squeezy ödeme altyapısı üzerinden tahsil edilir. Kart verileri satıcı sisteminde tutulmaz.',
+          'Ödeme, güvenli ödeme altyapısı üzerinden tahsil edilir. Kart verileri satıcı sisteminde tutulmaz.',
         ],
       },
       {
@@ -436,7 +436,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         paragraphs: [
           'Unvan: AKA YAZILIM',
           'E-posta: akasalimserhat@gmail.com',
-          'Vergi Dairesi/No: [VERGI_DAIRESI] / [VERGI_NO]',
+          
         ],
       },
       {
@@ -454,7 +454,7 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '4. Ödeme Yöntemi',
         paragraphs: [
-          'Ödemeler Lemon Squeezy aracılığıyla güvenli ödeme adımında tamamlanır. Kart bilgileri satıcı sisteminde saklanmaz.',
+          'Ödemeler güvenli ödeme adımında tamamlanır. Kart bilgileri satıcı sisteminde saklanmaz.',
         ],
       },
       {
@@ -519,10 +519,10 @@ const LEGAL_PAGES_TR: Record<LegalPageSlug, LegalPageContent> = {
         ],
       },
       {
-        title: '6. Lemon Squeezy Ödemelerinde İade Süreci',
+        title: '6. Ödemelerde İade Süreci',
         paragraphs: [
-          'Lemon Squeezy üzerinden yapılan ödemelerde iade talebi önce destek ekibine iletilir, ardından işlem kayıtları doğrulanır.',
-          'İade onaylandığında süreç Lemon Squeezy ve ilgili banka/ödeme kuruluşu işlem sürelerine bağlı olarak tamamlanır.',
+          'Güvenli ödeme altyapıları üzerinden yapılan ödemelerde iade talebi önce destek ekibine iletilir, ardından işlem kayıtları doğrulanır.',
+          'İade onaylandığında süreç ilgili banka/ödeme kuruluşu işlem sürelerine bağlı olarak tamamlanır.',
         ],
       },
     ],
@@ -583,9 +583,9 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         ],
       },
       {
-        title: '3. Payment Processing (Lemon Squeezy)',
+        title: '3. Payment Processing',
         paragraphs: [
-          'Payments are processed via Lemon Squeezy. Card details such as card number, expiry date, and CVV are not stored by us.',
+          'Payments are processed via secure infrastructure. Card details such as card number, expiry date, and CVV are not stored by us.',
           'Limited payment-related transaction data may be processed for order verification and accounting obligations.',
         ],
       },
@@ -698,10 +698,10 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
   },
   'kvkk-aydinlatma-metni': {
     slug: 'kvkk-aydinlatma-metni',
-    title: 'KVKK Disclosure Notice',
-    description: 'General disclosure notice on personal data processing under Law No. 6698 (KVKK).',
+    title: 'GDPR Privacy Notice',
+    description: 'General disclosure notice on personal data processing under GDPR.',
     intro: [
-      'This notice has been prepared to fulfill the data controller disclosure obligation under the Turkish Personal Data Protection Law (KVKK).',
+      'This notice has been prepared to fulfill the data controller disclosure obligation under the General Data Protection Regulation (GDPR).',
       'This is a general template and may require organization-specific updates.',
     ],
     sections: [
@@ -709,7 +709,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         title: '1. Data Controller',
         paragraphs: [
           'Data controller: AKA YAZILIM',
-          'MERSIS No: [MERSIS_NO] | Tax Office/No: [VERGI_DAIRESI] / [VERGI_NO]',
+          
           'Email: akasalimserhat@gmail.com',
         ],
       },
@@ -740,7 +740,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '5. Potential Data Recipients',
         bullets: [
-          'Payment infrastructure providers (e.g., Lemon Squeezy) and financial operations parties.',
+          'Payment infrastructure providers and financial operations parties.',
           'Hosting, software, security, analytics, and email service providers.',
           'Legally authorized public authorities and judicial bodies.',
         ],
@@ -752,21 +752,21 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         ],
       },
       {
-        title: '7. Rights Under KVKK',
+        title: '7. Rights Under GDPR',
         bullets: [
           'Learn whether personal data is being processed.',
           'Request information if personal data has been processed.',
           'Learn the purpose of processing and whether data is used accordingly.',
           'Know third parties to whom data is transferred domestically/abroad.',
           'Request correction of incomplete or inaccurate data.',
-          'Request deletion/destruction under Article 7 of KVKK.',
+          'Request deletion/destruction under applicable law.',
           'Claim compensation for damages caused by unlawful processing.',
         ],
       },
       {
         title: '8. Application and Contact Method',
         paragraphs: [
-          'You can submit KVKK requests to akasalimserhat@gmail.com.',
+          'You can submit GDPR requests to akasalimserhat@gmail.com.',
           'Applications should clearly include full name, contact details, request subject, and identity verification details.',
         ],
       },
@@ -814,7 +814,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         title: '5. Pricing',
         paragraphs: [
           'Paid packages are offered at the prices listed on the pricing page.',
-          'Payments are processed via Lemon Squeezy infrastructure, and paid rights may remain inactive until payment is completed.',
+          'Payments are processed via secure infrastructure, and paid rights may remain inactive until payment is completed.',
         ],
       },
       {
@@ -858,7 +858,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
       {
         title: '1. Parties',
         paragraphs: [
-          'Seller: AKA YAZILIM, [VERGI_DAIRESI], [VERGI_NO], akasalimserhat@gmail.com',
+          'Seller: AKA YAZILIM, akasalimserhat@gmail.com',
           'Buyer: [ALICI_AD_SOYAD], [ALICI_EPOSTA], [ALICI_ADRES] (based on order and account records).',
         ],
       },
@@ -872,7 +872,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         title: '3. Pricing and Payment',
         paragraphs: [
           'The sale price is the total amount displayed in the order summary.',
-          'Payments are collected via Lemon Squeezy. Card data is not stored in the seller system.',
+          'Payments are collected via secure infrastructure. Card data is not stored in the seller system.',
         ],
       },
       {
@@ -923,7 +923,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         paragraphs: [
           'Company: AKA YAZILIM',
           'Email: akasalimserhat@gmail.com',
-          'Tax Office/No: [VERGI_DAIRESI] / [VERGI_NO]',
+          
         ],
       },
       {
@@ -938,7 +938,7 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
       },
       {
         title: '4. Payment Method',
-        paragraphs: ['Payments are completed via Lemon Squeezy secure checkout. Card information is not stored in the seller system.'],
+        paragraphs: ['Payments are completed via secure checkout. Card information is not stored in the seller system.'],
       },
       {
         title: '5. Use of Digital Service',
@@ -994,10 +994,10 @@ const LEGAL_PAGES_EN: Record<LegalPageSlug, LegalPageContent> = {
         paragraphs: ['You can submit your refund request to akasalimserhat@gmail.com with order details and your explanation.'],
       },
       {
-        title: '6. Refund Process for Lemon Squeezy Payments',
+        title: '6. Refund Process for Payments',
         paragraphs: [
-          'For Lemon Squeezy payments, requests are first received by support and then verified against transaction logs.',
-          'Once approved, refund completion depends on Lemon Squeezy and the related bank/payment institution processing times.',
+          'For payments, requests are first received by support and then verified against transaction logs.',
+          'Once approved, refund completion depends on the related bank/payment institution processing times.',
         ],
       },
     ],

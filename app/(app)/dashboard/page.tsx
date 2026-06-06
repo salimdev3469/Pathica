@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import { tr as trLocale } from 'date-fns/locale';
-import { Calendar, FileText, Plus } from 'lucide-react';
+import { Calendar, FileText, Plus, Sparkles } from 'lucide-react';
 import AtsReason from '@/components/dashboard/AtsReason';
 import CvCardActions from '@/components/dashboard/CvCardActions';
 import CvShareActions from '@/components/dashboard/CvShareActions';
@@ -130,6 +130,32 @@ export default async function DashboardPage() {
                 <Plus className="h-4 w-4" /> {t('New CV', 'Yeni CV')}
               </Link>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-7 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-purple-600/20 border border-blue-500/30 p-[1px]">
+        <div className="flex flex-col sm:flex-row items-center justify-between bg-[#0a101a]/90 backdrop-blur-xl rounded-xl p-5 sm:p-6">
+          <div className="flex items-start sm:items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">
+                {t('Unlimited Free CV Storage & Sharing', 'Sınırsız Ücretsiz CV Depolama ve Paylaşım')}
+              </h2>
+              <p className="mt-1 text-sm text-white/70">
+                {t(
+                  'Create and store as many CVs as you want for free. Share them anytime with a single Pathica link, just like Google Drive.',
+                  'Dilediğin kadar CV üret ve ücretsiz depola. Google Drive gibi tek bir Pathica linki ile her zaman ücretsiz paylaş.',
+                )}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 sm:mt-0 shrink-0">
+            <div className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-blue-300">
+              {t('Always Free', 'Her Zaman Ücretsiz')}
+            </div>
           </div>
         </div>
       </section>

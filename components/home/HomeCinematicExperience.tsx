@@ -432,17 +432,33 @@ export function HomeCinematicExperience({
 
   return (
     <div className="min-h-screen bg-[#05070b] text-white">
-      <header className="fixed inset-x-0 top-0 z-50 bg-[#05070b]/78 backdrop-blur-xl">
-        <div className="mx-auto flex h-32 max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
-          <button type="button" onClick={scrollToHero} className="group flex items-center" aria-label="Pathica home">
-            <Image
-              src={logoSrc}
-              alt="Pathica"
-              width={288}
-              height={288}
-              className="h-28 w-auto object-contain brightness-0 invert transition-transform duration-300 group-hover:scale-[1.02]"
-            />
-          </button>
+      <header className="fixed inset-x-0 top-0 z-50">
+        <div className="bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-2.5 text-center text-sm font-medium text-white border-b border-blue-400/20 shadow-[0_4px_20px_-5px_rgba(79,70,229,0.3)]">
+          {locale === 'tr' ? (
+            <p className="flex items-center justify-center gap-1.5 flex-wrap">
+              <Sparkles className="h-4 w-4 text-blue-200 inline" />
+              <span className="font-bold text-blue-50">Sınırsız & Ücretsiz:</span> 
+              <span>Dilediğin kadar CV üret, depola ve Pathica linki ile sınırsız paylaş! +10 Kredi ve 1 PDF Export ilk kayıtta hediye.</span>
+            </p>
+          ) : (
+            <p className="flex items-center justify-center gap-1.5 flex-wrap">
+              <Sparkles className="h-4 w-4 text-blue-200 inline" />
+              <span className="font-bold text-blue-50">Unlimited & Free:</span> 
+              <span>Create, store, and share CVs via Pathica link as much as you want! +10 Credits and 1 PDF Export free on signup.</span>
+            </p>
+          )}
+        </div>
+        <div className="bg-[#05070b]/78 backdrop-blur-xl border-b border-white/5">
+          <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
+            <button type="button" onClick={scrollToHero} className="group flex items-center" aria-label="Pathica home">
+              <Image
+                src={logoSrc}
+                alt="Pathica"
+                width={288}
+                height={288}
+                className="h-20 sm:h-24 w-auto object-contain brightness-0 invert transition-transform duration-300 group-hover:scale-[1.02]"
+              />
+            </button>
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-white/50 md:flex">
             {slideMeta
@@ -514,6 +530,7 @@ export function HomeCinematicExperience({
               <Link href={navCtaHref}>{navCtaLabel}</Link>
             </Button>
           </div>
+        </div>
         </div>
       </header>
 
@@ -1130,14 +1147,11 @@ function WorkflowSlide({ workflow, density }: { workflow: HomeCinematicExperienc
             <div
               key={step.number}
               className={cn(
-                'flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_24px_90px_-46px_rgba(0,0,0,0.85)]',
+                'flex flex-col rounded-xl border border-white/10 bg-white/[0.03] shadow-[0_24px_90px_-46px_rgba(0,0,0,0.85)]',
                 density === 'tight' ? 'min-h-[16.5rem] p-3.5' : density === 'compact' ? 'min-h-[17.8rem] p-4' : 'min-h-[19rem] p-[1.125rem]',
               )}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#9bd5ff]">
-                  <WorkflowIcon icon={step.icon} className="h-5 w-5" />
-                </div>
+              <div className="flex items-start justify-end gap-4">
                 <span className="font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.28em] text-white/35">{step.number}</span>
               </div>
               <h3

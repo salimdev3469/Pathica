@@ -81,29 +81,29 @@ export default function CheckoutButton({ packageCode, disabled = false, classNam
           />
           <label htmlFor={consentId} className={`text-xs leading-5 ${theme === 'dark' ? 'text-white/60' : 'text-slate-700'}`}>
             <Link href="/on-bilgilendirme-formu" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
-              Ön Bilgilendirme Formu
+              Pre-Information Form
             </Link>
-            {"'nu, "}
+            {", "}
             <Link href="/mesafeli-satis-sozlesmesi" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
-              Mesafeli Satış Sözleşmesi
+              Distance Sales Agreement
             </Link>
-            {"'ni, "}
+            {", "}
             <Link href="/kullanim-kosullari" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
-              Kullanım Koşulları
+              Terms and Conditions
             </Link>
-            {"'nı, "}
+            {", "}
             <Link href="/gizlilik-politikasi" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
-              Gizlilik Politikası
+              Privacy Policy
             </Link>
-            {"'nı, "}
+            {", "}
             <Link href="/cerez-politikasi" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
-              Çerez Politikası
+              Cookie Policy
             </Link>
-            {"'nı ve "}
+            {", and "}
             <Link href="/kvkk-aydinlatma-metni" className={`font-medium underline underline-offset-2 ${theme === 'dark' ? 'text-white/90 hover:text-white' : 'text-slate-900'}`}>
-              KVKK Aydınlatma Metni
+              GDPR Privacy Notice
             </Link>
-            {"'ni okudum, anladım ve kabul ediyorum."}
+            {". I have read, understood, and accept them."}
           </label>
         </div>
       </div>
