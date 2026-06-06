@@ -98,7 +98,7 @@ export default async function CoverLettersDashboardPage() {
                   {coverLetter.company_name ? <span>{coverLetter.company_name}</span> : null}
                   <div className="flex items-center gap-1 text-xs">
                     <Calendar className="h-3 w-3" />
-                    {formatDistanceToNow(new Date(coverLetter.updated_at), locale === 'tr' ? { locale: trLocale } : undefined)} {'ago'}
+                    {formatDistanceToNow(new Date(coverLetter.updated_at))} {'ago'}
                   </div>
                 </CardDescription>
               </CardHeader>

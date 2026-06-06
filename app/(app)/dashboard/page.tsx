@@ -157,7 +157,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {cvList.map((cv) => {
             const ats = atsByCvId.get(cv.id) || { score: null, reason: null };
-            const localizedReason = ats.reason ? localizeAtsReason(ats.reason, locale) : null;
+            const localizedReason = ats.reason ? localizeAtsReason(ats.reason, 'en') : null;
 
             return (
               <Card
@@ -174,7 +174,7 @@ export default async function DashboardPage() {
                   <CardDescription className="flex items-center gap-1 text-white/50">
                     <Calendar className="h-3 w-3" />
                     {'Updated'}{' '}
-                    {formatDistanceToNow(new Date(cv.updated_at), locale === 'tr' ? { locale: trLocale } : undefined)}{' '}
+                    {formatDistanceToNow(new Date(cv.updated_at))}{' '}
                     {'ago'}
                   </CardDescription>
                   <div className="pt-1">
