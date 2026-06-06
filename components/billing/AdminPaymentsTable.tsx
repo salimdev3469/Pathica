@@ -9,10 +9,11 @@ type AdminPayment = {
   id: string;
   buyer_email: string;
   package_code: string;
-  package_price_usd: number;
+  package_price: number;
   credit_amount: number;
   status: string;
-  shopier_order_id: string | null;
+  dodo_payment_id: string | null;
+  dodo_session_id: string | null;
   created_at: string;
   paid_at: string | null;
   failure_reason: string | null;
@@ -110,7 +111,7 @@ export default function AdminPaymentsTable({ initialPayments }: AdminPaymentsTab
               <th className="px-3 py-2">Email</th>
               <th className="px-3 py-2">Package</th>
               <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2">Order</th>
+              <th className="px-3 py-2">Payment ID</th>
               <th className="px-3 py-2">Created</th>
               <th className="px-3 py-2">Actions</th>
             </tr>
@@ -125,10 +126,10 @@ export default function AdminPaymentsTable({ initialPayments }: AdminPaymentsTab
                 <tr key={payment.id}>
                   <td className="px-3 py-2 text-slate-700">{payment.buyer_email}</td>
                   <td className="px-3 py-2 text-slate-700">
-                    {payment.package_code} ({formatUsd(Number(payment.package_price_usd))}) / {payment.credit_amount}
+                    {payment.package_code} ({formatUsd(Number(payment.package_price))}) / {payment.credit_amount}
                   </td>
                   <td className="px-3 py-2 text-slate-700">{payment.status}</td>
-                  <td className="px-3 py-2 text-slate-700">{payment.shopier_order_id || '-'}</td>
+                  <td className="px-3 py-2 text-slate-700">{payment.dodo_payment_id || payment.dodo_session_id || '-'}</td>
                   <td className="px-3 py-2 text-slate-700">{new Date(payment.created_at).toLocaleString()}</td>
                   <td className="px-3 py-2">
                     <div className="flex gap-2">

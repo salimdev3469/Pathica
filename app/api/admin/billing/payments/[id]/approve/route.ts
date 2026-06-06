@@ -13,8 +13,7 @@ export const dynamic = 'force-dynamic';
 
 type ApprovePayload = {
   userId?: string;
-  shopierOrderId?: string;
-  shopierProductId?: string;
+  dodoPaymentId?: string;
 };
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -54,8 +53,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         paymentId,
         adminEmail: user.email || '',
         userId: resolvedUserId,
-        shopierOrderId: payload.shopierOrderId,
-        shopierProductId: payload.shopierProductId,
+        dodoPaymentId: payload.dodoPaymentId,
       });
 
       const grantResult = await grantCreditsForPayment(paymentId, 'admin_manual_approval');

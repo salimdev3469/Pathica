@@ -27,7 +27,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'info' | 'success' | 'error'; text: string } | null>(null);
-  const [locale, setLocale] = useState<Locale>('en');
+
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,13 +35,11 @@ export default function RegisterPage() {
   const supabase = createBrowserClient();
   const isBusy = isLoading || isGoogleLoading;
 
-  useEffect(() => {
-    setLocale(getClientLocale());
-  }, []);
+
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    const language = locale === 'tr' ? 'tr' : 'en';
+    const language = 'en';
     const policyError = getPasswordPolicyError(password, language);
     if (policyError) {
       setStatusMessage({ type: 'error', text: policyError });

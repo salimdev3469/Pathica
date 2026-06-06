@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import AdminPaymentsTable from '@/components/billing/AdminPaymentsTable';
-import AdminShopierWebhookCard from '@/components/billing/AdminShopierWebhookCard';
+
 
 export default function AdminDashboardTabs({
   users,
@@ -116,9 +116,8 @@ export default function AdminDashboardTabs({
       {activeTab === 'billing' && (
         <div className="space-y-6">
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            Manual fallback mode: approve or reject unmatched Shopier payments when webhook matching cannot auto-map a user.
+            Manual fallback mode: approve or reject unmatched Dodo payments when webhook matching cannot auto-map a user.
           </div>
-          <AdminShopierWebhookCard />
           <AdminPaymentsTable initialPayments={payments} />
         </div>
       )}

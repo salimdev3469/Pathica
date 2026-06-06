@@ -35,7 +35,7 @@ export default async function BillingReturnPage({ searchParams }: BillingReturnP
         </div>
 
         <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
-          {getBillingSummaryText(locale)}
+          {getBillingSummaryText('en')}
         </div>
 
         <BillingReturnStatus paymentId={searchParams.payment_id} orderId={searchParams.order_id} />

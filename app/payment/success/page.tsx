@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 type PaymentSuccessPageProps = {
   searchParams: {
     payment_id?: string;
+    session_id?: string;
   };
 };
 
@@ -16,11 +17,11 @@ export default function PaymentSuccessPage({ searchParams }: PaymentSuccessPageP
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-600">Payment successful</p>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Your credits will be activated shortly.</h1>
           <p className="mt-3 text-sm leading-6 text-slate-600">
-            Payments are processed securely through Lemon Squeezy. If activation is delayed, this page will update automatically.
+            Payments are processed securely through Dodo Payments. If activation is delayed, this page will update automatically.
           </p>
 
           <div className="mt-6">
-            <BillingReturnStatus paymentId={searchParams.payment_id} />
+            <BillingReturnStatus paymentId={searchParams.payment_id} sessionId={searchParams.session_id} />
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">

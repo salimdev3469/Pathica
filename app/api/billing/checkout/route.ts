@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createPendingShopierPayment, getWalletSnapshot } from '@/lib/billing';
-import { getBillingPackageByCode, getShopierCheckoutUrl } from '@/lib/billing-config';
+import { createDodoCheckoutSession } from '@/lib/dodo';
+import { createPendingDodoPayment, getWalletSnapshot } from '@/lib/billing';
+import { getBillingPackageByCode, getDodoProductId } from '@/lib/billing-config';
 import { createClient } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
@@ -15,9 +16,7 @@ type CheckoutRequest = {
 export async function POST(req: Request) {
   try {
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -43,10 +42,32 @@ export async function POST(req: Request) {
       );
     }
 
-    const checkoutUrl = getShopierCheckoutUrl(pkg);
-    if (!checkoutUrl) {
-      return NextResponse.json({ error: 'Payment link is not configured for this package.' }, { status: 503 });
+    const dodoProductId = getDodoProductId(pkg);
+    if (!dodoProductId) {
+      return NextResponse.json({ error: 'Payment is not configured for this package.' }, { status: 503 });
     }
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+    // Get user display name from metadata if available
+    const userName = String(
+      user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || ''
+    ).trim();
+
+    const { sessionId, checkoutUrl } = await createDodoCheckoutSession({
+      productId: dodoProductId,
+      quantity: 1,
+      customerEmail: user.email,
+      customerName: userName || undefined,
+      returnUrl: `${appUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      metadata: {
+        userId: user.id,
+        email: user.email,
+        internalPlanId: pkg.code,
+        billingType: 'one_time',
+        credits: String(pkg.credits),
+      },
+    });
 
     const legalAcceptedAtInput = String(body?.legalAcceptedAt || '').trim();
     const parsedAcceptedAt = legalAcceptedAtInput ? Date.parse(legalAcceptedAtInput) : NaN;
@@ -55,34 +76,20 @@ export async function POST(req: Request) {
       : new Date(parsedAcceptedAt).toISOString();
 
     const legalAcceptedDocuments = Array.isArray(body?.legalAcceptedDocuments)
-      ? body.legalAcceptedDocuments
-        .map((item) => String(item || '').trim())
-        .filter(Boolean)
+      ? body.legalAcceptedDocuments.map((item) => String(item || '').trim()).filter(Boolean)
       : [];
 
-    const legalAcceptance = {
-      accepted: true as const,
-      acceptedAt: legalAcceptedAt,
-      documents: legalAcceptedDocuments,
-      packageCode: pkg.code,
-      packagePriceUsd: pkg.priceUsd,
-      source: 'billing_checkout',
-    };
-
-    console.info('Checkout legal consent captured', {
-      userId: user.id,
-      packageCode: pkg.code,
-      packagePriceUsd: pkg.priceUsd,
-      legalAcceptedAt,
-      acceptedDocuments: legalAcceptedDocuments,
-    });
-
-    const payment = await createPendingShopierPayment({
+    const payment = await createPendingDodoPayment({
       userId: user.id,
       buyerEmail: user.email,
       pkg,
+      sessionId,
       checkoutUrl,
-      legalAcceptance,
+      metadata: {
+        legalAccepted: true,
+        legalAcceptedAt,
+        legalAcceptedDocuments,
+      },
     });
 
     const wallet = await getWalletSnapshot(user.id);
@@ -92,24 +99,15 @@ export async function POST(req: Request) {
         id: payment.id,
         packageCode: payment.package_code,
         credits: payment.credit_amount,
-        priceUsd: Number(payment.package_price_usd),
         status: payment.status,
         createdAt: payment.created_at,
       },
       checkoutUrl,
-      statusUrl: `/billing/return?payment_id=${encodeURIComponent(payment.id)}`,
+      sessionId,
       wallet,
     });
   } catch (error) {
-    const asRecord = error as { code?: string; message?: string } | null;
-    if (asRecord?.code === 'PGRST205') {
-      return NextResponse.json(
-        { error: 'Billing schema is not initialized. Apply supabase/schema.sql first.' },
-        { status: 503 },
-      );
-    }
-
-    console.error('Failed to initialize Shopier checkout:', error);
+    console.error('Failed to initialize Dodo checkout:', error);
     return NextResponse.json({ error: 'Failed to start checkout' }, { status: 500 });
   }
 }

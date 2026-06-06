@@ -12,7 +12,7 @@ import {
   FREE_SIGNUP_EXPORTS,
   PDF_EXPORT_CREDIT_COST,
   formatUsd,
-  getShopierCheckoutUrl,
+  getDodoProductId,
 } from '@/lib/billing-config';
 import { getBillingSummaryText, getUserBillingPayments, getWalletSnapshot } from '@/lib/billing';
 import { createClient } from '@/lib/supabase-server';
@@ -23,7 +23,7 @@ function isBillingSchemaCacheError(error: unknown): boolean {
 
   const code = String(asRecord.code || '');
   const message = String(asRecord.message || '');
-  return code === 'PGRST205' || message.includes('shopier_payments') || message.includes('credit_wallets');
+  return code === 'PGRST205' || message.includes('dodo_payments') || message.includes('credit_wallets');
 }
 
 export default async function BillingPage() {
@@ -119,12 +119,9 @@ export default async function BillingPage() {
 
         <section className="mt-8">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">{'Credit Packages'}</h2>
-          <p className="mb-3 text-xs text-slate-600">
-            {`For automatic crediting, use this same email on Shopier checkout: ${user.email || '-'}`}
-          </p>
           <div className="grid gap-4 md:grid-cols-3">
             {BILLING_PACKAGES.map((pkg) => {
-              const configured = Boolean(getShopierCheckoutUrl(pkg));
+              const configured = Boolean(getDodoProductId(pkg));
               return (
                 <Card
                   key={pkg.code}
@@ -149,7 +146,7 @@ export default async function BillingPage() {
                       packageCode={pkg.code}
                       disabled={!configured}
                       className="w-full"
-                      label={configured ? 'Buy with Shopier' : 'Not Configured'}
+                      label={configured ? 'Buy Credits' : 'Coming Soon'}
                     />
                     <p className="text-xs text-slate-500">{getBillingSummaryText('en')}</p>
                   </CardContent>
@@ -169,7 +166,7 @@ export default async function BillingPage() {
                   <th className="px-3 py-2">{'Package'}</th>
                   <th className="px-3 py-2">{'Credits'}</th>
                   <th className="px-3 py-2">{'Status'}</th>
-                  <th className="px-3 py-2">{'Order'}</th>
+                  <th className="px-3 py-2">{'Payment ID'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -186,7 +183,7 @@ export default async function BillingPage() {
                       <td className="px-3 py-2">{payment.package_code}</td>
                       <td className="px-3 py-2">{payment.credit_amount}</td>
                       <td className="px-3 py-2">{payment.status}</td>
-                      <td className="px-3 py-2">{payment.shopier_order_id || '-'}</td>
+                      <td className="px-3 py-2">{payment.dodo_payment_id || payment.dodo_session_id || '-'}</td>
                     </tr>
                   ))
                 )}

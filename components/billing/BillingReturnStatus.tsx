@@ -4,11 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 type BillingReturnStatusProps = {
   paymentId?: string;
-  orderId?: string;
+  sessionId?: string;
 };
 
 type ReturnPayload = {
@@ -20,9 +19,6 @@ type ReturnPayload = {
     status: string;
     packageCode: string;
     credits: number;
-    priceUsd: number;
-    buyerEmail: string;
-    shopierOrderId: string | null;
     createdAt: string;
     paidAt: string | null;
     creditedAt: string | null;
@@ -33,20 +29,18 @@ type ReturnPayload = {
   } | null;
 };
 
-export default function BillingReturnStatus({ paymentId, orderId }: BillingReturnStatusProps) {
+export default function BillingReturnStatus({ paymentId, sessionId }: BillingReturnStatusProps) {
   const router = useRouter();
   const [data, setData] = useState<ReturnPayload | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [manualOrderId, setManualOrderId] = useState(orderId || '');
   const [didAutoRedirect, setDidAutoRedirect] = useState(false);
 
   const query = useMemo(() => {
     const params = new URLSearchParams();
     if (paymentId) params.set('payment_id', paymentId);
-    const resolvedOrderId = manualOrderId.trim() || orderId || '';
-    if (resolvedOrderId) params.set('order_id', resolvedOrderId);
+    if (sessionId) params.set('session_id', sessionId);
     return params.toString();
-  }, [manualOrderId, orderId, paymentId]);
+  }, [paymentId, sessionId]);
 
   const fetchStatus = useCallback(async () => {
     if (!query) return;
@@ -71,9 +65,7 @@ export default function BillingReturnStatus({ paymentId, orderId }: BillingRetur
     (!data?.payment || ['pending', 'paid'].includes(String(data.payment.status || '').toLowerCase()) || data?.status === 'processing');
 
   useEffect(() => {
-    if (!shouldPoll) {
-      return;
-    }
+    if (!shouldPoll) return;
 
     const interval = setInterval(() => {
       void fetchStatus();
@@ -84,9 +76,7 @@ export default function BillingReturnStatus({ paymentId, orderId }: BillingRetur
 
   useEffect(() => {
     const paymentStatus = String(data?.payment?.status || '').toLowerCase();
-    if (paymentStatus !== 'credited' || didAutoRedirect) {
-      return;
-    }
+    if (paymentStatus !== 'credited' || didAutoRedirect) return;
 
     setDidAutoRedirect(true);
     const timer = setTimeout(() => {
@@ -97,10 +87,8 @@ export default function BillingReturnStatus({ paymentId, orderId }: BillingRetur
   }, [data?.payment?.status, didAutoRedirect, router]);
 
   if (!query) {
-    return <p className="text-sm text-slate-600">Missing `payment_id` or `order_id` query parameter.</p>;
+    return <p className="text-sm text-slate-600">Payment status information is not available.</p>;
   }
-
-  const shouldShowOrderIdInput = Boolean(paymentId) && (data?.payment?.status === 'pending' || data?.status === 'processing' || !data?.payment);
 
   return (
     <div className="space-y-4">
@@ -122,24 +110,6 @@ export default function BillingReturnStatus({ paymentId, orderId }: BillingRetur
 
       {data?.message ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">{data.message}</div>
-      ) : null}
-
-      {shouldShowOrderIdInput ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="mb-2 text-sm text-slate-700">
-            If webhook is delayed, enter your Shopier <strong>order_id</strong> and verify this payment.
-          </p>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Input
-              value={manualOrderId}
-              onChange={(event) => setManualOrderId(event.target.value)}
-              placeholder="Shopier order_id (example: 468838843)"
-            />
-            <Button onClick={fetchStatus} disabled={isLoading || !manualOrderId.trim()}>
-              Verify Order
-            </Button>
-          </div>
-        </div>
       ) : null}
 
       {data?.payment ? (

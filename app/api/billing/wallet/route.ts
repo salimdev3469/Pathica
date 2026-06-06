@@ -7,7 +7,7 @@ import {
   FREE_SIGNUP_AI_CREDITS,
   FREE_SIGNUP_EXPORTS,
   PDF_EXPORT_CREDIT_COST,
-  getShopierCheckoutUrl,
+  getDodoProductId,
 } from '@/lib/billing-config';
 import { getBillingSummaryText, getUserBillingPayments, getUserLedger, getWalletSnapshot } from '@/lib/billing';
 import { createClient } from '@/lib/supabase-server';
@@ -41,7 +41,7 @@ export async function GET() {
         credits: pkg.credits,
         priceUsd: pkg.priceUsd,
         highlight: Boolean(pkg.highlight),
-        checkoutConfigured: Boolean(getShopierCheckoutUrl(pkg)),
+        checkoutConfigured: Boolean(getDodoProductId(pkg)),
       })),
       rules: {
         freeSignupAiCredits: FREE_SIGNUP_AI_CREDITS,

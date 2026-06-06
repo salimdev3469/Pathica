@@ -9,7 +9,7 @@ import {
   FREE_SIGNUP_EXPORTS,
   PDF_EXPORT_CREDIT_COST,
   formatUsd,
-  getShopierCheckoutUrl,
+  getDodoProductId,
 } from '@/lib/billing-config';
 import { getBillingSummaryText } from '@/lib/billing';
 import { HomeCinematicExperience } from '@/components/home/HomeCinematicExperience';
@@ -157,7 +157,7 @@ export default async function Home() {
 
   const pricingPackages = BILLING_PACKAGES.map((pkg) => {
     const href = isAuthenticated ? '/billing' : '/register';
-    const isConfigured = Boolean(getShopierCheckoutUrl(pkg));
+    const isConfigured = Boolean(getDodoProductId(pkg));
 
     if (pkg.code === 'starter') {
       return {

@@ -1,24 +1,17 @@
-﻿'use client';;
+'use client';;
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 
-const LINES_BY_LOCALE: Record<Locale, readonly [string, string, string]> = {
-  en: ['Setting up your dashboard...', 'Making everything ready for you...', 'Welcome'],
-  tr: ['Panelinizi hazırlıyoruz...', 'Her şeyi sizin için ayarlıyoruz...', 'Hoş geldiniz'],
-};
+const LINES = ['Setting up your dashboard...', 'Making everything ready for you...', 'Welcome'];
 
 export default function WelcomeTransitionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [locale, setLocale] = useState<Locale>('en');
   const next = searchParams.get('next') || '/dashboard';
-  const lines = LINES_BY_LOCALE[locale];
+  const lines = LINES;
 
-  useEffect(() => {
-    setLocale(getClientLocale());
-  }, []);
 
   useEffect(() => {
     let isMounted = true;

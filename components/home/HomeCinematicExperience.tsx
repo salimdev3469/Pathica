@@ -1408,7 +1408,7 @@ function PricingSlide({
                       ? 'bg-[#9bd5ff] text-slate-950 shadow-[0_20px_60px_-32px_rgba(155,213,255,0.85)] hover:bg-[#b5e2ff]'
                       : 'border border-white/12 bg-transparent text-white hover:bg-white/[0.05]',
                   )}
-                  label={pkg.isConfigured ? (false ? 'Shopier ile Satın Al' : 'Buy with Shopier') : (false ? 'Yapılandırılmadı' : 'Not Configured')}
+                  label={pkg.isConfigured ? (false ? 'Kredi Satın Al' : 'Buy Credits') : (false ? 'Yakında' : 'Coming Soon')}
                   theme="dark"
                 />
               ) : (

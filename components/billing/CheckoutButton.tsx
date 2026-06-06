@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { DodoPayments } from 'dodopayments-checkout';
 import { Button } from '@/components/ui/button';
 import { CHECKOUT_CONSENT_DOCUMENTS } from '@/lib/legal-pages';
 
@@ -17,7 +18,7 @@ type CheckoutButtonProps = {
 
 type CheckoutResponse = {
   checkoutUrl?: string;
-  statusUrl?: string;
+  sessionId?: string;
   error?: string;
 };
 
@@ -26,7 +27,34 @@ const LEGAL_WARNING_MESSAGE = 'Ödemeye devam etmek için gerekli sözleşme ve 
 export default function CheckoutButton({ packageCode, disabled = false, className, label = 'Buy Credits', theme = 'light' }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConsentChecked, setIsConsentChecked] = useState(false);
+  const [sdkReady, setSdkReady] = useState(false);
   const consentId = `checkout-consent-${packageCode}`;
+
+  useEffect(() => {
+    try {
+      DodoPayments.Initialize({
+        mode: process.env.NEXT_PUBLIC_DODO_ENV === 'live' ? 'live' : 'test',
+        displayType: 'overlay',
+        onEvent: (event) => {
+          switch (event.event_type) {
+            case 'checkout.opened':
+              setIsLoading(false);
+              break;
+            case 'checkout.closed':
+              setIsLoading(false);
+              break;
+            case 'checkout.error':
+              setIsLoading(false);
+              toast.error('Payment error. Please try again.');
+              break;
+          }
+        },
+      });
+      setSdkReady(true);
+    } catch (error) {
+      console.error('Failed to initialize Dodo Payments SDK:', error);
+    }
+  }, []);
 
   const handleClick = async () => {
     if (!isConsentChecked) {
@@ -54,16 +82,20 @@ export default function CheckoutButton({ packageCode, disabled = false, classNam
         throw new Error(data.error || 'Could not start checkout.');
       }
 
-      const opened = typeof window !== 'undefined' ? window.open(data.checkoutUrl, '_blank', 'noopener,noreferrer') : null;
-      if (opened && data.statusUrl) {
-        window.location.href = data.statusUrl;
-        return;
+      if (sdkReady) {
+        try {
+          await DodoPayments.Checkout.open({
+            checkoutUrl: data.checkoutUrl,
+          });
+        } catch (overlayError) {
+          console.warn('Overlay checkout failed, redirecting:', overlayError);
+          window.location.href = data.checkoutUrl;
+        }
+      } else {
+        window.location.href = data.checkoutUrl;
       }
-
-      window.location.href = data.checkoutUrl;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Checkout failed.');
-    } finally {
       setIsLoading(false);
     }
   };

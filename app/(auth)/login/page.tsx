@@ -24,7 +24,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [authMessage, setAuthMessage] = useState<{ type: 'info' | 'success' | 'error'; text: string } | null>(null);
-  const [locale, setLocale] = useState<Locale>('en');
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,9 +31,6 @@ export default function LoginPage() {
   const supabase = createBrowserClient();
   const isBusy = isLoading || isGoogleLoading;
 
-  useEffect(() => {
-    setLocale(getClientLocale());
-  }, []);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();

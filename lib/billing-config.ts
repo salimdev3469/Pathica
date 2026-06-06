@@ -6,8 +6,7 @@ export type BillingPackage = {
   credits: number;
   priceUsd: number;
   highlight?: boolean;
-  shopierProductIdEnv: string;
-  shopierProductUrlEnv: string;
+  dodoProductIdEnv: string;
 };
 
 export const FREE_SIGNUP_AI_CREDITS = 10;
@@ -31,8 +30,7 @@ export const BILLING_PACKAGES: BillingPackage[] = [
     name: 'Starter',
     credits: 100,
     priceUsd: 79,
-    shopierProductIdEnv: 'SHOPIER_PRODUCT_ID_STARTER',
-    shopierProductUrlEnv: 'SHOPIER_PRODUCT_URL_STARTER',
+    dodoProductIdEnv: 'DODO_PRODUCT_ID_STARTER',
   },
   {
     code: 'pro',
@@ -40,16 +38,14 @@ export const BILLING_PACKAGES: BillingPackage[] = [
     credits: 300,
     priceUsd: 129,
     highlight: true,
-    shopierProductIdEnv: 'SHOPIER_PRODUCT_ID_PRO',
-    shopierProductUrlEnv: 'SHOPIER_PRODUCT_URL_PRO',
+    dodoProductIdEnv: 'DODO_PRODUCT_ID_PRO',
   },
   {
     code: 'mega',
     name: 'Mega',
     credits: 1000,
     priceUsd: 259,
-    shopierProductIdEnv: 'SHOPIER_PRODUCT_ID_MEGA',
-    shopierProductUrlEnv: 'SHOPIER_PRODUCT_URL_MEGA',
+    dodoProductIdEnv: 'DODO_PRODUCT_ID_MEGA',
   },
 ];
 
@@ -70,7 +66,7 @@ export function getBillingPackageByProductId(productId: string | null | undefine
   if (!productId) return null;
 
   for (const pkg of BILLING_PACKAGES) {
-    const configuredId = process.env[pkg.shopierProductIdEnv];
+    const configuredId = process.env[pkg.dodoProductIdEnv];
     if (configuredId && configuredId === productId) {
       return pkg;
     }
@@ -79,10 +75,9 @@ export function getBillingPackageByProductId(productId: string | null | undefine
   return null;
 }
 
-export function getShopierCheckoutUrl(pkg: BillingPackage): string | null {
-  const value = process.env[pkg.shopierProductUrlEnv];
+export function getDodoProductId(pkg: BillingPackage): string | null {
+  const value = process.env[pkg.dodoProductIdEnv];
   if (!value) return null;
-
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
 }
