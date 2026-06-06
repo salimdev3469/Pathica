@@ -68,7 +68,8 @@ export async function GET(req: NextRequest) {
     
     if (paymentId) {
       if (paymentId.startsWith('pay_')) {
-        let { data } = await supabase.from('dodo_payments').select('*').eq('dodo_payment_id', paymentId).eq('user_id', user.id).maybeSingle();
+        const { supabaseAdmin } = await import('@/lib/supabase');
+        let { data } = await supabaseAdmin.from('dodo_payments').select('*').eq('dodo_payment_id', paymentId).eq('user_id', user.id).maybeSingle();
         if (!data) {
           try {
             const { retrieveDodoPayment } = await import('@/lib/dodo');
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
               const checkoutSessionId = dodoPayment.checkout_session_id;
               let pending = null;
               if (checkoutSessionId) {
-                const { data } = await supabase
+                const { data } = await supabaseAdmin
                   .from('dodo_payments')
                   .select('*')
                   .eq('dodo_session_id', checkoutSessionId)
@@ -87,7 +88,6 @@ export async function GET(req: NextRequest) {
               }
               debugInfo.pending = pending;
               if (pending) {
-                const { supabaseAdmin } = await import('@/lib/supabase');
                 await supabaseAdmin
                   .from('dodo_payments')
                   .update({ dodo_payment_id: paymentId, status: 'paid', paid_at: new Date().toISOString() })
@@ -102,7 +102,8 @@ export async function GET(req: NextRequest) {
         }
         if (data) currentPayment = data as DodoPayment;
       } else {
-        const { data } = await supabase.from('dodo_payments').select('*').eq('id', paymentId).eq('user_id', user.id).maybeSingle();
+        const { supabaseAdmin } = await import('@/lib/supabase');
+        const { data } = await supabaseAdmin.from('dodo_payments').select('*').eq('id', paymentId).eq('user_id', user.id).maybeSingle();
         if (data) currentPayment = data as DodoPayment;
       }
     } else if (sessionId) {
