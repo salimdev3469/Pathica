@@ -1258,48 +1258,8 @@ function StatsSlide({ stats, density }: { stats: HomeCinematicExperienceProps['s
     <div className="flex h-full w-full items-center overflow-hidden">
       <div className="w-full">
         <InlineLabel>{stats.label}</InlineLabel>
-        <p
-          className={cn(
-            'text-center text-white/45',
-            density === 'tight'
-              ? 'mt-6 text-[12px] font-medium uppercase tracking-[0.16em]'
-              : density === 'compact'
-                ? 'mt-7 text-[13px] font-medium uppercase tracking-[0.18em]'
-                : 'mt-8 text-[13px] font-medium uppercase tracking-[0.2em]',
-          )}
-        >
-          {stats.companyLabel}
-        </p>
 
-        <div className={cn('grid md:grid-cols-2 xl:grid-cols-3', density === 'tight' ? 'mt-5 gap-3' : 'mt-6 gap-3.5')}>
-          {stats.badges.map((badge, index) => (
-            <div
-              key={badge.label}
-              className={cn(
-                'relative overflow-hidden rounded-2xl border shadow-[0_24px_90px_-46px_rgba(0,0,0,0.85)]',
-                density === 'tight' ? 'min-h-[6.25rem] p-4' : 'min-h-[6.9rem] p-[1.125rem]',
-                index % 3 === 1
-                  ? 'border-[#9bd5ff]/30 bg-[linear-gradient(180deg,rgba(155,213,255,0.1),rgba(255,255,255,0.03))]'
-                  : 'border-white/10 bg-white/[0.035]',
-              )}
-            >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_center,rgba(155,213,255,0.08),transparent_60%)]" />
-              <div className="relative flex h-full flex-col items-center justify-center text-center">
-                <div className="absolute top-1 right-1">
-                  <span className={cn('block h-1.5 w-1.5 rounded-full', index % 3 === 1 ? ACCENT_BG_CLASS : 'bg-white/20')} />
-                </div>
-                <p className={cn('font-semibold tracking-tight text-white', density === 'tight' ? 'text-xl' : 'text-[1.4rem]')}>
-                  {badge.label}
-                </p>
-                <p className={cn('mt-3 max-w-[16rem] text-white/50', density === 'tight' ? 'text-[13px] leading-relaxed' : 'text-[14px] leading-relaxed')}>
-                  {badge.detail}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className={cn('grid gap-6 border-t border-white/8 lg:grid-cols-3', density === 'tight' ? 'mt-7 pt-6' : density === 'compact' ? 'mt-8 pt-7' : 'mt-9 pt-8')}>
+        <div className={cn('grid gap-6 lg:grid-cols-3', density === 'tight' ? 'mt-7' : density === 'compact' ? 'mt-8' : 'mt-9')}>
           {stats.values.map((item) => (
             <div key={item.label} className="text-center">
               <p
