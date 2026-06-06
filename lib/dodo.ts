@@ -55,6 +55,11 @@ export async function createDodoCheckoutSession(params: DodoCheckoutParams): Pro
   return { sessionId: String(sessionId), checkoutUrl: String(checkoutUrl) };
 }
 
+export async function retrieveDodoPayment(paymentId: string) {
+  const client = getDodoClient();
+  return client.payments.retrieve(paymentId);
+}
+
 export function verifyDodoWebhookSignature(
   rawBody: string,
   headers: { webhookId: string; webhookSignature: string; webhookTimestamp: string },

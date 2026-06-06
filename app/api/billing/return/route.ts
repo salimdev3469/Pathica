@@ -66,8 +66,39 @@ export async function GET(req: NextRequest) {
     let currentPayment: DodoPayment | null = null;
     
     if (paymentId) {
-      const { data } = await supabase.from('dodo_payments').select('*').eq('id', paymentId).eq('user_id', user.id).maybeSingle();
-      if (data) currentPayment = data as DodoPayment;
+      if (paymentId.startsWith('pay_')) {
+        let { data } = await supabase.from('dodo_payments').select('*').eq('dodo_payment_id', paymentId).eq('user_id', user.id).maybeSingle();
+        if (!data) {
+          try {
+            const { retrieveDodoPayment } = await import('@/lib/dodo');
+            const dodoPayment = await retrieveDodoPayment(paymentId);
+            if (dodoPayment && dodoPayment.status === 'succeeded' && dodoPayment.metadata?.userId === user.id) {
+              const { data: pending } = await supabase
+                .from('dodo_payments')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('status', 'pending')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+              if (pending) {
+                const { supabaseAdmin } = await import('@/lib/supabase');
+                await supabaseAdmin
+                  .from('dodo_payments')
+                  .update({ dodo_payment_id: paymentId, status: 'paid', paid_at: new Date().toISOString() })
+                  .eq('id', pending.id);
+                data = { ...pending, dodo_payment_id: paymentId, status: 'paid' };
+              }
+            }
+          } catch (e) {
+            console.error('Fallback fetch from Dodo API failed:', e);
+          }
+        }
+        if (data) currentPayment = data as DodoPayment;
+      } else {
+        const { data } = await supabase.from('dodo_payments').select('*').eq('id', paymentId).eq('user_id', user.id).maybeSingle();
+        if (data) currentPayment = data as DodoPayment;
+      }
     } else if (sessionId) {
       currentPayment = await findDodoPaymentBySessionId(sessionId);
       if (currentPayment && currentPayment.user_id !== user.id) {
