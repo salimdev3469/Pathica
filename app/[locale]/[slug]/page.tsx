@@ -6,7 +6,6 @@ import { getSeoLandingAlternates, getSeoLandingPage, getSeoLandingStaticParams }
 
 interface SeoLandingRouteProps {
   params: {
-    locale: string;
     slug: string;
   };
 }
@@ -69,5 +68,5 @@ export default function SeoLandingRoutePage({ params }: SeoLandingRouteProps) {
 
   const alternates = getSeoLandingAlternates(page.key);
 
-  return <SeoLandingPageView locale={params.locale} page={page} alternates={alternates} />;
+  return <SeoLandingPageView page={page} alternates={alternates} />;
 }

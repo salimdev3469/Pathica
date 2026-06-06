@@ -1,23 +1,19 @@
 import Link from 'next/link';
-import type { Locale } from '@/lib/locale';
 import type { ProfessionSeed } from '@/lib/seo/professions';
 import { getProfessionPath } from '@/lib/seo/professions';
 import { PRICING_MESSAGE } from '@/lib/seo/config';
 
 type ProgrammaticProfessionListPageProps = {
-  locale: Locale;
   title: string;
   description: string;
   professions: ProfessionSeed[];
 };
 
 export default function ProgrammaticProfessionListPage({
-  locale,
   title,
   description,
-  professions,
+  professions
 }: ProgrammaticProfessionListPageProps) {
-  const isTr = locale === 'tr';
   const collectionSteps = isTr
     ? [
         'Uygun meslek kartını açıp örnek yapıyı gör.',

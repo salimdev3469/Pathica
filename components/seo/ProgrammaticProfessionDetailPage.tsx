@@ -1,16 +1,15 @@
 import Link from 'next/link';
-import type { Locale } from '@/lib/locale';
 import type { ProfessionSeed } from '@/lib/seo/professions';
 import { getProfessionListPath, getProfessionPath } from '@/lib/seo/professions';
 import { PRICING_MESSAGE, toAbsoluteUrl } from '@/lib/seo/config';
 
 type ProgrammaticProfessionDetailPageProps = {
-  locale: Locale;
   profession: ProfessionSeed;
 };
 
-export default function ProgrammaticProfessionDetailPage({ locale, profession }: ProgrammaticProfessionDetailPageProps) {
-  const isTr = locale === 'tr';
+export default function ProgrammaticProfessionDetailPage({
+  profession
+}: ProgrammaticProfessionDetailPageProps) {
   const pageUrl = toAbsoluteUrl(getProfessionPath(locale, profession.slug));
   const roleBuilderLabel = isTr ? 'Bu Rol İçin CV Oluştur' : 'Build This Resume Free';
   const roleBuilderHint = isTr
@@ -32,12 +31,13 @@ export default function ProgrammaticProfessionDetailPage({ locale, profession }:
     {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
+
       name: isTr
         ? `${profession.roleName.tr} CV Örneği`
         : `${profession.roleName.en} Resume Example`,
+
       description: profession.summary[locale],
-      inLanguage: locale,
-      url: pageUrl,
+      url: pageUrl
     },
     {
       '@context': 'https://schema.org',

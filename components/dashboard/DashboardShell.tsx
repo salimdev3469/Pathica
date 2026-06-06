@@ -5,14 +5,12 @@ import { Brain, FileText, Mail } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 import LiveTokenCounter from '@/components/billing/LiveTokenCounter';
 import ThemeToggle from '@/components/theme-toggle';
-import type { Locale } from '@/lib/locale';
 import type { WalletSnapshot } from '@/lib/billing';
 
 type DashboardShellProps = {
   active: 'resumes' | 'coverLetters' | 'aiReview';
   userEmail?: string | null;
   userName?: string | null;
-  locale: Locale;
   wallet?: Pick<WalletSnapshot, 'creditBalance' | 'freeExportsRemaining'>;
   billingSchemaMissing?: boolean;
   children: ReactNode;
@@ -24,16 +22,21 @@ const NAV_ITEMS = [
   { id: 'aiReview', href: '/dashboard/ai-review', labelEn: 'AI Review', labelTr: 'AI Review', icon: Brain },
 ] as const;
 
-export default function DashboardShell({ active, userEmail, userName, locale, wallet, billingSchemaMissing, children }: DashboardShellProps) {
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
-
+export default function DashboardShell({
+  active,
+  userEmail,
+  userName,
+  wallet,
+  billingSchemaMissing,
+  children
+}: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-[#05070b] text-white">
       <header className="border-b border-white/5 bg-transparent">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
           <div className="flex items-center justify-between">
             <Link href="/" className="shrink-0">
-              <Image src="/logo_pathica_footer.png" alt={t('Pathica logo', 'Pathica logosu')} width={200} height={200} className="h-16 w-auto object-contain sm:h-20" />
+              <Image src="/logo_pathica_footer.png" alt={'Pathica logo'} width={200} height={200} className="h-16 w-auto object-contain sm:h-20" />
             </Link>
 
             <div className="flex items-center gap-2 sm:gap-3">
@@ -42,21 +45,17 @@ export default function DashboardShell({ active, userEmail, userName, locale, wa
                   <div className="hidden lg:block">
                     <Link href="/billing">
                       <LiveTokenCounter
-                        locale={locale}
                         initialCredits={wallet.creditBalance}
                         initialFreeExports={wallet.freeExportsRemaining}
-                        compact={false}
-                      />
+                        compact={false} />
                     </Link>
                   </div>
                   <div className="lg:hidden">
                     <Link href="/billing">
                       <LiveTokenCounter
-                        locale={locale}
                         initialCredits={wallet.creditBalance}
                         initialFreeExports={wallet.freeExportsRemaining}
-                        compact={true}
-                      />
+                        compact={true} />
                     </Link>
                   </div>
                 </>
@@ -64,10 +63,12 @@ export default function DashboardShell({ active, userEmail, userName, locale, wa
               {userName ? (
                 <div className="flex items-center gap-2 sm:gap-3 rounded-xl border border-white/10 bg-white/5 pl-3 sm:pl-4 pr-1.5 py-1.5">
                   <span className="max-w-[100px] sm:max-w-[150px] truncate text-xs sm:text-sm font-medium text-white/90">{userName}</span>
-                  <LogoutButton locale={locale} className="h-7 sm:h-8 rounded-lg bg-white/10 hover:bg-red-500/20 hover:text-red-300 px-2 sm:px-3 text-[10px] sm:text-xs transition-colors text-white/70" />
+                  <LogoutButton
+                    className="h-7 sm:h-8 rounded-lg bg-white/10 hover:bg-red-500/20 hover:text-red-300 px-2 sm:px-3 text-[10px] sm:text-xs transition-colors text-white/70" />
                 </div>
               ) : (
-                <LogoutButton locale={locale} className="h-10 rounded-xl border border-white/10 px-3 sm:px-4 text-xs sm:text-sm font-medium bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors" />
+                <LogoutButton
+                  className="h-10 rounded-xl border border-white/10 px-3 sm:px-4 text-xs sm:text-sm font-medium bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors" />
               )}
             </div>
           </div>
@@ -94,7 +95,6 @@ export default function DashboardShell({ active, userEmail, userName, locale, wa
           </nav>
         </div>
       </header>
-
       <main className="mx-auto w-full max-w-6xl px-4 pb-12 pt-7 sm:px-6">
         {billingSchemaMissing ? (
           <p className="mb-6 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">

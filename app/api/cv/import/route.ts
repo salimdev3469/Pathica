@@ -42,7 +42,6 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
     const fileEntry = formData.get('file');
-    const locale = formData.get('locale') === 'tr' ? 'tr' : 'en';
 
     if (!(fileEntry instanceof File)) {
       return NextResponse.json({ error: 'File is required.' }, { status: 400 });

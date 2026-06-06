@@ -591,21 +591,15 @@ function stripMockMarkers(value: string): string {
 
 function isPlaceholderLikeValue(value: string): boolean {
   const normalized = value.trim().toLowerCase();
-  return (
-    /^\[.*\]$/.test(normalized) ||
-    normalized.startsWith('add ') ||
-    normalized.startsWith('replace ') ||
-    normalized.startsWith('enter ') ||
-    normalized.startsWith('your ')
-  );
+  return (/^\[.*\]$/.test(normalized) ||
+  normalized.startsWith('add ') ||
+  normalized.startsWith('replace ') ||
+  normalized.startsWith('enter ') || normalized.startsWith('your '));
 }
 
 function isDiscardableBulletLine(value: string): boolean {
   const normalized = value.trim().toLowerCase();
-  return (
-    normalized.length === 0 ||
-    normalized.includes('recommendation:') ||
-    normalized.includes('(mock)') ||
-    /^\[.*\]$/.test(normalized)
-  );
+  return (normalized.length === 0 ||
+  normalized.includes('recommendation:') ||
+  normalized.includes('(mock)') || /^\[.*\]$/.test(normalized));
 }

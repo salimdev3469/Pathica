@@ -1,7 +1,5 @@
-'use client';
-
+'use client';;
 import React from 'react';
-import type { Locale } from '@/lib/locale';
 import { Section, Item, useCV } from '@/context/CVContext';
 import { ItemCard } from './ItemCard';
 import { Plus, Trash2 } from 'lucide-react';
@@ -11,12 +9,9 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 
 interface SectionCardProps {
     section: Section;
-    locale?: Locale;
 }
 
 export function SectionCard({ section, locale = 'en' }: SectionCardProps) {
-    const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
-
     const { dispatch } = useCV();
 
     const handleUpdateTitle = (title: string) => {
@@ -48,7 +43,7 @@ export function SectionCard({ section, locale = 'en' }: SectionCardProps) {
                                 value={section.title}
                                 onChange={(e) => handleUpdateTitle(e.target.value)}
                                 className="h-9 flex-1 border-transparent bg-transparent p-1 text-lg font-bold uppercase text-primary hover:border-slate-200 focus-visible:ring-1 dark:hover:border-slate-600"
-                                placeholder={t('Section Title', 'Bölüm Başlığı')}
+                                placeholder={'Section Title'}
                             />
                             <Input
                                 type="number"
@@ -58,7 +53,7 @@ export function SectionCard({ section, locale = 'en' }: SectionCardProps) {
                                 placeholder="12"
                                 onChange={(e) => dispatch({ type: 'UPDATE_SECTION', payload: { id: section.id, titleFontSize: e.target.value === '' ? 12 : Number(e.target.value) } })}
                                 className="h-9 w-16 px-2 text-sm"
-                                title={t('Font Size', 'Yazı Büyüklüğü')}
+                                title={'Font Size'}
                             />
                         </div>
                         <Button
@@ -74,7 +69,7 @@ export function SectionCard({ section, locale = 'en' }: SectionCardProps) {
                     <CardContent className="flex flex-col gap-3 p-4 pt-0">
                         <div className="flex flex-col gap-3">
                             {(section.items || []).map((item) => (
-                                <ItemCard key={item.id} sectionId={section.id} item={item} locale={locale} />
+                                <ItemCard key={item.id} sectionId={section.id} item={item} />
                             ))}
                         </div>
 
@@ -84,7 +79,7 @@ export function SectionCard({ section, locale = 'en' }: SectionCardProps) {
                             className="mt-2 border-dashed border-primary/20 text-primary hover:border-primary/50 hover:bg-primary/5"
                             onClick={handleAddItem}
                         >
-                            <Plus size={16} className="mr-1" /> {t('Add Sub-Section', 'Alt Bölüm Ekle')}
+                            <Plus size={16} className="mr-1" /> {'Add Sub-Section'}
                         </Button>
                     </CardContent>
                 </div>

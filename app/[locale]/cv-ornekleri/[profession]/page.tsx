@@ -6,7 +6,6 @@ import { getProfessionBySlug, getProfessionPath, getProfessionStaticParams } fro
 
 interface CvExampleDetailPageProps {
   params: {
-    locale: string;
     profession: string;
   };
 }
@@ -65,5 +64,5 @@ export default function CvExampleDetailPage({ params }: CvExampleDetailPageProps
     notFound();
   }
 
-  return <ProgrammaticProfessionDetailPage locale="tr" profession={profession} />;
+  return <ProgrammaticProfessionDetailPage profession={profession} />;
 }

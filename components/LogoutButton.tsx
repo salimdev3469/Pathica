@@ -1,5 +1,4 @@
-'use client';
-
+'use client';;
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -7,16 +6,12 @@ import { LogOut, Loader2 } from 'lucide-react';
 import { createBrowserClient } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import type { Locale } from '@/lib/locale';
 
 type LogoutButtonProps = {
     className?: string;
-    locale?: Locale;
 };
 
 export default function LogoutButton({ className, locale = 'en' }: LogoutButtonProps) {
-    const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
-
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
@@ -29,7 +24,7 @@ export default function LogoutButton({ className, locale = 'en' }: LogoutButtonP
             router.push('/');
             router.refresh();
         } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : t('Error signing out', 'Çıkış yaparken hata oluştu');
+            const message = error instanceof Error ? error.message : 'Error signing out';
             toast.error(message);
             setIsLoading(false);
         }
@@ -43,7 +38,7 @@ export default function LogoutButton({ className, locale = 'en' }: LogoutButtonP
             disabled={isLoading}
         >
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
-            {t('Log Out', 'Çıkış Yap')}
+            {'Log Out'}
         </Button>
     );
 }

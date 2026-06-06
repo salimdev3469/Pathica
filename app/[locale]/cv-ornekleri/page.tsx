@@ -5,9 +5,7 @@ import { localeAlternates } from '@/lib/seo/config';
 import { getProfessionListPath, professionSeeds } from '@/lib/seo/professions';
 
 interface CvExamplesPageProps {
-  params: {
-    locale: string;
-  };
+  params: {};
 }
 
 export function generateStaticParams() {
@@ -48,10 +46,8 @@ export default function CvExamplesPage({ params }: CvExamplesPageProps) {
 
   return (
     <ProgrammaticProfessionListPage
-      locale="tr"
       title="Meslek Bazlı CV Örnekleri"
       description="Her meslek için role uygun yetkinlikler ve başarı odaklı örnek cümlelerle CV hazırlama sürecini hızlandırın."
-      professions={professionSeeds}
-    />
+      professions={professionSeeds} />
   );
 }

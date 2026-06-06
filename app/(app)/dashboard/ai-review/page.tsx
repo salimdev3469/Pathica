@@ -43,7 +43,6 @@ function isResumeReviewSchemaError(error: unknown): boolean {
 }
 
 export default async function AiReviewDashboardPage() {
-  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
   const supabase = createClient();
   const {
     data: { user },
@@ -123,15 +122,18 @@ export default async function AiReviewDashboardPage() {
   }));
 
   return (
-    <DashboardShell active="aiReview" userEmail={user.email} userName={user.user_metadata?.full_name} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing || reviewSchemaMissing}>
+    <DashboardShell
+      active="aiReview"
+      userEmail={user.email}
+      userName={user.user_metadata?.full_name}
+      wallet={wallet}
+      billingSchemaMissing={billingSchemaMissing || reviewSchemaMissing}>
       <AiReviewDashboard
-        locale={locale}
         initialReviews={initialReviews}
         initialStats={initialStats}
         billingPackages={billingPackages}
         fixCreditCost={AI_REVIEW_FIX_CREDIT_COST}
-        billingSchemaMissing={billingSchemaMissing || reviewSchemaMissing}
-      />
+        billingSchemaMissing={billingSchemaMissing || reviewSchemaMissing} />
     </DashboardShell>
   );
 }

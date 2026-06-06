@@ -1,16 +1,16 @@
 import Link from 'next/link';
-import type { Locale } from '@/lib/locale';
 import type { SeoLandingPage } from '@/lib/seo/landing-pages';
 import { PRICING_MESSAGE, SITE_NAME, toAbsoluteUrl } from '@/lib/seo/config';
 
 type SeoLandingPageProps = {
-  locale: Locale;
   page: SeoLandingPage;
   alternates: Record<Locale, string>;
 };
 
-export default function SeoLandingPageView({ locale, page, alternates }: SeoLandingPageProps) {
-  const isTr = locale === 'tr';
+export default function SeoLandingPageView({
+  page,
+  alternates
+}: SeoLandingPageProps) {
   const pageUrl = toAbsoluteUrl(alternates[locale]);
   const journeySteps = isTr
     ? [
@@ -30,13 +30,13 @@ export default function SeoLandingPageView({ locale, page, alternates }: SeoLand
       '@type': 'WebPage',
       name: page.h1,
       description: page.description,
-      inLanguage: locale,
       url: pageUrl,
+
       isPartOf: {
         '@type': 'WebSite',
         name: SITE_NAME,
         url: toAbsoluteUrl('/'),
-      },
+      }
     },
     {
       '@context': 'https://schema.org',

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { CVTemplate } from '@/components/pdf/CVTemplate';
 import { buildCvStateFromTemplate, cvTemplateSeeds } from '@/lib/cv-templates';
-import { normalizeLocale } from '@/lib/locale';
 
 export const metadata: Metadata = {
   title: 'Template Preview Generator',
@@ -12,14 +11,10 @@ export const metadata: Metadata = {
 };
 
 type TemplatePreviewPageProps = {
-  searchParams?: {
-    locale?: string;
-  };
+  searchParams?: {};
 };
 
 export default function TemplatePreviewPage({ searchParams }: TemplatePreviewPageProps) {
-  const locale = normalizeLocale(searchParams?.locale);
-
   return (
     <main className="min-h-screen bg-slate-100 px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-16">

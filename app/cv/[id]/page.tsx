@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase-server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CVState, Section, Item, PersonalInfo } from '@/context/CVContext';
-import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { normalizeCvFont } from '@/lib/cv-fonts';
 import { normalizeCvPageMargins } from '@/lib/cv-layout';
 import { isCvTemplateSlug } from '@/lib/cv-templates';
@@ -25,7 +24,6 @@ type CvSectionRow = {
 };
 
 export default async function CVBuilderPage({ params, searchParams }: { params: { id: string }, searchParams: { [key: string]: string | string[] | undefined } }) {
-    const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
     const supabase = createClient();
     const {
         data: { user },
@@ -191,7 +189,7 @@ export default async function CVBuilderPage({ params, searchParams }: { params: 
 
     return (
         <CVProvider initialState={initialState}>
-            <CVWorkspace locale={locale} showPostFixGuide={searchParams?.fixed === 'true'} />
+            <CVWorkspace showPostFixGuide={searchParams?.fixed === 'true'} />
         </CVProvider>
     );
 }

@@ -15,8 +15,6 @@ type BillingReturnPageProps = {
 };
 
 export default async function BillingReturnPage({ searchParams }: BillingReturnPageProps) {
-  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
   const supabase = createClient();
   const {
     data: { user },
@@ -30,9 +28,9 @@ export default async function BillingReturnPage({ searchParams }: BillingReturnP
     <div className="min-h-screen bg-slate-50">
       <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{t('Shopier Payment Return', 'Shopier Ödeme Sonucu')}</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{'Shopier Payment Return'}</h1>
           <Button variant="outline" asChild>
-            <Link href="/billing">{t('Back to Billing', 'Faturalamaya Dön')}</Link>
+            <Link href="/billing">{'Back to Billing'}</Link>
           </Button>
         </div>
 

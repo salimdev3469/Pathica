@@ -1,5 +1,4 @@
-'use client';
-
+'use client';;
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -34,7 +33,6 @@ import { AI_REVIEW_ONTOLOGY, type ExperienceLevelId, type ReviewCategoryId, type
 import type { NormalizedResume } from '@/lib/ai-review/extract';
 import type { ReviewAnalysis } from '@/lib/ai-review/score';
 import { CV_PAGE_HEIGHT_PX, CV_PAGE_WIDTH_PX } from '@/lib/cv-layout';
-import type { Locale } from '@/lib/locale';
 
 type BillingPackageView = {
   code: string;
@@ -68,7 +66,6 @@ type AiReviewStats = {
 };
 
 type AiReviewDashboardProps = {
-  locale: Locale;
   initialReviews: AiReviewClientReview[];
   initialStats: AiReviewStats;
   billingPackages: BillingPackageView[];
@@ -111,12 +108,11 @@ const BREAKDOWN_LABELS: Record<keyof ReviewAnalysis['breakdown'], string> = {
 };
 
 export default function AiReviewDashboard({
-  locale,
   initialReviews,
   initialStats,
   billingPackages,
   fixCreditCost,
-  billingSchemaMissing = false,
+  billingSchemaMissing = false
 }: AiReviewDashboardProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -134,8 +130,6 @@ export default function AiReviewDashboard({
   const [loadingProgress, setLoadingProgress] = useState(8);
   const [billingOpen, setBillingOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
 
   const fieldsForCategory = useMemo(() => {
     const selectedCategory = AI_REVIEW_ONTOLOGY.categories.find((item) => item.id === category);
@@ -208,7 +202,7 @@ export default function AiReviewDashboard({
 
   const startReview = async () => {
     if (!selectedFile) {
-      toast.error(t('Please upload a resume file first.', 'Önce bir CV dosyası yükleyin.'));
+      toast.error('Please upload a resume file first.');
       return;
     }
 
@@ -230,7 +224,7 @@ export default function AiReviewDashboard({
       const payload = (await response.json().catch(() => ({}))) as AnalyzeResponse;
 
       if (!response.ok || !payload.review) {
-        throw new Error(payload.error || t('Could not analyze this CV.', 'Bu CV analiz edilemedi.'));
+        throw new Error(payload.error || 'Could not analyze this CV.');
       }
 
       const completedReview = payload.review;
@@ -240,9 +234,9 @@ export default function AiReviewDashboard({
       });
       setActiveReview(completedReview);
       setSelectedFile(null);
-      toast.success(t('AI Review completed.', 'AI Review tamamlandı.'));
+      toast.success('AI Review completed.');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('Review failed.', 'Analiz başarısız oldu.'));
+      toast.error(error instanceof Error ? error.message : 'Review failed.');
       setWizardOpen(true);
     } finally {
       window.setTimeout(() => setIsAnalyzing(false), 350);
@@ -263,12 +257,12 @@ export default function AiReviewDashboard({
         }
 
         if (!response.ok || !payload.cvId) {
-          throw new Error(payload.error || t('Could not create fixed CV.', 'Düzeltilmiş CV oluşturulamadı.'));
+          throw new Error(payload.error || 'Could not create fixed CV.');
         }
 
         router.push(`/cv/${payload.cvId}?fixed=true`);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : t('Fix failed.', 'Düzeltme başarısız oldu.'));
+        toast.error(error instanceof Error ? error.message : 'Fix failed.');
       }
     });
   };
@@ -279,12 +273,9 @@ export default function AiReviewDashboard({
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
 
-            <h1 className="text-4xl font-bold tracking-tight text-white">{t('AI Resume Review', 'AI Resume Review')}</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-white">{'AI Resume Review'}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
-              {t(
-                'Free analysis uses file extraction, schema normalization, ontology mapping, and weighted mathematical scoring. LLM is only used for paid CV fixes.',
-                'Ücretsiz analiz dosya okuma, şema normalizasyonu, ontoloji eşleme ve ağırlıklı matematiksel skorla çalışır. LLM sadece ücretli CV fix için kullanılır.',
-              )}
+              {'Free analysis uses file extraction, schema normalization, ontology mapping, and weighted mathematical scoring. LLM is only used for paid CV fixes.'}
             </p>
           </div>
           <div className="shrink-0">
@@ -292,21 +283,17 @@ export default function AiReviewDashboard({
               onClick={openFilePicker}
               className="h-11 rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl"
             >
-              <Plus className="mr-2 h-4 w-4" /> {t('New Review', 'Yeni İnceleme')}
+              <Plus className="mr-2 h-4 w-4" /> {'New Review'}
             </Button>
           </div>
         </div>
       </section>
-
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard icon={Target} label={t('Target Score', 'Hedef Skor')} value={`${stats.targetScore}+`} hint="Hire Zone" tone="emerald" />
-        <MetricCard icon={TrendingUp} label={t('Your Best', 'En İyi Skor')} value={stats.bestScore === null ? '--' : String(stats.bestScore)} hint="/100" tone="slate" />
-        <MetricCard icon={Brain} label={t('Reviews', 'Review')} value={String(stats.reviewCount)} hint={t('completed', 'tamamlandı')} tone="blue" />
-        <MetricCard icon={Sparkles} label={t('Avg Score', 'Ortalama')} value={stats.avgScore === null ? '--' : String(stats.avgScore)} hint="/100" tone="amber" />
+        <MetricCard icon={Target} label={'Target Score'} value={`${stats.targetScore}+`} hint="Hire Zone" tone="emerald" />
+        <MetricCard icon={TrendingUp} label={'Your Best'} value={stats.bestScore === null ? '--' : String(stats.bestScore)} hint="/100" tone="slate" />
+        <MetricCard icon={Brain} label={'Reviews'} value={String(stats.reviewCount)} hint={'completed'} tone="blue" />
+        <MetricCard icon={Sparkles} label={'Avg Score'} value={stats.avgScore === null ? '--' : String(stats.avgScore)} hint="/100" tone="amber" />
       </section>
-
-
-
       {activeReview ? (
         <section className="flex flex-col gap-5 xl:flex-row">
           <div className="w-full xl:w-[45%] shrink-0 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
@@ -325,17 +312,20 @@ export default function AiReviewDashboard({
             <ResumePreview review={activeReview} />
           </div>
 
-          <ResultPanel review={activeReview} locale={locale} onFix={fixActiveReview} isFixing={isPending} fixCreditCost={fixCreditCost} />
+          <ResultPanel
+            review={activeReview}
+            onFix={fixActiveReview}
+            isFixing={isPending}
+            fixCreditCost={fixCreditCost} />
         </section>
       ) : null}
-
       <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400">
               <FileText className="h-5 w-5" />
             </div>
-            <h2 className="text-lg font-bold text-white">{t('Review History', 'Review Geçmişi')}</h2>
+            <h2 className="text-lg font-bold text-white">{'Review History'}</h2>
           </div>
         </div>
 
@@ -364,13 +354,11 @@ export default function AiReviewDashboard({
           </div>
         ) : (
           <p className="rounded-2xl border border-dashed border-white/20 p-8 text-center text-sm text-white/50">
-            {t('Upload your first resume to create a deterministic review.', 'İlk deterministik review için CV yükleyin.')}
+            {'Upload your first resume to create a deterministic review.'}
           </p>
         )}
       </section>
-
       <input ref={fileInputRef} type="file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" className="hidden" onChange={handleFileChange} />
-
       <ReviewWizard
         open={wizardOpen}
         onOpenChange={setWizardOpen}
@@ -386,21 +374,15 @@ export default function AiReviewDashboard({
         onFieldSelect={setField}
         onExperienceSelect={setExperienceLevel}
         onJobDescriptionChange={setJobDescription}
-        onStart={startReview}
-        locale={locale}
-      />
-
-      {isAnalyzing ? <AnalyzingOverlay locale={locale} progress={loadingProgress} /> : null}
-      {isPending ? <FixingOverlay locale={locale} /> : null}
-
+        onStart={startReview} />
+      {isAnalyzing ? <AnalyzingOverlay progress={loadingProgress} /> : null}
+      {isPending ? <FixingOverlay /> : null}
       <BillingModal
         open={billingOpen}
         onOpenChange={setBillingOpen}
         packages={billingPackages}
         fixCreditCost={fixCreditCost}
-        billingSchemaMissing={billingSchemaMissing}
-        locale={locale}
-      />
+        billingSchemaMissing={billingSchemaMissing} />
     </div>
   );
 }
@@ -452,22 +434,19 @@ function ReviewWizard(props: {
   onExperienceSelect: (level: ExperienceLevelId) => void;
   onJobDescriptionChange: (value: string) => void;
   onStart: () => void;
-  locale: Locale;
 }) {
-  const isTr = props.locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
   const canGoNext = props.step === 0 ? Boolean(props.category) : props.step === 1 ? Boolean(props.field) : true;
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent className="flex h-full w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-[#05070b] p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-2xl">
         <DialogHeader className="shrink-0 border-b border-white/10 p-5 sm:p-8">
-          <DialogTitle className="text-3xl font-black">{t('AI Resume Review', 'AI Resume Review')}</DialogTitle>
+          <DialogTitle className="text-3xl font-black">{'AI Resume Review'}</DialogTitle>
           <DialogDescription>{wizardSubtitle(props.step, props.locale)}</DialogDescription>
         </DialogHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto p-7">
-          <StepIndicator step={props.step} locale={props.locale} />
+          <StepIndicator step={props.step} />
 
           {props.selectedFile ? (
             <div className="mx-auto mb-8 max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
@@ -506,7 +485,7 @@ function ReviewWizard(props: {
           {props.step === 1 ? (
             <div className="mx-auto max-w-5xl text-center">
               <h3 className="mb-2 text-3xl font-black">{AI_REVIEW_ONTOLOGY.categories.find((item) => item.id === props.category)?.label}</h3>
-              <p className="mb-8 text-slate-500">{t('Select your specific field', 'Spesifik alanını seç')}</p>
+              <p className="mb-8 text-slate-500">{'Select your specific field'}</p>
               <div className="flex flex-wrap justify-center gap-3">
                 {props.fieldsForCategory.map((item) => (
                   <button
@@ -549,14 +528,14 @@ function ReviewWizard(props: {
               <label className="mt-9 block">
                 <span className="mb-3 flex items-center gap-2 text-lg font-bold">
                   <Zap className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-                  {t('Add job description (optional)', 'İş tanımı ekle (opsiyonel)')}
+                  {'Add job description (optional)'}
                 </span>
                 <textarea
                   value={props.jobDescription}
                   onChange={(event) => props.onJobDescriptionChange(event.target.value)}
                   rows={6}
                   className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition focus:border-white/30 focus:ring-4 focus:ring-white/10 placeholder:text-white/30"
-                  placeholder={t('Paste the job description to score keyword coverage mathematically.', 'Anahtar kelime kapsamını matematiksel skorlamak için iş tanımını yapıştır.')}
+                  placeholder={'Paste the job description to score keyword coverage mathematically.'}
                 />
               </label>
             </div>
@@ -572,7 +551,7 @@ function ReviewWizard(props: {
               className="h-12 rounded-xl px-5 border-white/10 bg-transparent text-white hover:bg-white/10"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('Back', 'Geri')}
+              {'Back'}
             </Button>
 
             {props.step < 2 ? (
@@ -581,7 +560,7 @@ function ReviewWizard(props: {
                 disabled={!canGoNext}
                 className="h-12 rounded-xl bg-blue-600 px-7 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
               >
-                {t('Next', 'İleri')}
+                {'Next'}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
@@ -589,7 +568,7 @@ function ReviewWizard(props: {
                 onClick={props.onStart}
                 className="h-12 rounded-xl bg-blue-600 px-8 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
               >
-                {t('Start Review', 'Review Başlat')}
+                {'Start Review'}
               </Button>
             )}
           </div>
@@ -599,8 +578,11 @@ function ReviewWizard(props: {
   );
 }
 
-function StepIndicator({ step, locale }: { step: number; locale: Locale }) {
-  const isTr = locale === 'tr';
+function StepIndicator({
+  step
+}: {
+  step: number;
+}) {
   const labels = isTr ? ['Kategori', 'Alan', 'Deneyim'] : ['Category', 'Field', 'Experience'];
 
   return (
@@ -633,13 +615,16 @@ function StepIndicator({ step, locale }: { step: number; locale: Locale }) {
 }
 
 function wizardSubtitle(step: number, locale: Locale): string {
-  const isTr = locale === 'tr';
   if (step === 0) return isTr ? 'Alan kategorini seç' : 'Select your field category';
   if (step === 1) return isTr ? 'Spesifik alanını seç' : 'Choose your specific field';
   return isTr ? 'Deneyim seviyeni ve opsiyonel iş tanımını ekle' : 'Set your experience level and optional job description';
 }
 
-function AnalyzingOverlay({ locale, progress }: { locale: Locale; progress: number }) {
+function AnalyzingOverlay({
+  progress
+}: {
+  progress: number;
+}) {
   const lines = locale === 'tr'
     ? ['CV analiz ediliyor...', 'Ontoloji eşlemesi kuruluyor...', 'Deterministik skor hesaplanıyor...']
     : ['Analyzing your CV...', 'Building ontology matches...', 'Calculating deterministic score...'];
@@ -673,7 +658,7 @@ function AnalyzingOverlay({ locale, progress }: { locale: Locale; progress: numb
   );
 }
 
-function FixingOverlay({ locale }: { locale: Locale }) {
+function FixingOverlay({}: {}) {
   const lines = locale === 'tr'
     ? ['CV yeniden yazılıyor...', 'Zayıf eylem fiilleri düzeltiliyor...', 'Anahtar kelimeler yerleştiriliyor...', 'ATS skoru maksimize ediliyor...']
     : ['Rewriting your CV...', 'Fixing weak action verbs...', 'Injecting target keywords...', 'Maximizing ATS score...'];
@@ -707,56 +692,59 @@ function FixingOverlay({ locale }: { locale: Locale }) {
   );
 }
 
-function EmptyBenchmark({ locale, onUpload }: { locale: Locale; onUpload: () => void }) {
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
-
+function EmptyBenchmark({
+  onUpload
+}: {
+  onUpload: () => void;
+}) {
   return (
     <div className="flex min-h-[390px] flex-col">
       <div className="mb-5 flex items-center gap-3">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
           <TrendingUp className="h-5 w-5" />
         </div>
-        <h2 className="text-lg font-bold text-slate-950 dark:text-slate-100">{t('Industry Benchmark', 'Sektör Benchmark')}</h2>
+        <h2 className="text-lg font-bold text-slate-950 dark:text-slate-100">{'Industry Benchmark'}</h2>
       </div>
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-white/5 text-white/30">
           <TrendingUp className="h-8 w-8" />
         </div>
-        <p className="text-white/50">{t('Complete an AI review to see how you compare', 'Karşılaştırmayı görmek için ilk review’ünü tamamla')}</p>
+        <p className="text-white/50">{'Complete an AI review to see how you compare'}</p>
         <button type="button" onClick={onUpload} className="mt-6 font-bold text-white hover:text-white/80">
-          {t('Get your first review', 'İlk review’ünü al')} →
+          {'Get your first review'} →
         </button>
       </div>
     </div>
   );
 }
 
-function ReviewSummary({ review, locale, onFix, isFixing }: { review: AiReviewClientReview; locale: Locale; onFix: () => void; isFixing: boolean }) {
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
+function ReviewSummary({
+  review,
+  onFix,
+  isFixing
+}: {
+  review: AiReviewClientReview;
+  onFix: () => void;
+  isFixing: boolean;
+}) {
   const scoreTone = review.score >= 70 ? 'text-emerald-500' : review.score >= 55 ? 'text-amber-500' : 'text-rose-500';
 
   return (
     <div className="flex min-h-[390px] flex-col">
       <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-bold text-white">{t("We'll help rebuild fast - unlock your job-ready plan", 'Job-ready planı açarak hızlıca iyileştirelim')}</p>
+          <p className="font-bold text-white">{"We'll help rebuild fast - unlock your job-ready plan"}</p>
           <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-white text-slate-950 hover:bg-white/90">
             {isFixing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LockKeyhole className="mr-2 h-4 w-4" />}
-            {t('Fix CV', 'CV’yi Fixle')}
+            {'Fix CV'}
           </Button>
         </div>
       </div>
-
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <ScoreDonut score={review.score} />
         <h3 className={`mt-6 text-2xl font-black ${scoreTone}`}>{review.analysis.rating} - {review.headline}</h3>
         <p className="mt-3 max-w-md text-sm text-white/50">
-          {t(
-            'Unlock deterministic findings into rewritten bullets, structure fixes, and a clean editable CV.',
-            'Deterministik bulguları rewritten bullet, yapı düzeltmeleri ve temiz düzenlenebilir CV’ye dönüştür.',
-          )}
+          {'Unlock deterministic findings into rewritten bullets, structure fixes, and a clean editable CV.'}
         </p>
       </div>
     </div>
@@ -765,45 +753,38 @@ function ReviewSummary({ review, locale, onFix, isFixing }: { review: AiReviewCl
 
 function ResultPanel({
   review,
-  locale,
   onFix,
   isFixing,
-  fixCreditCost,
+  fixCreditCost
 }: {
   review: AiReviewClientReview;
-  locale: Locale;
   onFix: () => void;
   isFixing: boolean;
   fixCreditCost: number;
 }) {
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
-
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-sm">
       <div className="mb-7 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-black text-white">{t('Unlock Full Review', 'Full Review Aç')}</p>
-            <p className="text-sm text-white/50">{fixCreditCost} {t('credits for a new fixed CV', 'kredi ile yeni düzeltilmiş CV')}</p>
+            <p className="font-black text-white">{'Unlock Full Review'}</p>
+            <p className="text-sm text-white/50">{fixCreditCost} {'credits for a new fixed CV'}</p>
           </div>
           <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-white px-5 text-slate-950 hover:bg-white/90">
             {isFixing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-            {t('Get Job-Ready Review', 'Job-Ready Review Al')}
+            {'Get Job-Ready Review'}
           </Button>
         </div>
       </div>
-
       <div className="flex flex-col items-center">
         <ScoreDonut score={review.score} />
         <h2 className="mt-6 text-center text-2xl font-black text-white">{review.analysis.rating}</h2>
         <p className="mt-2 text-center text-sm text-white/50">{review.headline}</p>
       </div>
-
       <div className="mt-8">
         <div className="mb-4 flex items-center gap-2 font-black text-white">
           <BarChart3 className="h-5 w-5" />
-          {t('Category Breakdown', 'Kategori Dağılımı')}
+          {'Category Breakdown'}
         </div>
         <div className="space-y-3">
           {Object.entries(review.analysis.breakdown).map(([key, value]) => {
@@ -821,9 +802,8 @@ function ResultPanel({
           })}
         </div>
       </div>
-
       <div className="mt-8">
-        <h3 className="mb-3 font-black text-white">{t('Deterministic Findings', 'Deterministik Bulgular')}</h3>
+        <h3 className="mb-3 font-black text-white">{'Deterministic Findings'}</h3>
         <div className="space-y-3">
           {review.analysis.findings.slice(0, 6).map((finding) => (
             <div key={finding.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -917,26 +897,21 @@ function BillingModal({
   onOpenChange,
   packages,
   fixCreditCost,
-  billingSchemaMissing,
-  locale,
+  billingSchemaMissing
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   packages: BillingPackageView[];
   fixCreditCost: number;
   billingSchemaMissing: boolean;
-  locale: Locale;
 }) {
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-[#05070b] p-0 text-white shadow-2xl">
         <DialogHeader className="border-b border-white/10 p-7">
-          <DialogTitle className="text-3xl font-black">{t('Unlock Full Review', 'Full Review Aç')}</DialogTitle>
+          <DialogTitle className="text-3xl font-black">{'Unlock Full Review'}</DialogTitle>
           <DialogDescription className="text-white/60">
-            {t('You need credits to create a new fixed CV.', 'Yeni düzeltilmiş CV oluşturmak için kredi gerekir.')} {fixCreditCost} {t('credits required.', 'kredi gerekli.')}
+            {'You need credits to create a new fixed CV.'} {fixCreditCost} {'credits required.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -966,7 +941,7 @@ function BillingModal({
                 </div>
                 <CheckoutButton
                   packageCode={pkg.code}
-                  label={t('Buy Credits', 'Kredi Satın Al')}
+                  label={'Buy Credits'}
                   theme="dark"
                   className="w-full rounded-xl bg-white text-slate-950 hover:bg-white/90"
                 />

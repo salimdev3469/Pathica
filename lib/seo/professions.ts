@@ -1,4 +1,3 @@
-import type { Locale } from '@/lib/locale';
 import { localizedPath } from '@/lib/seo/config';
 
 export interface ProfessionSeed {

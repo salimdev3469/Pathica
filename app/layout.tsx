@@ -6,7 +6,6 @@ import CssHealthCheck from '@/components/CssHealthCheck';
 import { ThemeProvider } from '@/components/theme-provider';
 import NavigationFeedback from '@/components/NavigationFeedback';
 import SiteFooter from '@/components/layout/SiteFooter';
-import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { getBaseUrl } from '@/lib/seo/config';
 import { Toaster } from '@/components/ui/sonner';
 import CookieConsentBanner from '@/components/legal/CookieConsentBanner';
@@ -77,7 +76,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = cookies();
-  const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE_NAME)?.value);
   const initialCookieConsent = cookieStore.get(COOKIE_CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
@@ -87,8 +85,8 @@ export default function RootLayout({
           <CssHealthCheck />
           <NavigationFeedback />
           {children}
-          <SiteFooter locale={locale} />
-          <CookieConsentBanner locale={locale} initialConsentValue={initialCookieConsent} />
+          <SiteFooter />
+          <CookieConsentBanner initialConsentValue={initialCookieConsent} />
           <Toaster />
         </ThemeProvider>
       </body>

@@ -5,9 +5,7 @@ import { localeAlternates } from '@/lib/seo/config';
 import { getProfessionListPath, professionSeeds } from '@/lib/seo/professions';
 
 interface ResumeExamplesPageProps {
-  params: {
-    locale: string;
-  };
+  params: {};
 }
 
 export function generateStaticParams() {
@@ -48,10 +46,8 @@ export default function ResumeExamplesPage({ params }: ResumeExamplesPageProps) 
 
   return (
     <ProgrammaticProfessionListPage
-      locale="en"
       title="Resume Examples by Job Title"
       description="Explore profession-specific resume examples, skill cues, and measurable achievement patterns you can adapt quickly."
-      professions={professionSeeds}
-    />
+      professions={professionSeeds} />
   );
 }

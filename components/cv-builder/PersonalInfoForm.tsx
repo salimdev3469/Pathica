@@ -1,8 +1,6 @@
-'use client';
-
+'use client';;
 import React, { useRef } from 'react';
 import { toast } from 'sonner';
-import type { Locale } from '@/lib/locale';
 import { useCV } from '@/context/CVContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,16 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { CV_PAGE_WIDTH_PX, normalizeCvPageMargins } from '@/lib/cv-layout';
 
-type PersonalInfoFormProps = {
-  locale?: Locale;
-};
+type PersonalInfoFormProps = {};
 
 const DEFAULT_PHOTO_SIZE = 112;
 const MIN_PHOTO_SIZE = 72;
 const MAX_PHOTO_SIZE = 200;
 
 export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { state, dispatch } = useCV();
@@ -40,12 +35,12 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error(t('Please select an image file.', 'Lutfen bir gorsel dosyasi secin.'));
+      toast.error('Please select an image file.');
       return;
     }
 
     if (file.size > 3 * 1024 * 1024) {
-      toast.error(t('Image must be smaller than 3MB.', 'Gorsel 3MB altinda olmali.'));
+      toast.error('Image must be smaller than 3MB.');
       return;
     }
 
@@ -70,7 +65,7 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
         },
       });
 
-      toast.success(t('Photo uploaded. You can drag it in preview.', 'Fotograf yuklendi. Onizlemede surukleyebilirsin.'));
+      toast.success('Photo uploaded. You can drag it in preview.');
     };
 
     reader.readAsDataURL(file);
@@ -107,12 +102,12 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
   return (
     <Card className="mb-6 border-primary/20 bg-primary/5 shadow-sm">
       <CardHeader className="mb-3 border-b border-primary/10 pb-3">
-        <CardTitle className="flex justify-between text-lg text-primary">{t('Personal Information & Summary', 'Kisisel Bilgiler ve Ozet')}</CardTitle>
+        <CardTitle className="flex justify-between text-lg text-primary">{'Personal Information & Summary'}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div className="flex flex-col gap-1">
-            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Full Name', 'Ad Soyad')}</label>
+            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{'Full Name'}</label>
             <div className="flex gap-2">
               <Input value={personalInfo?.fullName || ''} onChange={(e) => handleInfoChange('fullName', e.target.value)} className="bg-white flex-1" />
               <Input
@@ -123,12 +118,12 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
                 placeholder="18"
                 onChange={(e) => handleInfoChange('fullNameFontSize', e.target.value === '' ? 18 : Number(e.target.value))}
                 className="bg-white w-16 px-2"
-                title={t('Font Size', 'Yazı Büyüklüğü')}
+                title={'Font Size'}
               />
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Job Title', 'Meslek / Ünvan')}</label>
+            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{'Job Title'}</label>
             <div className="flex gap-2">
               <Input value={personalInfo?.jobTitle || ''} onChange={(e) => handleInfoChange('jobTitle', e.target.value)} className="bg-white flex-1" />
               <Input
@@ -139,12 +134,12 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
                 placeholder="14"
                 onChange={(e) => handleInfoChange('jobTitleFontSize', e.target.value === '' ? 14 : Number(e.target.value))}
                 className="bg-white w-16 px-2"
-                title={t('Font Size', 'Yazı Büyüklüğü')}
+                title={'Font Size'}
               />
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Email & {t('Contact Font Size', 'İletişim Font Büyüklüğü')}</label>
+            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Email & {'Contact Font Size'}</label>
             <div className="flex gap-2">
               <Input value={personalInfo?.email || ''} onChange={(e) => handleInfoChange('email', e.target.value)} className="bg-white flex-1" />
               <Input
@@ -155,16 +150,16 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
                 placeholder="10"
                 onChange={(e) => handleInfoChange('contactFontSize', e.target.value === '' ? 10 : Number(e.target.value))}
                 className="bg-white w-16 px-2"
-                title={t('Contact Info Font Size', 'İletişim Font Büyüklüğü')}
+                title={'Contact Info Font Size'}
               />
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Phone', 'Telefon')}</label>
+            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{'Phone'}</label>
             <Input value={personalInfo?.phone || ''} onChange={(e) => handleInfoChange('phone', e.target.value)} className="bg-white" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Location', 'Konum')}</label>
+            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{'Location'}</label>
             <Input value={personalInfo?.location || ''} onChange={(e) => handleInfoChange('location', e.target.value)} className="bg-white" />
           </div>
           <div className="flex flex-col gap-1">
@@ -172,21 +167,21 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
             <Input value={personalInfo?.linkedin || ''} onChange={(e) => handleInfoChange('linkedin', e.target.value)} className="bg-white" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Portfolio / GitHub', 'Portfolyo / GitHub')}</label>
+            <label className="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{'Portfolio / GitHub'}</label>
             <Input value={personalInfo?.portfolio || ''} onChange={(e) => handleInfoChange('portfolio', e.target.value)} className="bg-white" />
           </div>
         </div>
 
         <div className="rounded-md border border-primary/20 bg-white/70 p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-600">{t('Profile Photo', 'Profil Fotografi')}</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-600">{'Profile Photo'}</p>
             <div className="flex gap-2">
               <Button type="button" size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                {personalInfo?.photoDataUrl ? t('Change Photo', 'Fotografi Degistir') : t('Upload Photo', 'Fotograf Yukle')}
+                {personalInfo?.photoDataUrl ? 'Change Photo' : 'Upload Photo'}
               </Button>
               {personalInfo?.photoDataUrl && (
                 <Button type="button" size="sm" variant="ghost" onClick={handleRemovePhoto}>
-                  {t('Remove', 'Kaldir')}
+                  {'Remove'}
                 </Button>
               )}
             </div>
@@ -197,7 +192,7 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
           {personalInfo?.photoDataUrl && (
             <div className="mt-3 space-y-2">
               <div className="flex items-center justify-between text-xs text-slate-500">
-                <span>{t('Photo Size', 'Fotograf Boyutu')}</span>
+                <span>{'Photo Size'}</span>
                 <span>{Math.round(personalInfo?.photoSize || DEFAULT_PHOTO_SIZE)} px</span>
               </div>
               <input
@@ -213,18 +208,18 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
           )}
 
           <p className="text-xs text-slate-500">
-            {t('Default position is top-right. Drag in preview to move it freely anywhere on the page and resize with the slider.', 'Varsayilan konum sag ust. Sayfa icinde serbestce tasimak icin onizlemede surukle, boyut icin kaydiriciyi kullan.')}
+            {'Default position is top-right. Drag in preview to move it freely anywhere on the page and resize with the slider.'}
           </p>
         </div>
 
         <div className="mt-2 flex flex-col gap-1 border-t border-primary/10 pt-2">
-          <label className="mt-1 pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Summary Title', 'Ozet Basligi')}</label>
+          <label className="mt-1 pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{'Summary Title'}</label>
           <div className="flex gap-2">
             <Input
               value={summaryTitle || ''}
               onChange={(e) => dispatch({ type: 'UPDATE_SUMMARY_TITLE', payload: e.target.value })}
               className="bg-white flex-1"
-              placeholder={t('e.g. Profile Summary', 'Orn. Profil Ozeti')}
+              placeholder={'e.g. Profile Summary'}
             />
             <Input
               type="number"
@@ -234,16 +229,16 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
               placeholder="12"
               onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, summaryTitleFontSize: e.target.value === '' ? 12 : Number(e.target.value) } })}
               className="bg-white w-16 px-2"
-              title={t('Font Size', 'Yazı Büyüklüğü')}
+              title={'Font Size'}
             />
           </div>
-          <label className="mt-2 pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Summary Content', 'Ozet Icerigi')}</label>
+          <label className="mt-2 pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{'Summary Content'}</label>
           <div className="relative">
             <Textarea
               value={summary || ''}
               onChange={(e) => dispatch({ type: 'UPDATE_SUMMARY', payload: e.target.value })}
               className="min-h-[100px] bg-white pr-20"
-              placeholder={t('Enter a brief summary...', 'Kisa bir ozet girin...')}
+              placeholder={'Enter a brief summary...'}
             />
             <div className="absolute right-2 top-2 w-16">
               <Input
@@ -254,7 +249,7 @@ export function PersonalInfoForm({ locale = 'en' }: PersonalInfoFormProps) {
                 placeholder="11"
                 onChange={(e) => dispatch({ type: 'SET_CV', payload: { ...state, summaryFontSize: e.target.value === '' ? 11 : Number(e.target.value) } })}
                 className="bg-white px-2 h-8 text-xs"
-                title={t('Font Size', 'Yazı Büyüklüğü')}
+                title={'Font Size'}
               />
             </div>
           </div>

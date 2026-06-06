@@ -5,13 +5,9 @@ import { Button } from '@/components/ui/button';
 import type { TemplateLocale } from '@/lib/cv-templates';
 import { getCvTemplateSeed, getLocalizedText } from '@/lib/cv-templates';
 
-type TemplateLibraryGridProps = {
-  locale: TemplateLocale;
-};
+type TemplateLibraryGridProps = {};
 
-export function TemplateLibraryGrid({ locale }: TemplateLibraryGridProps) {
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
+export function TemplateLibraryGrid({}: TemplateLibraryGridProps) {
   const template = getCvTemplateSeed('classic-ats');
 
   if (!template) {
@@ -19,9 +15,9 @@ export function TemplateLibraryGrid({ locale }: TemplateLibraryGridProps) {
   }
 
   const highlights = [
-    t('Experience-first structure', 'Deneyim odaklı yapı'),
-    t('ATS-safe section labels', 'ATS uyumlu bölüm başlıkları'),
-    t('Clean PDF-ready spacing', 'Temiz ve PDF’ye hazır boşluk yapısı'),
+    'Experience-first structure',
+    'ATS-safe section labels',
+    'Clean PDF-ready spacing',
   ];
 
   return (
@@ -29,14 +25,11 @@ export function TemplateLibraryGrid({ locale }: TemplateLibraryGridProps) {
       <div className="flex flex-col justify-between gap-8">
         <div className="space-y-6">
           <span className="inline-flex rounded-full border border-slate-300 bg-slate-50 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-700">
-            {t('Default ATS template', 'Varsayılan ATS şablonu')}
+            {'Default ATS template'}
           </span>
-          <h3 className="text-4xl font-semibold tracking-[-0.05em] text-slate-950 md:text-5xl">{t('Classic ATS', 'Klasik ATS')}</h3>
+          <h3 className="text-4xl font-semibold tracking-[-0.05em] text-slate-950 md:text-5xl">{'Classic ATS'}</h3>
           <p className="max-w-[42ch] text-lg leading-8 text-slate-600">
-            {t(
-              'This is the same structure Pathica opens by default in the editor. Clean hierarchy, ATS-safe headings, and balanced spacing from the first draft.',
-              'Bu, Pathica’nın editörde varsayılan açtığı aynı yapıdır. İlk taslaktan itibaren temiz hiyerarşi, ATS-safe başlıklar ve dengeli boşluk yapısı sunar.',
-            )}
+            {'This is the same structure Pathica opens by default in the editor. Clean hierarchy, ATS-safe headings, and balanced spacing from the first draft.'}
           </p>
           <div className="grid gap-3">
             {highlights.map((highlight) => (
@@ -61,21 +54,20 @@ export function TemplateLibraryGrid({ locale }: TemplateLibraryGridProps) {
           </div>
           <Button asChild className="h-12 rounded-full px-6 text-base">
             <Link href={`/cv/new?template=${template.slug}`}>
-              {t('Use This Template', 'Bu Şablonu Kullan')}
+              {'Use This Template'}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>
       </div>
-
       <div className="relative">
         <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[30px] bg-gradient-to-br from-blue-100 via-sky-50 to-slate-100" />
         <div className="relative rounded-[30px] border border-slate-200 bg-[#f8fafc] p-4 shadow-[0_22px_60px_-36px_rgba(15,23,42,0.22)]">
           <div className="absolute left-4 top-4 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-            {t('ATS-safe layout', 'ATS-safe yerleşim')}
+            {'ATS-safe layout'}
           </div>
           <div className="absolute right-4 top-4 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-            {t('Ready in editor', 'Editörde hazır')}
+            {'Ready in editor'}
           </div>
           <div className="mx-auto mt-10 max-w-[460px] overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_28px_70px_-36px_rgba(15,23,42,0.2)]">
             <Image

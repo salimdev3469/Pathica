@@ -1,4 +1,3 @@
-import type { Locale } from '@/lib/locale';
 import { localizedPath } from '@/lib/seo/config';
 
 export type SeoLandingKey =
@@ -26,7 +25,6 @@ export interface SeoLandingFaq {
 
 export interface SeoLandingPage {
   key: SeoLandingKey;
-  locale: Locale;
   slug: string;
   title: string;
   description: string;

@@ -1,9 +1,7 @@
-'use client';
-
+'use client';;
 import { useRef, useState } from 'react';
 import { Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Locale } from '@/lib/locale';
 import { useCV } from '@/context/CVContext';
 import { applyImportedCvToState, type CvImportMode, type ImportedCvDraft } from '@/lib/cv-import';
 import { Button } from '@/components/ui/button';
@@ -18,9 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type CvImportDialogProps = {
-  locale?: Locale;
-};
+type CvImportDialogProps = {};
 
 type ImportResponse = {
   importedCv?: ImportedCvDraft;
@@ -28,7 +24,6 @@ type ImportResponse = {
 };
 
 export function CvImportDialog({ locale = 'en' }: CvImportDialogProps) {
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
   const { state, dispatch } = useCV();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
@@ -59,7 +54,7 @@ export function CvImportDialog({ locale = 'en' }: CvImportDialogProps) {
 
   const handleImport = async () => {
     if (!file) {
-      toast.error(t('Please choose a CV file first.', 'Lütfen önce bir CV dosyası seçin.'));
+      toast.error('Please choose a CV file first.');
       return;
     }
 
@@ -77,7 +72,7 @@ export function CvImportDialog({ locale = 'en' }: CvImportDialogProps) {
 
       const payload = (await response.json().catch(() => null)) as ImportResponse | null;
       if (!response.ok || !payload?.importedCv) {
-        throw new Error(payload?.error || t('Could not import CV file.', 'CV dosyası içe aktarılamadı.'));
+        throw new Error(payload?.error || 'Could not import CV file.');
       }
 
       const merged = applyImportedCvToState(state, payload.importedCv, mode);
@@ -85,8 +80,8 @@ export function CvImportDialog({ locale = 'en' }: CvImportDialogProps) {
 
       toast.success(
         mode === 'replace'
-          ? t('Imported CV data replaced your current content.', 'İçe aktarılan CV, mevcut içeriğin yerine uygulandı.')
-          : t('Imported CV data merged into your current content.', 'İçe aktarılan CV, mevcut içerikle birleştirildi.'),
+          ? 'Imported CV data replaced your current content.'
+          : 'Imported CV data merged into your current content.',
       );
 
       setOpen(false);
@@ -95,7 +90,7 @@ export function CvImportDialog({ locale = 'en' }: CvImportDialogProps) {
       const message =
         error instanceof Error
           ? error.message
-          : t('An unexpected error occurred during import.', 'İçe aktarma sırasında beklenmeyen bir hata oluştu.');
+          : 'An unexpected error occurred during import.';
       toast.error(message);
     } finally {
       setIsImporting(false);
@@ -107,47 +102,37 @@ export function CvImportDialog({ locale = 'en' }: CvImportDialogProps) {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full gap-2 border-slate-200 bg-white text-slate-700 hover:bg-slate-50 sm:w-auto">
           <Upload className="h-4 w-4" />
-          {t('Import CV', 'CV İçe Aktar')}
+          {'Import CV'}
         </Button>
       </DialogTrigger>
-
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{t('Import CV File', 'CV Dosyası İçe Aktar')}</DialogTitle>
+          <DialogTitle>{'Import CV File'}</DialogTitle>
           <DialogDescription>
-            {t(
-              'Upload a PDF, DOC, DOCX, or TXT file. We will extract your data and update this CV.',
-              'PDF, DOC, DOCX veya TXT dosyası yükleyin. Bilgiler çıkarılıp bu CV güncellenecek.',
-            )}
+            {'Upload a PDF, DOC, DOCX, or TXT file. We will extract your data and update this CV.'}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-1">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">{t('Update Mode', 'Güncelleme Modu')}</label>
+            <label className="text-sm font-medium text-slate-700">{'Update Mode'}</label>
             <Select value={mode} onValueChange={(value) => setMode(value as CvImportMode)}>
               <SelectTrigger>
-                <SelectValue placeholder={t('Select mode', 'Mod seçin')} />
+                <SelectValue placeholder={'Select mode'} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="merge">
-                  {t('Merge with current CV', 'Mevcut CV ile birleştir')}
+                  {'Merge with current CV'}
                 </SelectItem>
                 <SelectItem value="replace">
-                  {t('Replace section contents', 'Bölüm içeriklerini değiştir')}
+                  {'Replace section contents'}
                 </SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-slate-500">
               {mode === 'merge'
-                ? t(
-                    'Matching sections are updated, unmatched sections are added.',
-                    'Eşleşen bölümler güncellenir, eşleşmeyen bölümler eklenir.',
-                  )
-                : t(
-                    'Imported sections replace current sections. Styling settings remain.',
-                    'İçe aktarılan bölümler mevcut bölümlerin yerini alır. Stil ayarları korunur.',
-                  )}
+                ? 'Matching sections are updated, unmatched sections are added.'
+                : 'Imported sections replace current sections. Styling settings remain.'}
             </p>
           </div>
 
@@ -166,16 +151,16 @@ export function CvImportDialog({ locale = 'en' }: CvImportDialogProps) {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm font-medium text-slate-800">
-                  {file ? file.name : t('No file selected', 'Dosya seçilmedi')}
+                  {file ? file.name : 'No file selected'}
                 </p>
                 <p className="text-xs text-slate-500">
                   {file
-                    ? `${formatFileSize(file.size)} • ${file.type || t('unknown type', 'bilinmeyen tür')}`
-                    : t('Maximum file size: 5MB', 'Maksimum dosya boyutu: 5MB')}
+                    ? `${formatFileSize(file.size)} • ${file.type || 'unknown type'}`
+                    : 'Maximum file size: 5MB'}
                 </p>
               </div>
               <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isImporting}>
-                {file ? t('Change File', 'Dosyayı Değiştir') : t('Choose File', 'Dosya Seç')}
+                {file ? 'Change File' : 'Choose File'}
               </Button>
             </div>
           </div>
@@ -183,11 +168,11 @@ export function CvImportDialog({ locale = 'en' }: CvImportDialogProps) {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={isImporting}>
-            {t('Cancel', 'İptal')}
+            {'Cancel'}
           </Button>
           <Button onClick={handleImport} disabled={isImporting || !file} className="gap-2">
             {isImporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            {isImporting ? t('Importing...', 'İçe aktarılıyor...') : t('Import and Update', 'İçe Aktar ve Güncelle')}
+            {isImporting ? 'Importing...' : 'Import and Update'}
           </Button>
         </DialogFooter>
       </DialogContent>

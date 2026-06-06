@@ -1,15 +1,9 @@
-'use client';
-
-import type { Locale } from '@/lib/locale';
+'use client';;
 import { COOKIE_CONSENT_OPEN_PANEL_EVENT } from '@/lib/cookie-consent';
 
-type CookieSettingsButtonProps = {
-  locale: Locale;
-};
+type CookieSettingsButtonProps = {};
 
-export default function CookieSettingsButton({ locale }: CookieSettingsButtonProps) {
-  const isTr = locale === 'tr';
-
+export default function CookieSettingsButton({}: CookieSettingsButtonProps) {
   return (
     <button
       type="button"

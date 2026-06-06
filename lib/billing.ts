@@ -1,5 +1,4 @@
 import { supabaseAdmin } from '@/lib/supabase';
-import type { Locale } from '@/lib/locale';
 import {
   BILLING_PACKAGES,
   FREE_SIGNUP_AI_CREDITS,

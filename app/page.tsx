@@ -12,7 +12,6 @@ import {
   getShopierCheckoutUrl,
 } from '@/lib/billing-config';
 import { getBillingSummaryText } from '@/lib/billing';
-import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { HomeCinematicExperience } from '@/components/home/HomeCinematicExperience';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -61,10 +60,6 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
-
   const supabase = createClient();
   let user: { id: string } | null = null;
   try {
@@ -78,74 +73,59 @@ export default async function Home() {
 
   const isAuthenticated = Boolean(user);
   const navCtaHref = isAuthenticated ? '/dashboard' : '/register';
-  const navCtaLabel = isAuthenticated ? t('Dashboard', 'Panel') : t('Start Free', 'Başla');
+  const navCtaLabel = isAuthenticated ? 'Dashboard' : 'Start Free';
   const heroPrimaryHref = isAuthenticated ? '/dashboard' : '/cv/new';
-  const heroPrimaryLabel = isAuthenticated ? t('Open Dashboard', 'Panele Git') : t('Build Free CV', 'Ücretsiz CV Oluştur');
+  const heroPrimaryLabel = isAuthenticated ? 'Open Dashboard' : 'Build Free CV';
   const billingSummaryText = getBillingSummaryText(locale);
   const logoSrc = getLogoSrc();
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
 
   const faqItems = [
     {
-      question: t('How is this different from a general AI chatbot?', 'Bu genel bir AI chatbot’tan nasıl ayrılıyor?'),
-      answer: t(
-        'A chatbot rewrites one bullet at a time. Pathica keeps the template, job-match context, ATS structure, and export flow in the same workspace.',
-        'Bir chatbot tek tek madde düzeltir. Pathica ise şablonu, ilan bağlamını, ATS yapısını ve export akışını aynı çalışma alanında tutar.',
-      ),
+      question: 'How is this different from a general AI chatbot?',
+      answer: 'A chatbot rewrites one bullet at a time. Pathica keeps the template, job-match context, ATS structure, and export flow in the same workspace.',
     },
     {
-      question: t('Will the resume read as AI-generated?', 'CV yapay yazılmış gibi mi görünür?'),
-      answer: t(
-        'The goal is not generic copy. Pathica helps tighten wording around your own experience, results, and target role.',
-        'Amaç jenerik bir çıktı vermek değil. Pathica kendi deneyimini, sonuçlarını ve hedef rolünü daha net anlatmana yardım eder.',
-      ),
+      question: 'Will the resume read as AI-generated?',
+      answer: 'The goal is not generic copy. Pathica helps tighten wording around your own experience, results, and target role.',
     },
     {
-      question: t('Does it pass applicant tracking systems?', 'ATS sistemlerinden geçer mi?'),
-      answer: t(
-        'The builder is structured around ATS-safe section order, simple layout rules, readable spacing, and export-safe formatting.',
-        'Builder; ATS-safe bölüm sırası, sade yerleşim kuralları, okunur boşluk yapısı ve export-safe format etrafında kuruludur.',
-      ),
+      question: 'Does it pass applicant tracking systems?',
+      answer: 'The builder is structured around ATS-safe section order, simple layout rules, readable spacing, and export-safe formatting.',
     },
     {
-      question: t('Can I export to PDF and keep editing later?', 'PDF dışa aktarabilir ve sonra düzenlemeye devam edebilir miyim?'),
-      answer: t(
-        'Yes. You can keep iterating in the same workspace and export only when the draft is ready.',
-        'Evet. Aynı çalışma alanında düzenlemeye devam edip yalnızca taslak hazır olduğunda export alabilirsin.',
-      ),
+      question: 'Can I export to PDF and keep editing later?',
+      answer: 'Yes. You can keep iterating in the same workspace and export only when the draft is ready.',
     },
     {
-      question: t('Can I use it without design skills?', 'Tasarım bilgisi olmadan kullanabilir miyim?'),
-      answer: t(
-        'Yes. Pathica is opinionated on structure and spacing, so you focus on the content rather than formatting choices.',
-        'Evet. Pathica yapı ve boşluk tarafında kararları senin yerine daraltır; sen format yerine içeriğe odaklanırsın.',
-      ),
+      question: 'Can I use it without design skills?',
+      answer: 'Yes. Pathica is opinionated on structure and spacing, so you focus on the content rather than formatting choices.',
     },
   ];
 
   const proofMetrics = [
     {
-      label: t('ATS readability', 'ATS okunabilirliği'),
+      label: 'ATS readability',
       score: 25,
       total: 25,
     },
     {
-      label: t('Content quality', 'İçerik kalitesi'),
+      label: 'Content quality',
       score: 32,
       total: 35,
     },
     {
-      label: t('Writing', 'Yazım'),
+      label: 'Writing',
       score: 9,
       total: 10,
     },
     {
-      label: t('Job match', 'İlan uyumu'),
+      label: 'Job match',
       score: 20,
       total: 25,
     },
     {
-      label: t('Application ready', 'Başvuru hazırlığı'),
+      label: 'Application ready',
       score: 5,
       total: 5,
     },
@@ -155,32 +135,23 @@ export default async function Home() {
     {
       number: '01',
       icon: 'foundation' as const,
-      title: t('Start from a clean base', 'Temiz bir temelle başla'),
-      description: t(
-        'Open an ATS-safe structure with live preview already in place.',
-        'Canlı önizleme hazır, ATS-safe bir yapı ile doğrudan başla.',
-      ),
-      label: t('Base', 'Temel'),
+      title: 'Start from a clean base',
+      description: 'Open an ATS-safe structure with live preview already in place.',
+      label: 'Base',
     },
     {
       number: '02',
       icon: 'tailor' as const,
-      title: t('Tailor for the role', 'Role göre özelleştir'),
-      description: t(
-        'Paste the job description and strengthen weak bullets without flattening your tone.',
-        'İlanı yapıştır, zayıf maddeleri tonunu kaybetmeden güçlendir.',
-      ),
-      label: t('Tailor', 'Özelleştir'),
+      title: 'Tailor for the role',
+      description: 'Paste the job description and strengthen weak bullets without flattening your tone.',
+      label: 'Tailor',
     },
     {
       number: '03',
       icon: 'deliver' as const,
-      title: t('Export when it is ready', 'Hazır olduğunda dışa aktar'),
-      description: t(
-        'Keep editing in one place, then export a recruiter-safe PDF only when the draft is tight.',
-        'Taslak oturduğunda recruiter-safe PDF’i dışa aktar; tüm düzenleme tek yerde kalsın.',
-      ),
-      label: t('Deliver', 'Teslim'),
+      title: 'Export when it is ready',
+      description: 'Keep editing in one place, then export a recruiter-safe PDF only when the draft is tight.',
+      label: 'Deliver',
     },
   ];
 
@@ -192,20 +163,17 @@ export default async function Home() {
       return {
         id: pkg.code,
         code: pkg.code,
-        name: t('Starter', 'Starter'),
+        name: 'Starter',
         displayPrice: formatUsd(pkg.priceUsd),
-        description: t(
-          'A focused pack for one or two strong application passes.',
-          'Bir veya iki güçlü başvuru turu için odaklı paket.',
-        ),
+        description: 'A focused pack for one or two strong application passes.',
         features: [
-          t('100 AI credits for tailoring and rewrite tools', 'Tailor ve rewrite araçları için 100 AI kredi'),
-          t('Good fit for one resume plus a few role adjustments', 'Bir CV ve birkaç rol özelleştirmesi için uygun'),
-          t('One-time purchase, no subscription pressure', 'Tek seferlik ödeme, abonelik baskısı yok'),
+          '100 AI credits for tailoring and rewrite tools',
+          'Good fit for one resume plus a few role adjustments',
+          'One-time purchase, no subscription pressure',
         ],
         isPopular: pkg.highlight,
         isConfigured,
-        ctaLabel: t('Choose Starter', 'Starter’ı Seç'),
+        ctaLabel: 'Choose Starter',
         href,
       };
     }
@@ -214,20 +182,17 @@ export default async function Home() {
       return {
         id: pkg.code,
         code: pkg.code,
-        name: t('Pro', 'Pro'),
+        name: 'Pro',
         displayPrice: formatUsd(pkg.priceUsd),
-        description: t(
-          'Best balance for active search, repeated tailoring, and export.',
-          'Aktif iş arayışı, tekrar tekrar özelleştirme ve export için en dengeli paket.',
-        ),
+        description: 'Best balance for active search, repeated tailoring, and export.',
         features: [
-          t('300 AI credits for multiple job-specific rewrites', 'Çoklu role göre rewrite için 300 AI kredi'),
-          t('Covers repeated ATS checks and stronger content passes', 'Tekrarlı ATS kontrolleri ve güçlü içerik turunu kapsar'),
-          t('Most practical pack for multi-role applications', 'Birden fazla role başvuranlar için en pratik paket'),
+          '300 AI credits for multiple job-specific rewrites',
+          'Covers repeated ATS checks and stronger content passes',
+          'Most practical pack for multi-role applications',
         ],
         isPopular: pkg.highlight,
         isConfigured,
-        ctaLabel: t('Choose Pro', 'Pro’yu Seç'),
+        ctaLabel: 'Choose Pro',
         href,
       };
     }
@@ -235,20 +200,17 @@ export default async function Home() {
     return {
       id: pkg.code,
       code: pkg.code,
-      name: t('Mega', 'Mega'),
+      name: 'Mega',
       displayPrice: formatUsd(pkg.priceUsd),
-      description: t(
-        'A larger pack for heavy iteration, cover letters, and broad search.',
-        'Yoğun iterasyon, ön yazı üretimi ve geniş arama için daha büyük paket.',
-      ),
+      description: 'A larger pack for heavy iteration, cover letters, and broad search.',
       features: [
-        t('1000 AI credits for heavier resume and cover letter work', 'Yoğun CV ve ön yazı çalışması için 1000 AI kredi'),
-        t('Good fit for broad search or multiple application tracks', 'Geniş arama veya paralel başvuru akışları için uygun'),
-        t('One-time checkout, credits stay in your account', 'Tek seferlik ödeme, krediler hesabında kalır'),
+        '1000 AI credits for heavier resume and cover letter work',
+        'Good fit for broad search or multiple application tracks',
+        'One-time checkout, credits stay in your account',
       ],
       isPopular: pkg.highlight,
       isConfigured,
-      ctaLabel: t('Choose Mega', 'Mega’yı Seç'),
+      ctaLabel: 'Choose Mega',
       href,
     };
   });
@@ -278,14 +240,11 @@ export default async function Home() {
         price: '0',
         priceCurrency: 'USD',
       },
-      description: t(
-        'Pathica helps job seekers build ATS-friendly resumes, tailor content to job descriptions, and export recruiter-ready PDF resumes.',
-        'Pathica, iş arayanların ATS uyumlu CV oluşturmasına, ilan metnine göre içeriği özelleştirmesine ve recruiter-ready PDF CV dışa aktarmasına yardımcı olur.',
-      ),
+      description: 'Pathica helps job seekers build ATS-friendly resumes, tailor content to job descriptions, and export recruiter-ready PDF resumes.',
       featureList: [
-        t('ATS resume checker', 'ATS CV kontrolü'),
-        t('Resume keyword optimizer', 'CV anahtar kelime optimizasyonu'),
-        t('AI-assisted resume editing', 'AI destekli CV düzenleme'),
+        'ATS resume checker',
+        'Resume keyword optimizer',
+        'AI-assisted resume editing',
       ],
       url: baseUrl,
     },
@@ -306,166 +265,133 @@ export default async function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-
       <HomeCinematicExperience
-        locale={locale}
         isAuthenticated={isAuthenticated}
         logoSrc={logoSrc}
         navCtaHref={navCtaHref}
         navCtaLabel={navCtaLabel}
         heroPrimaryHref={heroPrimaryHref}
         heroPrimaryLabel={heroPrimaryLabel}
-        heroSecondaryLabel={t('See the proof', 'Proof’u gör')}
-        heroTitleTop={t('The AI that gets', 'The AI that gets')}
+        heroSecondaryLabel={'See the proof'}
+        heroTitleTop={'The AI that gets'}
         heroTitleAccentWords={
           isTr
             ? ['HRs', 'Engineers', 'Designers', 'Marketers', 'Developers']
             : ['HRs', 'Engineers', 'Designers', 'Marketers', 'Developers']
         }
-        heroTitleBottom={t('hired.', 'hired.')}
-        heroSubtitle={t(
-          'Write, tailor, check ATS fit, and export from one calm workspace. Pathica helps the final resume feel sharper before the PDF is even sent.',
-          'Yaz, role göre sıkılaştır, ATS uyumunu kontrol et ve export al. Pathica son CV’nin PDF gönderilmeden önce bile daha net ve güçlü görünmesini sağlar.',
-        )}
+        heroTitleBottom={'hired.'}
+        heroSubtitle={'Write, tailor, check ATS fit, and export from one calm workspace. Pathica helps the final resume feel sharper before the PDF is even sent.'}
         navLabels={{
-          proof: t('Proof', 'Proof'),
-          flow: t('How It Works', 'Nasıl Çalışır'),
-          pricing: t('Pricing', 'Fiyatlandırma'),
-          questions: t('Questions', 'Sorular'),
+          proof: 'Proof',
+          flow: 'How It Works',
+          pricing: 'Pricing',
+          questions: 'Questions',
         }}
         heroTrustItems={[
-          t('ATS-safe structure', 'ATS-safe yapı'),
+          'ATS-safe structure',
           isTr ? `${FREE_SIGNUP_EXPORTS} ücretsiz PDF export` : `${FREE_SIGNUP_EXPORTS} free PDF export`,
           isTr ? `${FREE_SIGNUP_AI_CREDITS} AI kredi` : `${FREE_SIGNUP_AI_CREDITS} AI credits`,
-          t('No subscription', 'Abonelik yok'),
+          'No subscription',
         ]}
         proof={{
-          label: t('THE PROOF', 'PROOF'),
-          title: t('See what recruiters see, before they do.', 'Recruiter ne görecekse, daha onlar bakmadan gör.'),
-          description: t(
-            'Every resume goes through the same screen recruiters use. You see the score, the weak spots, and the stronger rewrite before you export.',
-            'Her CV recruiter’ın gördüğü benzer bir kontrolden geçer. Skoru, zayıf kalan noktaları ve daha güçlü rewrite yönünü export’tan önce görürsün.',
-          ),
+          label: 'THE PROOF',
+          title: 'See what recruiters see, before they do.',
+          description: 'Every resume goes through the same screen recruiters use. You see the score, the weak spots, and the stronger rewrite before you export.',
           findings: [
             {
-              title: t('Strengths identified', 'Güçlü taraflar'),
-              body: t(
-                'Strong technical skills and quantified bullets with measurable business impact.',
-                'Ölçülebilir iş etkisi taşıyan güçlü teknik yetenekler ve sayısal sonuç içeren maddeler.',
-              ),
+              title: 'Strengths identified',
+              body: 'Strong technical skills and quantified bullets with measurable business impact.',
             },
             {
-              title: t('Improvement suggestions', 'İyileştirme önerileri'),
-              body: t(
-                'Move the most relevant role-specific project higher and tighten the summary around target keywords.',
-                'Role en uygun projeyi yukarı taşı ve özet kısmını hedef anahtar kelimeler etrafında sıkılaştır.',
-              ),
+              title: 'Improvement suggestions',
+              body: 'Move the most relevant role-specific project higher and tighten the summary around target keywords.',
             },
           ],
-          scoreLabel: t('Excellent', 'Mükemmel'),
+          scoreLabel: 'Excellent',
           metrics: proofMetrics,
         }}
         workflow={{
-          label: t('THE FLOW', 'AKIŞ'),
-          title: t('Three moves. One working surface.', 'Üç hamle. Tek çalışma yüzeyi.'),
-          description: t(
-            'You do not need a document, a chatbot, a design tool, and a PDF exporter open at the same time. Pathica compresses the workflow.',
-            'Aynı anda döküman, chatbot, tasarım aracı ve PDF exporter açık tutmana gerek kalmaz. Pathica akışı sıkıştırır.',
-          ),
+          label: 'THE FLOW',
+          title: 'Three moves. One working surface.',
+          description: 'You do not need a document, a chatbot, a design tool, and a PDF exporter open at the same time. Pathica compresses the workflow.',
           steps: workflowSteps,
         }}
         quote={{
-          label: t('HIRED', 'SONUÇ'),
+          label: 'HIRED',
           entries: [
             {
-              text: t(
-                'I used to rebuild every resume from scratch for each opening. Now I keep one strong base and tailor it in minutes.',
-                'Eskiden her ilan için CV’yi neredeyse baştan kuruyordum. Şimdi güçlü bir temel tutup birkaç dakikada role göre sıkılaştırıyorum.',
-              ),
+              text: 'I used to rebuild every resume from scratch for each opening. Now I keep one strong base and tailor it in minutes.',
               author: 'Sarah J.',
-              role: t('HR Specialist · London', 'İK Uzmanı · Londra'),
+              role: 'HR Specialist · London',
               initials: 'SJ',
               avatar: '/girl1.png',
             },
             {
-              text: t(
-                'The useful part is not just rewriting. It keeps the ATS-safe structure stable while I improve the bullets that matter.',
-                'Asıl fayda sadece yeniden yazım değil. Maddeleri güçlendirirken ATS-safe yapıyı sabit tutması başvuruyu çok daha kontrollü hale getiriyor.',
-              ),
+              text: 'The useful part is not just rewriting. It keeps the ATS-safe structure stable while I improve the bullets that matter.',
               author: 'David M.',
-              role: t('Data Analyst · Berlin', 'Veri Analisti · Berlin'),
+              role: 'Data Analyst · Berlin',
               initials: 'DM',
               avatar: '/man1.png',
             },
             {
-              text: t(
-                'My summary and experience read much tighter now. The final application feels designed for the role instead of generally polished.',
-                'Özet ve deneyim kısmı artık çok daha sıkı okunuyor. Son başvuru da genel olarak düzeltilmiş değil, role özel hazırlanmış gibi hissettiriyor.',
-              ),
+              text: 'My summary and experience read much tighter now. The final application feels designed for the role instead of generally polished.',
               author: 'Elif T.',
-              role: t('Product Designer · Istanbul', 'Ürün Tasarımcısı · İstanbul'),
+              role: 'Product Designer · Istanbul',
               initials: 'ET',
               avatar: '/girl2.png',
             },
           ],
         }}
         stats={{
-          label: t('OUTCOMES', 'ÇIKTI'),
-          companyLabel: t('users applying across teams like', 'kullanıcıların hedeflediği ekipler'),
+          label: 'OUTCOMES',
+          companyLabel: 'users applying across teams like',
           badges: [
             {
-              label: t('Operations', 'Operasyon'),
-              detail: t('Process-heavy roles that need clean metrics and readable bullet structure.', 'Süreç, raporlama ve ölçülebilir operasyon çıktısı isteyen roller.'),
+              label: 'Operations',
+              detail: 'Process-heavy roles that need clean metrics and readable bullet structure.',
             },
             {
-              label: t('Product', 'Ürün'),
-              detail: t('PM and product-adjacent applications where summary clarity changes first impression.', 'İlk izlenimi özet netliğinin değiştirdiği PM ve ürün odaklı başvurular.'),
+              label: 'Product',
+              detail: 'PM and product-adjacent applications where summary clarity changes first impression.',
             },
             {
-              label: t('Data', 'Veri'),
-              detail: t('Analyst and BI tracks that benefit from quantified impact and keyword alignment.', 'Sayısal etki ve ilan uyumunun kritik olduğu analist ve BI akışları.'),
+              label: 'Data',
+              detail: 'Analyst and BI tracks that benefit from quantified impact and keyword alignment.',
             },
             {
-              label: t('Sales', 'Satış'),
-              detail: t('Revenue-facing roles where outcomes, ownership, and progression need to read fast.', 'Sonuç, sahiplik ve ilerleme hikayesinin hızlı okunması gereken gelir odaklı roller.'),
+              label: 'Sales',
+              detail: 'Revenue-facing roles where outcomes, ownership, and progression need to read fast.',
             },
             {
-              label: t('Finance', 'Finans'),
-              detail: t('Structured applications that depend on disciplined formatting and precise language.', 'Disiplinli format ve hassas dil gerektiren daha yapı odaklı başvurular.'),
+              label: 'Finance',
+              detail: 'Structured applications that depend on disciplined formatting and precise language.',
             },
             {
-              label: t('Support', 'Destek'),
-              detail: t('Customer-facing roles that need calmer writing and more obvious service impact.', 'Daha sakin anlatım ve görünür hizmet etkisi isteyen müşteri odaklı roller.'),
+              label: 'Support',
+              detail: 'Customer-facing roles that need calmer writing and more obvious service impact.',
             },
           ],
           values: [
-            { value: '28K+', label: t('resumes tailored', 'özelleştirilen CV') },
-            { value: '1.8x', label: t('median interview rate', 'medyan mülakat oranı') },
-            { value: '300+', label: t('roles supported', 'desteklenen rol') },
+            { value: '28K+', label: 'resumes tailored' },
+            { value: '1.8x', label: 'median interview rate' },
+            { value: '300+', label: 'roles supported' },
           ],
         }}
         pricing={{
-          label: t('PRICING', 'FİYAT'),
-          title: t('Three tiers. No tricks.', 'Üç paket. Net fiyat.'),
-          description: t(
-            'Editing stays free. Credits are only for export and heavier AI actions, so you pay when the stronger layer actually helps.',
-            'Düzenleme ücretsiz kalır. Krediler yalnızca export ve daha ağır AI aksiyonlarında kullanılır; yani gerçekten ihtiyaç olduğunda ödeme yaparsın.',
-          ),
+          label: 'PRICING',
+          title: 'Three tiers. No tricks.',
+          description: 'Editing stays free. Credits are only for export and heavier AI actions, so you pay when the stronger layer actually helps.',
           summary: billingSummaryText,
-          footnote: t(
-            `After free usage: PDF export costs ${PDF_EXPORT_CREDIT_COST} credits, Tailor/Generate from Job cost ${ADVANCED_AI_CREDIT_COST} credits, Cover Letter costs ${COVER_LETTER_CREDIT_COST} credits.`,
-            `Ücretsiz hak sonrası: PDF export ${PDF_EXPORT_CREDIT_COST} kredi, Tailor/Generate from Job ${ADVANCED_AI_CREDIT_COST} kredi, Cover Letter ${COVER_LETTER_CREDIT_COST} kredi.`,
-          ),
+          footnote: `After free usage: PDF export costs ${PDF_EXPORT_CREDIT_COST} credits, Tailor/Generate from Job cost ${ADVANCED_AI_CREDIT_COST} credits, Cover Letter costs ${COVER_LETTER_CREDIT_COST} credits.`,
           packages: pricingPackages,
         }}
         faq={{
-          label: t('QUESTIONS', 'SORULAR'),
-          title: t('Answers, briefly.', 'Kısa cevaplar.'),
+          label: 'QUESTIONS',
+          title: 'Answers, briefly.',
           items: faqItems,
-          openLabel: t('Open', 'Aç'),
-          closeLabel: t('Close', 'Kapat'),
-        }}
-      />
+          openLabel: 'Open',
+          closeLabel: 'Close',
+        }} />
     </>
   );
 }

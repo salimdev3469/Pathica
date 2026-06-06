@@ -13,7 +13,6 @@ type WalletPayload = {
 };
 
 type LiveTokenCounterProps = {
-  locale?: 'en' | 'tr';
   initialCredits?: number;
   initialFreeExports?: number;
   compact?: boolean;
@@ -25,10 +24,8 @@ export default function LiveTokenCounter({
   initialFreeExports,
   compact = false,
 }: LiveTokenCounterProps) {
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
   const hasInitialValues = typeof initialCredits === 'number' && typeof initialFreeExports === 'number';
-  const fetchErrorText = t('Could not fetch token counter.', 'Token sayacı alınamadı.');
+  const fetchErrorText = 'Could not fetch token counter.';
   const formatter = new Intl.NumberFormat(isTr ? 'tr-TR' : 'en-US');
 
   const [credits, setCredits] = useState<number>(initialCredits ?? 0);
@@ -76,7 +73,7 @@ export default function LiveTokenCounter({
 
   if (compact) {
     return (
-      <div className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 text-white shadow-sm transition hover:bg-white/10" title={t('Available credits', 'Kullanılabilir kredi')}>
+      <div className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 text-white shadow-sm transition hover:bg-white/10" title={'Available credits'}>
         <Coins className="h-4 w-4 text-blue-400" />
         <span className="text-sm font-bold tabular-nums">
           {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : formatter.format(credits)}
@@ -89,25 +86,22 @@ export default function LiveTokenCounter({
     <div className="flex min-w-0 flex-wrap items-center gap-2">
       <div className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-white">
         <Coins className="h-4 w-4 text-white/50" />
-        <span className="text-xs text-white/50">{t('Available credits', 'Kullanılabilir kredi')}</span>
+        <span className="text-xs text-white/50">{'Available credits'}</span>
         <span className="text-xl font-semibold leading-none tabular-nums text-white">
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : formatter.format(credits)}
         </span>
       </div>
-
       <div className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-white">
         <Download className="h-4 w-4 text-white/50" />
-        <span className="text-xs text-white/50">{t('Free exports left', 'Kalan ücretsiz export')}</span>
+        <span className="text-xs text-white/50">{'Free exports left'}</span>
         <span className="text-xl font-semibold leading-none tabular-nums text-white">
           {isLoading ? '-' : formatter.format(freeExports)}
         </span>
       </div>
-
       <div className="inline-flex h-10 cursor-pointer items-center justify-center rounded-lg border border-blue-500/50 bg-blue-600/10 px-4 text-sm font-medium text-blue-400 transition hover:bg-blue-600/20">
         <Plus className="mr-2 h-4 w-4" />
-        {t('Add Credit', 'Kredi Ekle')}
+        {'Add Credit'}
       </div>
-
       {error ? <p className="w-full text-xs text-white/60">{error}</p> : null}
     </div>
   );

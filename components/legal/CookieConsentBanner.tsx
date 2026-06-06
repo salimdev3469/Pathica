@@ -1,8 +1,6 @@
-'use client';
-
+'use client';;
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import type { Locale } from '@/lib/locale';
 import {
   COOKIE_CONSENT_COOKIE_NAME,
   COOKIE_CONSENT_OPEN_PANEL_EVENT,
@@ -14,13 +12,12 @@ import {
 } from '@/lib/cookie-consent';
 
 type CookieConsentBannerProps = {
-  locale: Locale;
   initialConsentValue: string | null;
 };
 
-export default function CookieConsentBanner({ locale, initialConsentValue }: CookieConsentBannerProps) {
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
+export default function CookieConsentBanner({
+  initialConsentValue
+}: CookieConsentBannerProps) {
   const initialPreferences = useMemo(
     () => parseCookieConsentPreferences(initialConsentValue),
     [initialConsentValue],
@@ -66,15 +63,12 @@ export default function CookieConsentBanner({ locale, initialConsentValue }: Coo
         <div className="space-y-4">
           <div className="space-y-2">
             <h2 className="text-sm font-semibold text-slate-900">
-              {t('Cookie Preferences', 'Çerez Tercihleri')}
+              {'Cookie Preferences'}
             </h2>
             <p className="text-xs leading-5 text-slate-700">
-              {t(
-                'We use necessary cookies for login, security, and core site functions. Optional analytics and marketing cookies are used only with your consent.',
-                'Giriş, güvenlik ve temel site işlevleri için zorunlu çerezler kullanıyoruz. Analitik ve pazarlama çerezleri yalnızca açık onayınızla çalışır.',
-              )}{' '}
+              {'We use necessary cookies for login, security, and core site functions. Optional analytics and marketing cookies are used only with your consent.'}{' '}
               <Link href="/cerez-politikasi" className="font-medium text-slate-900 underline underline-offset-2">
-                {t('Cookie Policy', 'Çerez Politikası')}
+                {'Cookie Policy'}
               </Link>
               .
             </p>
@@ -83,34 +77,34 @@ export default function CookieConsentBanner({ locale, initialConsentValue }: Coo
           {showPreferences ? (
             <div className="grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
               <label className="flex items-center justify-between gap-4 text-xs text-slate-700">
-                <span>{t('Necessary cookies (always active)', 'Zorunlu çerezler (her zaman aktif)')}</span>
+                <span>{'Necessary cookies (always active)'}</span>
                 <input
                   type="checkbox"
                   checked
                   disabled
-                  aria-label={t('Necessary cookies always active', 'Zorunlu çerezler her zaman aktif')}
+                  aria-label={'Necessary cookies always active'}
                   className="h-4 w-4 rounded border-slate-300 text-slate-900"
                 />
               </label>
 
               <label className="flex items-center justify-between gap-4 text-xs text-slate-700">
-                <span>{t('Analytics cookies', 'Analitik çerezler')}</span>
+                <span>{'Analytics cookies'}</span>
                 <input
                   type="checkbox"
                   checked={analyticsEnabled}
                   onChange={(event) => setAnalyticsEnabled(event.target.checked)}
-                  aria-label={t('Analytics cookies', 'Analitik çerezler')}
+                  aria-label={'Analytics cookies'}
                   className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                 />
               </label>
 
               <label className="flex items-center justify-between gap-4 text-xs text-slate-700">
-                <span>{t('Marketing cookies', 'Pazarlama çerezleri')}</span>
+                <span>{'Marketing cookies'}</span>
                 <input
                   type="checkbox"
                   checked={marketingEnabled}
                   onChange={(event) => setMarketingEnabled(event.target.checked)}
-                  aria-label={t('Marketing cookies', 'Pazarlama çerezleri')}
+                  aria-label={'Marketing cookies'}
                   className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                 />
               </label>
@@ -123,7 +117,7 @@ export default function CookieConsentBanner({ locale, initialConsentValue }: Coo
               onClick={() => savePreferences(true, true)}
               className="h-9 rounded-md border border-slate-300 bg-white px-4 text-xs font-medium text-slate-800 transition hover:bg-slate-100"
             >
-              {t('Accept all', 'Hepsini kabul et')}
+              {'Accept all'}
             </button>
 
             <button
@@ -131,7 +125,7 @@ export default function CookieConsentBanner({ locale, initialConsentValue }: Coo
               onClick={() => savePreferences(false, false)}
               className="h-9 rounded-md border border-slate-300 bg-white px-4 text-xs font-medium text-slate-800 transition hover:bg-slate-100"
             >
-              {t('Reject optional', 'Sadece zorunlu')}
+              {'Reject optional'}
             </button>
 
             <button
@@ -139,7 +133,7 @@ export default function CookieConsentBanner({ locale, initialConsentValue }: Coo
               onClick={() => (showPreferences ? savePreferences(analyticsEnabled, marketingEnabled) : setShowPreferences(true))}
               className="h-9 rounded-md border border-slate-300 bg-white px-4 text-xs font-medium text-slate-800 transition hover:bg-slate-100"
             >
-              {showPreferences ? t('Save preferences', 'Tercihleri kaydet') : t('Preferences', 'Tercihler')}
+              {showPreferences ? 'Save preferences' : 'Preferences'}
             </button>
           </div>
         </div>

@@ -2,7 +2,6 @@ import { CVProvider } from '@/context/CVContext';
 import { CVWorkspace } from '@/components/cv-builder/CVWorkspace';
 import { cookies } from 'next/headers';
 import { CVState } from '@/context/CVContext';
-import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { normalizeCvFont } from '@/lib/cv-fonts';
 import { getCvTemplateSeed, getLocalizedText, getCvTemplateDefaultFont } from '@/lib/cv-templates';
 
@@ -13,7 +12,6 @@ type GuestCVPageProps = {
 };
 
 export default function GuestCVPage({ searchParams }: GuestCVPageProps) {
-    const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
     const template = getCvTemplateSeed(searchParams?.template);
 
     const initialState: CVState = {
@@ -68,7 +66,7 @@ export default function GuestCVPage({ searchParams }: GuestCVPageProps) {
 
     return (
         <CVProvider initialState={initialState}>
-            <CVWorkspace locale={locale} />
+            <CVWorkspace />
         </CVProvider>
     );
 }

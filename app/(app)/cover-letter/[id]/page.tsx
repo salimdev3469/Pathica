@@ -23,12 +23,10 @@ export default async function EditCoverLetterPage({ params }: { params: { id: st
         redirect('/dashboard');
     }
 
-    const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
-
     return (
         <div className="min-h-screen bg-slate-50 py-10 dark:bg-slate-950">
             <div className="mx-auto max-w-3xl px-4 sm:px-6">
-                <CoverLetterEdit coverLetter={coverLetter} locale={locale} />
+                <CoverLetterEdit coverLetter={coverLetter} />
             </div>
         </div>
     );

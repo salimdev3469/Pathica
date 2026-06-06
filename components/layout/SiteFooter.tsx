@@ -2,14 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Locale } from '@/lib/locale';
 import { getLegalPageLinks } from '@/lib/legal-pages';
 import { localizedPath } from '@/lib/seo/config';
 import CookieSettingsButton from '@/components/legal/CookieSettingsButton';
 
-type SiteFooterProps = {
-  locale: Locale;
-};
+type SiteFooterProps = {};
 
 function getFooterLogoSrc() {
   try {
@@ -20,31 +17,29 @@ function getFooterLogoSrc() {
   }
 }
 
-export default function SiteFooter({ locale }: SiteFooterProps) {
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
+export default function SiteFooter({}: SiteFooterProps) {
   const legalPageLinks = getLegalPageLinks(locale);
   const footerLogoSrc = getFooterLogoSrc();
   const seoLinks = [
     {
       href: localizedPath(locale, isTr ? 'cv-olusturucu' : 'resume-builder'),
-      label: t('Resume Builder', 'CV Oluşturucu'),
+      label: 'Resume Builder',
     },
     {
       href: localizedPath(locale, isTr ? 'ai-cv-olusturucu' : 'ai-resume-builder'),
-      label: t('AI Resume Builder', 'AI CV Oluşturucu'),
+      label: 'AI Resume Builder',
     },
     {
       href: localizedPath(locale, isTr ? 'on-yazi-olusturucu' : 'cover-letter-generator'),
-      label: t('Cover Letter Generator', 'Ön Yazı Oluşturucu'),
+      label: 'Cover Letter Generator',
     },
     {
       href: localizedPath(locale, isTr ? 'on-yazi-nasil-yazilir' : 'cover-letter-writing-guide'),
-      label: t('Cover Letter Writing', 'Ön Yazı Yazmak'),
+      label: 'Cover Letter Writing',
     },
     {
       href: localizedPath(locale, isTr ? 'ats-cv-olusturucu' : 'ats-resume-builder'),
-      label: t('ATS Resume Builder', 'ATS CV Oluşturucu'),
+      label: 'ATS Resume Builder',
     },
   ];
 
@@ -54,12 +49,12 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
         <div className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
           <Link
             href={localizedPath(locale)}
-            aria-label={t('Go to Pathica homepage', 'Pathica ana sayfasına git')}
+            aria-label={'Go to Pathica homepage'}
             className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           >
             <Image
               src={footerLogoSrc}
-              alt={t('Pathica footer logo', 'Pathica alt logosu')}
+              alt={'Pathica footer logo'}
               width={144}
               height={144}
               className="h-24 w-24 object-contain sm:h-28 sm:w-28"
@@ -68,10 +63,7 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
         </div>
 
         <p className="mx-auto mb-6 max-w-xl text-center text-sm text-slate-400">
-          {t(
-            'The automated, AI-driven way to build resumes that pass ATS tests and win interviews.',
-            'ATS testlerini geçen ve mülakat şansını artıran özgeçmişleri AI destekli şekilde oluştur.',
-          )}
+          {'The automated, AI-driven way to build resumes that pass ATS tests and win interviews.'}
         </p>
 
         <nav aria-label="Yasal ve kurumsal bağlantılar" className="w-full">
@@ -87,12 +79,12 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
               </li>
             ))}
             <li>
-              <CookieSettingsButton locale={locale} />
+              <CookieSettingsButton />
             </li>
           </ul>
         </nav>
 
-        <nav aria-label={t('Popular SEO pages', 'Popüler SEO sayfaları')} className="mt-4 w-full">
+        <nav aria-label={'Popular SEO pages'} className="mt-4 w-full">
           <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center text-sm">
             {seoLinks.map((link) => (
               <li key={link.href}>
@@ -107,7 +99,7 @@ export default function SiteFooter({ locale }: SiteFooterProps) {
           </ul>
         </nav>
 
-        <div className="mt-6 text-sm">&copy; {new Date().getFullYear()} {t('All rights reserved.', 'Tüm hakları saklıdır.')}</div>
+        <div className="mt-6 text-sm">&copy; {new Date().getFullYear()} {'All rights reserved.'}</div>
       </div>
     </footer>
   );

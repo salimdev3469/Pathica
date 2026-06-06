@@ -1,5 +1,4 @@
-'use client';
-
+'use client';;
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -26,7 +25,6 @@ import CheckoutButton from '@/components/billing/CheckoutButton';
 import type { CVState } from '@/context/CVContext';
 import { CV_PAGE_HEIGHT_PX, CV_PAGE_WIDTH_PX } from '@/lib/cv-layout';
 import { buildCvStateFromTemplate, getCvTemplateSeed } from '@/lib/cv-templates';
-import type { Locale } from '@/lib/locale';
 import { cn } from '@/lib/utils';
 
 type ProofMetric = {
@@ -76,7 +74,6 @@ type StatsBadge = {
 type ViewportDensity = 'regular' | 'compact' | 'tight';
 
 type HomeCinematicExperienceProps = {
-  locale: Locale;
   isAuthenticated: boolean;
   logoSrc: string;
   navCtaHref: string;
@@ -154,7 +151,6 @@ const HOME_PREVIEW_CV = HOME_PREVIEW_TEMPLATE
   : null;
 
 export function HomeCinematicExperience({
-  locale,
   isAuthenticated,
   logoSrc,
   navCtaHref,
@@ -174,7 +170,7 @@ export function HomeCinematicExperience({
   quote,
   stats,
   pricing,
-  faq,
+  faq
 }: HomeCinematicExperienceProps) {
   const preStackRef = useRef<HTMLDivElement>(null);
   const pricingSectionRef = useRef<HTMLElement>(null);
@@ -407,13 +403,13 @@ export function HomeCinematicExperience({
 
   const renderSlide = (slideId: (typeof SLIDE_IDS)[number]) => {
     if (slideId === 'proof') {
-      return <ProofSection locale={locale} proof={proof} density={viewportDensity} />;
+      return <ProofSection proof={proof} density={viewportDensity} />;
     }
     if (slideId === 'tailor') {
-      return <TailorSlide locale={locale} density={viewportDensity} />;
+      return <TailorSlide density={viewportDensity} />;
     }
     if (slideId === 'discover') {
-      return <DiscoverSlide locale={locale} density={viewportDensity} />;
+      return <DiscoverSlide density={viewportDensity} />;
     }
     if (slideId === 'flow') {
       return <WorkflowSlide workflow={workflow} density={viewportDensity} />;
@@ -425,7 +421,12 @@ export function HomeCinematicExperience({
       return <StatsSlide stats={stats} density={viewportDensity} />;
     }
     if (slideId === 'pricing') {
-      return <PricingSlide locale={locale} pricing={pricing} density={viewportDensity} isAuthenticated={isAuthenticated} />;
+      return (
+        <PricingSlide
+          pricing={pricing}
+          density={viewportDensity}
+          isAuthenticated={isAuthenticated} />
+      );
     }
     return <FaqSlide faq={faq} openFaqIndex={openFaqIndex} onOpenFaq={setOpenFaqIndex} density={viewportDensity} />;
   };
@@ -477,7 +478,7 @@ export function HomeCinematicExperience({
           </nav>
 
           <div className="flex items-center gap-3 sm:gap-4">
-            <LanguageToggle locale={locale} tone="dark" className="hidden sm:inline-flex" />
+            <LanguageToggle tone="dark" className="hidden sm:inline-flex" />
             <Dialog open={isSupportOpen} onOpenChange={setIsSupportOpen}>
               <DialogTrigger asChild>
                 <button className="hidden text-sm font-medium text-white/65 transition-colors hover:text-white md:inline-flex">
@@ -531,7 +532,6 @@ export function HomeCinematicExperience({
         </div>
         </div>
       </header>
-
       <main>
         <section className="relative min-h-[100svh] overflow-hidden border-b border-slate-700/30 pt-32">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(155,213,255,0.16),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(80,130,255,0.14),transparent_28%),linear-gradient(180deg,#06070b_0%,#090d16_58%,#08111d_100%)]" />
@@ -607,7 +607,7 @@ export function HomeCinematicExperience({
             </div>
 
             <div className="hidden lg:flex lg:justify-end">
-              <HeroShowcase locale={locale} density={viewportDensity} />
+              <HeroShowcase density={viewportDensity} />
             </div>
           </div>
         </section>
@@ -617,7 +617,7 @@ export function HomeCinematicExperience({
           className="relative bg-[#05070b] py-20 lg:py-28 overflow-hidden border-b border-slate-700/30"
         >
           <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-            <ProofSection locale={locale} proof={proof} density={viewportDensity} />
+            <ProofSection proof={proof} density={viewportDensity} />
           </div>
         </section>
 
@@ -758,7 +758,6 @@ export function HomeCinematicExperience({
           </div>
         </div>
       </main>
-
       <style jsx global>{`
         @keyframes pinnedSlideReveal {
           0% {
@@ -796,7 +795,11 @@ export function HomeCinematicExperience({
   );
 }
 
-function HeroShowcase({ locale, density }: { locale: Locale; density: ViewportDensity }) {
+function HeroShowcase({
+  density
+}: {
+  density: ViewportDensity;
+}) {
   return (
     <div
       className={cn(
@@ -980,11 +983,9 @@ function ResumePagePreview({
 }
 
 function ProofSection({
-  locale,
   proof,
-  density,
+  density
 }: {
-  locale: Locale;
   proof: HomeCinematicExperienceProps['proof'];
   density: ViewportDensity;
 }) {
@@ -1017,7 +1018,6 @@ function ProofSection({
           {proof.description}
         </p>
       </div>
-
       <div className="relative mt-10 md:mt-12 lg:mt-16">
         <div className="relative mx-auto w-full max-w-[620px]">
           <div className="mx-auto w-fit">
@@ -1029,30 +1029,30 @@ function ProofSection({
 
           {/* Left Column (Desktop) */}
           <div className="absolute -left-48 top-6 z-20 hidden w-[17rem] flex-col gap-5 lg:flex">
-            <ProofFindingCard locale={locale} findings={proof.findings} />
-            <ProofBulletRewriteCard locale={locale} />
+            <ProofFindingCard findings={proof.findings} />
+            <ProofBulletRewriteCard />
           </div>
 
           {/* Right Column (Desktop) */}
           <div className="absolute -right-48 top-6 z-20 hidden w-[17rem] flex-col gap-5 lg:flex">
             <ProofScoreCard proof={proof} />
-            <ProofAIWriterCard locale={locale} />
+            <ProofAIWriterCard />
           </div>
         </div>
 
         {/* Mobile/Tablet Card Stack */}
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:hidden">
-          <ProofFindingCard locale={locale} findings={proof.findings} />
+          <ProofFindingCard findings={proof.findings} />
           <ProofScoreCard proof={proof} />
-          <ProofBulletRewriteCard locale={locale} />
-          <ProofAIWriterCard locale={locale} />
+          <ProofBulletRewriteCard />
+          <ProofAIWriterCard />
         </div>
       </div>
     </div>
   );
 }
 
-function ProofBulletRewriteCard({ locale }: { locale: Locale }) {
+function ProofBulletRewriteCard({}: {}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#12131a]/92 p-5 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur">
       <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.2em] text-white/40">
@@ -1085,7 +1085,7 @@ function ProofBulletRewriteCard({ locale }: { locale: Locale }) {
   );
 }
 
-function ProofAIWriterCard({ locale }: { locale: Locale }) {
+function ProofAIWriterCard({}: {}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#12131a]/92 p-5 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur">
       <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.2em] text-white/40">
@@ -1321,12 +1321,10 @@ function StatsSlide({ stats, density }: { stats: HomeCinematicExperienceProps['s
 }
 
 function PricingSlide({
-  locale,
   pricing,
   density,
-  isAuthenticated,
+  isAuthenticated
 }: {
-  locale: Locale;
   pricing: HomeCinematicExperienceProps['pricing'];
   density: ViewportDensity;
   isAuthenticated: boolean;
@@ -1551,10 +1549,8 @@ function FaqSlide({
 }
 
 function ProofFindingCard({
-  locale,
-  findings,
+  findings
 }: {
-  locale: Locale;
   findings: HomeCinematicExperienceProps['proof']['findings'];
 }) {
   return (
@@ -1708,7 +1704,11 @@ function resolveHeldSlideIndex(progress: number, count: number) {
   return localProgress < PINNED_SLIDE_HOLD_RATIO ? currentIndex : currentIndex + 1;
 }
 
-function TailorSlide({ locale, density }: { locale: Locale; density: ViewportDensity }) {
+function TailorSlide({
+  density
+}: {
+  density: ViewportDensity;
+}) {
   return (
     <div className="flex h-full w-full items-center overflow-hidden">
       <div className={cn('grid w-full items-center xl:grid-cols-[0.78fr_1.22fr]', density === 'tight' ? 'gap-6' : 'gap-8')}>
@@ -1812,7 +1812,11 @@ function TailorSlide({ locale, density }: { locale: Locale; density: ViewportDen
   );
 }
 
-function DiscoverSlide({ locale, density }: { locale: Locale; density: ViewportDensity }) {
+function DiscoverSlide({
+  density
+}: {
+  density: ViewportDensity;
+}) {
   return (
     <div className="flex h-full w-full items-center overflow-hidden">
       <div className={cn('grid w-full items-center xl:grid-cols-[0.78fr_1.22fr]', density === 'tight' ? 'gap-6' : 'gap-8')}>

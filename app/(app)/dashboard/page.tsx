@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
 import { getWalletSnapshot } from '@/lib/billing';
-import { LOCALE_COOKIE_NAME, normalizeLocale, type Locale } from '@/lib/locale';
 import { createClient } from '@/lib/supabase-server';
 
 type DashboardCv = {
@@ -72,9 +71,6 @@ function isBillingSchemaCacheError(error: unknown): boolean {
 }
 
 export default async function DashboardPage() {
-  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
-
   const supabase = createClient();
   const {
     data: { user },
@@ -110,30 +106,31 @@ export default async function DashboardPage() {
   const atsByCvId = await buildAtsByCvId(supabase, cvList, cvIds);
 
   return (
-    <DashboardShell active="resumes" userEmail={user.email} userName={user.user_metadata?.full_name} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing}>
+    <DashboardShell
+      active="resumes"
+      userEmail={user.email}
+      userName={user.user_metadata?.full_name}
+      wallet={wallet}
+      billingSchemaMissing={billingSchemaMissing}>
       <section className="mb-7 rounded-xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">{t('My Resumes', 'Özgeçmişlerim')}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-white">{'My Resumes'}</h1>
             <p className="mt-2 text-sm text-white/60">
-              {t(
-                'Manage your CVs, improve ATS score, and jump back into editing quickly.',
-                'CV’lerini yönet, ATS skorunu geliştir ve düzenlemeye hızlıca geri dön.',
-              )}
+              {'Manage your CVs, improve ATS score, and jump back into editing quickly.'}
             </p>
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row">
-            <GenerateCvFromJobButton locale={locale} />
+            <GenerateCvFromJobButton />
             <Button asChild className="h-11 gap-2 rounded-xl bg-blue-600 px-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-md">
               <Link href="/cv/new">
-                <Plus className="h-4 w-4" /> {t('New CV', 'Yeni CV')}
+                <Plus className="h-4 w-4" /> {'New CV'}
               </Link>
             </Button>
           </div>
         </div>
       </section>
-
       <section className="mb-7 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-purple-600/20 border border-blue-500/30 p-[1px]">
         <div className="flex flex-col sm:flex-row items-center justify-between bg-[#0a101a]/90 backdrop-blur-xl rounded-xl p-5 sm:p-6">
           <div className="flex items-start sm:items-center gap-4">
@@ -142,24 +139,20 @@ export default async function DashboardPage() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">
-                {t('Unlimited Free CV Storage & Sharing', 'Sınırsız Ücretsiz CV Depolama ve Paylaşım')}
+                {'Unlimited Free CV Storage & Sharing'}
               </h2>
               <p className="mt-1 text-sm text-white/70">
-                {t(
-                  'Create and store as many CVs as you want for free. Share them anytime with a single Pathica link, just like Google Drive.',
-                  'Dilediğin kadar CV üret ve ücretsiz depola. Google Drive gibi tek bir Pathica linki ile her zaman ücretsiz paylaş.',
-                )}
+                {'Create and store as many CVs as you want for free. Share them anytime with a single Pathica link, just like Google Drive.'}
               </p>
             </div>
           </div>
           <div className="mt-4 sm:mt-0 shrink-0">
             <div className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-blue-300">
-              {t('Always Free', 'Her Zaman Ücretsiz')}
+              {'Always Free'}
             </div>
           </div>
         </div>
       </section>
-
       {cvList.length > 0 ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {cvList.map((cv) => {
@@ -180,25 +173,25 @@ export default async function DashboardPage() {
                   </div>
                   <CardDescription className="flex items-center gap-1 text-white/50">
                     <Calendar className="h-3 w-3" />
-                    {t('Updated', 'Güncellendi')}{' '}
+                    {'Updated'}{' '}
                     {formatDistanceToNow(new Date(cv.updated_at), locale === 'tr' ? { locale: trLocale } : undefined)}{' '}
-                    {t('ago', 'önce')}
+                    {'ago'}
                   </CardDescription>
                   <div className="pt-1">
                     {ats.score !== null ? (
                       <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${getAtsScoreStyles(ats.score)}`}>
-                        ATS {t('Score', 'Skoru')}: {ats.score}/100
+                        ATS {'Score'}: {ats.score}/100
                       </span>
                     ) : (
                       <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white/70">
-                        ATS {t('Score', 'Skoru')}: {t('Pending', 'Bekleniyor')}
+                        ATS {'Score'}: {'Pending'}
                       </span>
                     )}
-                    {localizedReason ? <AtsReason reason={localizedReason} locale={locale} /> : null}
+                    {localizedReason ? <AtsReason reason={localizedReason} /> : null}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CvCardActions cvId={cv.id} cvTitle={cv.title} locale={locale} />
+                  <CvCardActions cvId={cv.id} cvTitle={cv.title} />
                 </CardContent>
               </Card>
             );
@@ -209,27 +202,22 @@ export default async function DashboardPage() {
           <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
             <FileText className="h-10 w-10" />
           </div>
-          <h3 className="mb-2 text-xl font-semibold text-white">{t('No CVs yet', 'Henüz CV yok')}</h3>
+          <h3 className="mb-2 text-xl font-semibold text-white">{'No CVs yet'}</h3>
           <p className="mb-6 max-w-sm text-center text-white/60">
-            {t(
-              'Create your first CV and start optimizing it for ATS and recruiter readability.',
-              'İlk CV’ni oluştur ve ATS ile insan kaynakları okunabilirliği için optimize etmeye başla.',
-            )}
+            {'Create your first CV and start optimizing it for ATS and recruiter readability.'}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <GenerateCvFromJobButton
-              locale={locale}
-              triggerClassName="h-12 rounded-xl border-slate-300 px-5 text-sm font-semibold"
-            />
+              triggerClassName="h-12 rounded-xl border-slate-300 px-5 text-sm font-semibold" />
             <Button asChild className="h-12 rounded-xl bg-blue-600 px-6 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20">
               <Link href="/cv/new">
-                <Plus className="mr-2 h-5 w-5" /> {t('Create Your First CV', 'İlk CV’ni Oluştur')}
+                <Plus className="mr-2 h-5 w-5" /> {'Create Your First CV'}
               </Link>
             </Button>
           </div>
         </div>
       )}
-      <DashboardWelcomeModal locale={locale} />
+      <DashboardWelcomeModal />
     </DashboardShell>
   );
 }

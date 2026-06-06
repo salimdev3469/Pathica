@@ -17,8 +17,11 @@ type CV = {
     title: string;
 };
 
-export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale: Locale }) {
-    const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
+export default function CoverLetterBuilder({
+    cvs
+}: {
+    cvs: CV[],;
+}) {
     const router = useRouter();
 
     const [selectedCvId, setSelectedCvId] = useState('');
@@ -28,7 +31,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
     const [language, setLanguage] = useState('tr');
     const [tone, setTone] = useState('professional');
     const [length, setLength] = useState('medium');
-    
+
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
     const [generatedText, setGeneratedText] = useState('');
@@ -69,10 +72,10 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
         try {
             await copyToClipboard(text);
             setCopied(true);
-            toast.success(t('Cover letter copied to clipboard.', 'Ön yazı panoya kopyalandı.'));
+            toast.success('Cover letter copied to clipboard.');
             window.setTimeout(() => setCopied(false), 1600);
         } catch {
-            toast.error(t('Could not copy the cover letter.', 'Ön yazı kopyalanamadı.'));
+            toast.error('Could not copy the cover letter.');
         }
     };
 
@@ -87,7 +90,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                 const cvStateRes = await fetch(`/api/cv/${selectedCvId}/state`);
                 const cvStatePayload = await cvStateRes.json();
                 if (!cvStateRes.ok) {
-                    throw new Error(cvStatePayload.error || t('Failed to load selected CV.', 'Seçilen CV yüklenemedi.'));
+                    throw new Error(cvStatePayload.error || 'Failed to load selected CV.');
                 }
                 cvStateData = cvStatePayload;
             }
@@ -118,7 +121,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                     router.push('/billing?reason=insufficient_credits&feature=cover_letter');
                     return;
                 }
-                throw new Error(data.error || t('Failed to generate cover letter.', 'Ön yazı oluşturulamadı.'));
+                throw new Error(data.error || 'Failed to generate cover letter.');
             }
 
             setGeneratedText(data.coverLetter || '');
@@ -128,7 +131,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                 router.refresh();
             }
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : t('An unexpected error occurred.', 'Beklenmeyen bir hata oluştu.');
+            const message = err instanceof Error ? err.message : 'An unexpected error occurred.';
             setError(message);
         } finally {
             setIsGenerating(false);
@@ -143,56 +146,55 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                 </Button>
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                        {t('Cover Letter Builder', 'Ön Yazı Oluşturucu')}
+                        {'Cover Letter Builder'}
                     </h1>
                     <p className="text-sm text-slate-500">
-                        {t('Generate a tailored cover letter using your job details, with CV as optional context.', 'İş ilanı detaylarını kullanarak kişiselleştirilmiş bir ön yazı oluşturun; CV eklemek opsiyoneldir.')}
+                        {'Generate a tailored cover letter using your job details, with CV as optional context.'}
                     </p>
                 </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="shadow-sm border-slate-200 dark:border-slate-800">
                     <CardHeader>
-                        <CardTitle className="text-lg">{t('Details', 'Detaylar')}</CardTitle>
-                        <CardDescription>{t('Configure your cover letter settings.', 'Ön yazı ayarlarınızı yapılandırın.')}</CardDescription>
+                        <CardTitle className="text-lg">{'Details'}</CardTitle>
+                        <CardDescription>{'Configure your cover letter settings.'}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="cv-select">{t('Select Base CV (Optional)', 'Temel CV Seçimi (Opsiyonel)')}</Label>
+                            <Label htmlFor="cv-select">{'Select Base CV (Optional)'}</Label>
                             <select 
                                 id="cv-select"
                                 value={selectedCvId} 
                                 onChange={e => setSelectedCvId(e.target.value)}
                                 className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300"
                             >
-                                <option value="">{t('Continue without CV', 'CV olmadan devam et')}</option>
+                                <option value="">{'Continue without CV'}</option>
                                 {cvs.map(cv => (
                                     <option key={cv.id} value={cv.id}>{cv.title}</option>
                                 ))}
                             </select>
                             {cvs.length === 0 && (
                                 <p className="text-xs text-slate-500">
-                                    {t('No saved CV found. You can still generate a cover letter.', 'Kayıtlı CV bulunamadı. Yine de ön yazı oluşturabilirsiniz.')}
+                                    {'No saved CV found. You can still generate a cover letter.'}
                                 </p>
                             )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="job-title">{t('Job Title', 'İş Pozisyonu')}</Label>
+                                <Label htmlFor="job-title">{'Job Title'}</Label>
                                 <Input 
                                     id="job-title" 
-                                    placeholder={t('e.g. Frontend Developer', 'Örn. Frontend Developer')} 
+                                    placeholder={'e.g. Frontend Developer'} 
                                     value={jobTitle} 
                                     onChange={e => setJobTitle(e.target.value)} 
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="company">{t('Company', 'Şirket Adı')}</Label>
+                                <Label htmlFor="company">{'Company'}</Label>
                                 <Input 
                                     id="company" 
-                                    placeholder={t('e.g. Google', 'Örn. Google')} 
+                                    placeholder={'e.g. Google'} 
                                     value={company} 
                                     onChange={e => setCompany(e.target.value)} 
                                 />
@@ -200,10 +202,10 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="job-description">{t('Job Description', 'İş İlanı Metni')}</Label>
+                            <Label htmlFor="job-description">{'Job Description'}</Label>
                             <Textarea 
                                 id="job-description" 
-                                placeholder={t('Paste the job description here...', 'İş ilanı metnini buraya yapıştırın...')}
+                                placeholder={'Paste the job description here...'}
                                 className="min-h-[120px]"
                                 value={jobDescription}
                                 onChange={e => setJobDescription(e.target.value)}
@@ -211,14 +213,14 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                             {!jobDescription && (
                                 <div className="flex items-center gap-2 mt-1 text-amber-600 dark:text-amber-500 text-xs bg-amber-50 dark:bg-amber-400/10 p-2 rounded-md border border-amber-200 dark:border-amber-400/20">
                                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                    <span>{t('Daha kişiselleştirilmiş bir ön yazı için iş ilanı metnini eklemeniz önerilir.', 'Daha kişiselleştirilmiş bir ön yazı için iş ilanı metnini eklemeniz önerilir.')}</span>
+                                    <span>{'Daha kişiselleştirilmiş bir ön yazı için iş ilanı metnini eklemeniz önerilir.'}</span>
                                 </div>
                             )}
                         </div>
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="language">{t('Language', 'Dil')}</Label>
+                                <Label htmlFor="language">{'Language'}</Label>
                                 <select 
                                     id="language"
                                     value={language} 
@@ -231,29 +233,29 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="tone">{t('Tone', 'Ton')}</Label>
+                                <Label htmlFor="tone">{'Tone'}</Label>
                                 <select 
                                     id="tone"
                                     value={tone} 
                                     onChange={e => setTone(e.target.value)}
                                     className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 dark:border-slate-800 dark:bg-slate-950"
                                 >
-                                    <option value="professional">{t('Professional', 'Profesyonel')}</option>
-                                    <option value="enthusiastic">{t('Enthusiastic', 'Hevesli')}</option>
-                                    <option value="confident">{t('Confident', 'Özgüvenli')}</option>
+                                    <option value="professional">{'Professional'}</option>
+                                    <option value="enthusiastic">{'Enthusiastic'}</option>
+                                    <option value="confident">{'Confident'}</option>
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="length">{t('Length', 'Uzunluk')}</Label>
+                                <Label htmlFor="length">{'Length'}</Label>
                                 <select 
                                     id="length"
                                     value={length} 
                                     onChange={e => setLength(e.target.value)}
                                     className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 dark:border-slate-800 dark:bg-slate-950"
                                 >
-                                    <option value="short">{t('Short', 'Kısa')}</option>
-                                    <option value="medium">{t('Medium', 'Orta')}</option>
-                                    <option value="long">{t('Long', 'Uzun')}</option>
+                                    <option value="short">{'Short'}</option>
+                                    <option value="medium">{'Medium'}</option>
+                                    <option value="long">{'Long'}</option>
                                 </select>
                             </div>
                         </div>
@@ -266,7 +268,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                             className="w-full gap-2 bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
                         >
                             {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                            {isGenerating ? t('Generating...', 'Üretiliyor...') : t('Generate Cover Letter', 'Ön Yazı Üret')}
+                            {isGenerating ? 'Generating...' : 'Generate Cover Letter'}
                         </Button>
                     </CardFooter>
                 </Card>
@@ -274,7 +276,7 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                 <Card className="shadow-sm border-slate-200 dark:border-slate-800 h-full flex flex-col">
                     <CardHeader>
                         <div className="flex items-center justify-between gap-3">
-                            <CardTitle className="text-lg">{t('Result', 'Sonuç')}</CardTitle>
+                            <CardTitle className="text-lg">{'Result'}</CardTitle>
                             <Button
                                 type="button"
                                 variant="outline"
@@ -284,16 +286,16 @@ export default function CoverLetterBuilder({ cvs, locale }: { cvs: CV[], locale:
                                 className="gap-2"
                             >
                                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                {copied ? t('Copied', 'Kopyalandı') : t('Copy', 'Kopyala')}
+                                {copied ? 'Copied' : 'Copy'}
                             </Button>
                         </div>
-                        <CardDescription>{t('Your generated cover letter will appear here.', 'Oluşturulan ön yazınız burada görünecek.')}</CardDescription>
+                        <CardDescription>{'Your generated cover letter will appear here.'}</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 flex flex-col h-full min-h-[400px]">
                         <Textarea 
                             value={generatedText}
                             onChange={(e) => setGeneratedText(e.target.value)}
-                            placeholder={t('Click generate to create your tailored cover letter. Once generated, you can edit it here.', 'Ön yazınızı oluşturmak için "Üret" butonuna tıklayın. Oluşturulduktan sonra burada düzenleyebilirsiniz.')}
+                            placeholder={'Click generate to create your tailored cover letter. Once generated, you can edit it here.'}
                             className="flex-1 resize-none h-full min-h-[300px] bg-slate-50/50 dark:bg-slate-900/50 p-4 leading-relaxed"
                             readOnly={isGenerating}
                         />

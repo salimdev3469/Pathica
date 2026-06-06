@@ -15,7 +15,6 @@ import {
   getShopierCheckoutUrl,
 } from '@/lib/billing-config';
 import { getBillingSummaryText, getUserBillingPayments, getWalletSnapshot } from '@/lib/billing';
-import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { createClient } from '@/lib/supabase-server';
 
 function isBillingSchemaCacheError(error: unknown): boolean {
@@ -28,10 +27,6 @@ function isBillingSchemaCacheError(error: unknown): boolean {
 }
 
 export default async function BillingPage() {
-  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
-  const isTr = locale === 'tr';
-  const t = (en: string, tr: string) => (isTr ? tr : en);
-
   const supabase = createClient();
   const {
     data: { user },
@@ -62,11 +57,11 @@ export default async function BillingPage() {
       <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">{t('Billing & Credits', 'Ödeme ve Krediler')}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">{'Billing & Credits'}</h1>
             <p className="mt-2 text-sm text-slate-600">{getBillingSummaryText(locale)}</p>
           </div>
           <Button variant="outline" asChild>
-            <Link href="/dashboard">{t('Back to Dashboard', 'Panele Dön')}</Link>
+            <Link href="/dashboard">{'Back to Dashboard'}</Link>
           </Button>
         </div>
 
@@ -80,42 +75,42 @@ export default async function BillingPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="border-slate-200 bg-white">
             <CardHeader>
-              <CardTitle>{t('Wallet', 'Cüzdan')}</CardTitle>
-              <CardDescription>{t('Your current usage entitlements.', 'Mevcut kullanım hakların.')}</CardDescription>
+              <CardTitle>{'Wallet'}</CardTitle>
+              <CardDescription>{'Your current usage entitlements.'}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-slate-700">
               <p>
-                {t('Credit balance', 'Kredi bakiyesi')}: <strong>{wallet.creditBalance}</strong>
+                {'Credit balance'}: <strong>{wallet.creditBalance}</strong>
               </p>
               <p>
-                {t('Free exports remaining', 'Kalan ücretsiz export')}: <strong>{wallet.freeExportsRemaining}</strong>
+                {'Free exports remaining'}: <strong>{wallet.freeExportsRemaining}</strong>
               </p>
               <p>
-                {t('Signup bonus', 'Kayıt bonusu')}: <strong>{FREE_SIGNUP_AI_CREDITS}</strong> {t('AI credits', 'AI kredi')} +{' '}
-                <strong>{FREE_SIGNUP_EXPORTS}</strong> {t('free PDF export', 'ücretsiz PDF export')}
+                {'Signup bonus'}: <strong>{FREE_SIGNUP_AI_CREDITS}</strong> {'AI credits'} +{' '}
+                <strong>{FREE_SIGNUP_EXPORTS}</strong> {'free PDF export'}
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-slate-200 bg-white">
             <CardHeader>
-              <CardTitle>{t('Usage Rules', 'Kullanım Kuralları')}</CardTitle>
+              <CardTitle>{'Usage Rules'}</CardTitle>
               <CardDescription>
-                {t('Build and preview remain free. Paid only for export + advanced AI.', 'Build ve preview ücretsizdir. Ücret sadece export + gelişmiş AI içindir.')}
+                {'Build and preview remain free. Paid only for export + advanced AI.'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-slate-700">
               <p>
-                {t('Tailor / Generate from Job cost', 'Tailor / Generate from Job maliyeti')}:{' '}
-                <strong>{ADVANCED_AI_CREDIT_COST}</strong> {t('credits', 'kredi')}
+                {'Tailor / Generate from Job cost'}:{' '}
+                <strong>{ADVANCED_AI_CREDIT_COST}</strong> {'credits'}
               </p>
               <p>
-                {t('Cover Letter generation cost', 'Cover Letter üretim maliyeti')}: <strong>{COVER_LETTER_CREDIT_COST}</strong>{' '}
-                {t('credits', 'kredi')}
+                {'Cover Letter generation cost'}: <strong>{COVER_LETTER_CREDIT_COST}</strong>{' '}
+                {'credits'}
               </p>
               <p>
-                {t('PDF export cost (after first free export)', 'PDF export maliyeti (ilk ücretsiz export sonrası)')}:{' '}
-                <strong>{PDF_EXPORT_CREDIT_COST}</strong> {t('credits', 'kredi')}
+                {'PDF export cost (after first free export)'}:{' '}
+                <strong>{PDF_EXPORT_CREDIT_COST}</strong> {'credits'}
               </p>
               <p className="pt-1 text-xs text-slate-500">{getBillingSummaryText(locale)}</p>
             </CardContent>
@@ -123,12 +118,9 @@ export default async function BillingPage() {
         </div>
 
         <section className="mt-8">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">{t('Credit Packages', 'Kredi Paketleri')}</h2>
+          <h2 className="mb-3 text-xl font-semibold text-slate-900">{'Credit Packages'}</h2>
           <p className="mb-3 text-xs text-slate-600">
-            {t(
-              `For automatic crediting, use this same email on Shopier checkout: ${user.email || '-'}`,
-              `Otomatik kredi aktarimi icin Shopier odemesinde ayni e-postayi kullanin: ${user.email || '-'}`,
-            )}
+            {`For automatic crediting, use this same email on Shopier checkout: ${user.email || '-'}`}
           </p>
           <div className="grid gap-4 md:grid-cols-3">
             {BILLING_PACKAGES.map((pkg) => {
@@ -143,12 +135,12 @@ export default async function BillingPage() {
                       <span>{pkg.name}</span>
                       {pkg.highlight ? (
                         <span className="rounded-full bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
-                          {t('Most Popular', 'En Popüler')}
+                          {'Most Popular'}
                         </span>
                       ) : null}
                     </CardTitle>
                     <CardDescription>
-                      {pkg.credits} {t('credits', 'kredi')}
+                      {pkg.credits} {'credits'}
                     </CardDescription>
                     <p className="text-3xl font-bold text-slate-900">{formatUsd(pkg.priceUsd)}</p>
                   </CardHeader>
@@ -157,7 +149,7 @@ export default async function BillingPage() {
                       packageCode={pkg.code}
                       disabled={!configured}
                       className="w-full"
-                      label={configured ? t('Buy with Shopier', 'Shopier ile Satın Al') : t('Not Configured', 'Yapılandırılmadı')}
+                      label={configured ? 'Buy with Shopier' : 'Not Configured'}
                     />
                     <p className="text-xs text-slate-500">{getBillingSummaryText(locale)}</p>
                   </CardContent>
@@ -168,23 +160,23 @@ export default async function BillingPage() {
         </section>
 
         <section className="mt-8">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">{t('Recent Payments', 'Son Ödemeler')}</h2>
+          <h2 className="mb-3 text-xl font-semibold text-slate-900">{'Recent Payments'}</h2>
           <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600">
                 <tr>
-                  <th className="px-3 py-2">{t('Date', 'Tarih')}</th>
-                  <th className="px-3 py-2">{t('Package', 'Paket')}</th>
-                  <th className="px-3 py-2">{t('Credits', 'Kredi')}</th>
-                  <th className="px-3 py-2">{t('Status', 'Durum')}</th>
-                  <th className="px-3 py-2">{t('Order', 'Sipariş')}</th>
+                  <th className="px-3 py-2">{'Date'}</th>
+                  <th className="px-3 py-2">{'Package'}</th>
+                  <th className="px-3 py-2">{'Credits'}</th>
+                  <th className="px-3 py-2">{'Status'}</th>
+                  <th className="px-3 py-2">{'Order'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {payments.length === 0 ? (
                   <tr>
                     <td className="px-3 py-4" colSpan={5}>
-                      {t('No payment records yet.', 'Henüz ödeme kaydı yok.')}
+                      {'No payment records yet.'}
                     </td>
                   </tr>
                 ) : (

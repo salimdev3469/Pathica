@@ -234,14 +234,11 @@ function extractPersonalInfo(text: string, lines: string[]): NormalizedResume['p
 function inferFullName(lines: string[], email: string): string {
   const candidates = lines.slice(0, 8).filter((line) => {
     const words = line.split(/\s+/).filter(Boolean);
-    return (
-      words.length >= 2 &&
-      words.length <= 5 &&
-      line.length <= 60 &&
-      !line.includes('@') &&
-      !/\d/.test(line) &&
-      !resolveSectionConcept(line)
-    );
+    return (words.length >= 2 &&
+    words.length <= 5 &&
+    line.length <= 60 &&
+    !line.includes('@') &&
+    !/\d/.test(line) && !resolveSectionConcept(line));
   });
 
   if (candidates[0]) {

@@ -1,5 +1,4 @@
-'use client';
-
+'use client';;
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,7 +7,6 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createBrowserClient } from '@/lib/supabase';
 import { buildAuthCallbackUrl } from '@/lib/auth-redirect';
-import { getClientLocale, type Locale } from '@/lib/locale';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,7 +29,6 @@ export default function RegisterPage() {
   const [statusMessage, setStatusMessage] = useState<{ type: 'info' | 'success' | 'error'; text: string } | null>(null);
   const [locale, setLocale] = useState<Locale>('en');
 
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get('next') || '/dashboard';
@@ -53,15 +50,12 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
-    setStatusMessage({ type: 'info', text: t('Creating your account...', 'Hesabınız oluşturuluyor...') });
+    setStatusMessage({ type: 'info', text: 'Creating your account...' });
 
     try {
       const compromised = await isPasswordCompromised(password);
       if (compromised) {
-        const compromisedMessage = t(
-          'This password appears in known data breaches. Please choose a different password.',
-          'Bu şifre bilinen veri ihlallerinde görünüyor. Lütfen farklı bir şifre seçin.',
-        );
+        const compromisedMessage = 'This password appears in known data breaches. Please choose a different password.';
         setStatusMessage({ type: 'error', text: compromisedMessage });
         toast.error(compromisedMessage);
         return;
@@ -72,9 +66,9 @@ export default function RegisterPage() {
         // Pretend it succeeded to fool the bot
         setStatusMessage({
           type: 'success',
-          text: t('Account created. Check your email to verify your account.', 'Hesap oluşturuldu. Doğrulama için e-postanı kontrol et.'),
+          text: 'Account created. Check your email to verify your account.',
         });
-        toast.success(t('Registration successful', 'Kayıt başarılı'));
+        toast.success('Registration successful');
         setIsLoading(false);
         return;
       }
@@ -99,20 +93,17 @@ export default function RegisterPage() {
         if (hasSession) {
           setStatusMessage({
             type: 'success',
-            text: t('Account created. Redirecting...', 'Hesap oluşturuldu. Yönlendiriliyor...'),
+            text: 'Account created. Redirecting...',
           });
-          toast.success(t('Registration successful', 'Kayıt başarılı'));
+          toast.success('Registration successful');
           document.cookie = 'pathica_welcome_pending=1; Path=/; Max-Age=600; SameSite=Lax';
           window.location.assign(`/welcome?next=${encodeURIComponent(next)}`);
         } else {
           setStatusMessage({
             type: 'info',
-            text: t(
-              'Account created! We sent a verification link to your email. You MUST click the link to activate your account before logging in.',
-              'Hesabınız oluşturuldu! E-posta adresinize bir doğrulama bağlantısı gönderdik. Giriş yapabilmek için mutlaka gelen kutunuzdaki bağlantıya tıklamalısınız.'
-            ),
+            text: 'Account created! We sent a verification link to your email. You MUST click the link to activate your account before logging in.',
           });
-          toast.success(t('Please check your email', 'Lütfen e-postanızı kontrol edin'), { duration: 8000 });
+          toast.success('Please check your email', { duration: 8000 });
         }
       }
     } catch (error) {
@@ -126,7 +117,7 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    setStatusMessage({ type: 'info', text: t('Redirecting to Google sign-up...', 'Google kaydına yönlendiriliyor...') });
+    setStatusMessage({ type: 'info', text: 'Redirecting to Google sign-up...' });
 
     try {
       const signupCallbackUrl = buildAuthCallbackUrl(next, true);
@@ -151,35 +142,33 @@ export default function RegisterPage() {
       <Link
         href="/"
         className="absolute right-4 top-4 z-30 rounded-full bg-white/90 p-2 shadow-md backdrop-blur transition-transform hover:scale-105"
-        aria-label={t('Back to landing page', 'Anasayfaya dön')}
+        aria-label={'Back to landing page'}
       >
         <>
           <Image src="/logo_pathica.png?v=20260308-theme" alt="Pathica logo" width={56} height={56} className="h-14 w-14 object-contain dark:hidden" />
           <Image src="/logo_pathica_footer.png?v=20260308-theme" alt="Pathica dark logo" width={56} height={56} className="hidden h-14 w-14 object-contain dark:block" />
         </>
       </Link>
-
       <div className="relative hidden w-1/2 border-r border-slate-200 bg-slate-900 lg:block">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.28),transparent_45%),radial-gradient(circle_at_75%_30%,rgba(16,185,129,0.22),transparent_42%),radial-gradient(circle_at_60%_85%,rgba(99,102,241,0.22),transparent_40%),linear-gradient(160deg,#0f172a_0%,#111827_45%,#020617_100%)]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-16 left-16 right-16 z-20">
           <h2 className="mb-4 text-4xl font-normal leading-tight tracking-[-0.04em] text-white">
-            {t("Don't let bad formatting", 'Kötü formatlama')} <br />
-            {t('ruin your chances.', 'şansını düşürmesin.')}
+            {"Don't let bad formatting"} <br />
+            {'ruin your chances.'}
           </h2>
           <p className="text-lg text-slate-300">
-            {t('Pathica helps you build ATS-compliant resumes that actually reach human recruiters.', 'Pathica, ATS uyumlu özgeçmişler hazırlayarak başvurularının gerçek insanlara ulaşmasına yardım eder.')}
+            {'Pathica helps you build ATS-compliant resumes that actually reach human recruiters.'}
           </p>
         </div>
       </div>
-
       <div className="flex w-full items-center justify-center p-4 sm:p-8 lg:w-1/2">
         <div className="w-full max-w-md space-y-8">
           <Card className="rounded-xl border-0 bg-transparent shadow-none sm:border sm:border-t-4 sm:border-t-slate-900 sm:bg-white sm:shadow-lg">
             <CardHeader className="space-y-1 pb-4">
-              <CardTitle className="text-center text-3xl font-medium tracking-tight text-slate-900">{t('Create an account', 'Hesap oluştur')}</CardTitle>
+              <CardTitle className="text-center text-3xl font-medium tracking-tight text-slate-900">{'Create an account'}</CardTitle>
               <CardDescription className="text-center text-slate-500">
-                {t('Enter your email below to create your account', 'Hesabını oluşturmak için e-postanı gir')}
+                {'Enter your email below to create your account'}
               </CardDescription>
             </CardHeader>
 
@@ -192,7 +181,7 @@ export default function RegisterPage() {
               >
                 {isGoogleLoading ? (
                   <TextShimmer as="span" duration={1.2} className="text-sm [--base-color:#64748b] [--base-gradient-color:#0f172a]">
-                    {t('Redirecting to Google...', "Google'a yönlendiriliyor...")}
+                    {'Redirecting to Google...'}
                   </TextShimmer>
                 ) : (
                   <>
@@ -214,7 +203,7 @@ export default function RegisterPage() {
                         fill="#EA4335"
                       />
                     </svg>
-                    {t('Continue with Google', 'Google ile devam et')}
+                    {'Continue with Google'}
                   </>
                 )}
               </Button>
@@ -224,7 +213,7 @@ export default function RegisterPage() {
                   <span className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-slate-50 px-2 font-medium text-slate-500 sm:bg-white">{t('Or continue with e-mail', 'Veya e-posta ile devam et')}</span>
+                  <span className="bg-slate-50 px-2 font-medium text-slate-500 sm:bg-white">{'Or continue with e-mail'}</span>
                 </div>
               </div>
 
@@ -254,8 +243,8 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="fullName">{t('Full Name', 'Ad Soyad')}</Label>
-                  <Input id="fullName" type="text" placeholder={t('John Doe', 'Ahmet Yılmaz')} value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-11 rounded-full px-4" />
+                  <Label htmlFor="fullName">{'Full Name'}</Label>
+                  <Input id="fullName" type="text" placeholder={'John Doe'} value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-11 rounded-full px-4" />
                 </div>
 
                 <div className="grid gap-2">
@@ -264,7 +253,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="password">{t('Password', 'Şifre')}</Label>
+                  <Label htmlFor="password">{'Password'}</Label>
                   <Input
                     id="password"
                     type="password"
@@ -276,10 +265,7 @@ export default function RegisterPage() {
                     className="h-11 rounded-full px-4"
                   />
                   <p className="text-xs text-slate-500">
-                    {t(
-                      'Use at least 12 characters with uppercase, lowercase, and a number.',
-                      'En az 12 karakter, büyük harf, küçük harf ve rakam kullanın.',
-                    )}
+                    {'Use at least 12 characters with uppercase, lowercase, and a number.'}
                   </p>
                 </div>
 
@@ -288,11 +274,11 @@ export default function RegisterPage() {
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       <TextShimmer as="span" duration={1.2} className="text-sm [--base-color:#bfdbfe] [--base-gradient-color:#ffffff]">
-                        {t('Creating account...', 'Hesap oluşturuluyor...')}
+                        {'Creating account...'}
                       </TextShimmer>
                     </>
                   ) : (
-                    t('Create Account', 'Hesap Oluştur')
+                    'Create Account'
                   )}
                 </Button>
               </form>
@@ -300,9 +286,9 @@ export default function RegisterPage() {
 
             <CardFooter className="flex flex-col gap-2 rounded-b-xl border-t bg-slate-50/50 pt-4 sm:bg-white">
               <div className="text-center text-sm text-slate-500">
-                {t('Already have an account?', 'Zaten hesabın var mı?')}{' '}
+                {'Already have an account?'}{' '}
                 <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-slate-900 hover:underline">
-                  {t('Sign in', 'Giriş Yap')}
+                  {'Sign in'}
                 </Link>
               </div>
             </CardFooter>

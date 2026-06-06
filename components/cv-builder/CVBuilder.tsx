@@ -1,11 +1,9 @@
-'use client';
-
+'use client';;
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Plus, Briefcase, GraduationCap, Code, FolderGit2, Save, Loader2, FileText, ArrowLeft, Eye } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Locale } from '@/lib/locale';
 import { useCV, Section, type CVState } from '@/context/CVContext';
 import { SectionCard } from './SectionCard';
 import { PersonalInfoForm } from './PersonalInfoForm';
@@ -37,59 +35,56 @@ const PAGE_MARGIN_PRESETS = [
 ] as const;
 
 type CVBuilderProps = {
-  locale?: Locale;
   onOpenPreview?: () => void;
 };
 
 export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
-
   const PREBUILT_SECTIONS = [
     {
-      title: t('Experience', 'Deneyim'),
+      title: 'Experience',
       icon: <Briefcase size={16} />,
       items: [
         {
-          title: t('Company Name', 'Şirket Adı'),
-          subtitle: t('Job Title', 'Pozisyon'),
+          title: 'Company Name',
+          subtitle: 'Job Title',
           date: 'Jan 2020 - Present',
-          location: t('City, Country', 'Şehir, Ülke'),
-          bullets: t('- Achieved X by doing Y\n- Led a team of Z', '- X hedefine Y ile ulaşıldı\n- Z kişilik ekip yönetildi'),
+          location: 'City, Country',
+          bullets: '- Achieved X by doing Y\n- Led a team of Z',
         },
       ],
     },
     {
-      title: t('Education', 'Eğitim'),
+      title: 'Education',
       icon: <GraduationCap size={16} />,
       items: [
         {
-          title: t('University Name', 'Üniversite Adı'),
-          subtitle: t('Degree Name', 'Bölüm / Derece'),
+          title: 'University Name',
+          subtitle: 'Degree Name',
           date: 'Aug 2016 - May 2020',
-          location: t('City, Country', 'Şehir, Ülke'),
+          location: 'City, Country',
           bullets: '- GPA: 3.8/4.0',
         },
       ],
     },
     {
-      title: t('Projects', 'Projeler'),
+      title: 'Projects',
       icon: <FolderGit2 size={16} />,
       items: [
         {
-          title: t('Project Name', 'Proje Adı'),
-          subtitle: t('Tech Stack (React, Node.js)', 'Teknoloji (React, Node.js)'),
+          title: 'Project Name',
+          subtitle: 'Tech Stack (React, Node.js)',
           date: 'Jan 2023',
           location: '',
-          bullets: t('- Built application using X, improving Y by Z%', '- X ile uygulama geliştirildi, Y metriğinde Z% iyileşme sağlandı'),
+          bullets: '- Built application using X, improving Y by Z%',
         },
       ],
     },
     {
-      title: t('Technical Skills', 'Teknik Beceriler'),
+      title: 'Technical Skills',
       icon: <Code size={16} />,
       items: [
-        { title: t('Languages', 'Diller'), subtitle: '', date: '', location: '', bullets: 'Python, SQL, JavaScript' },
-        { title: t('Frameworks', 'Frameworkler'), subtitle: '', date: '', location: '', bullets: 'React, Next.js, Django' },
+        { title: 'Languages', subtitle: '', date: '', location: '', bullets: 'Python, SQL, JavaScript' },
+        { title: 'Frameworks', subtitle: '', date: '', location: '', bullets: 'React, Next.js, Django' },
       ],
     },
   ];
@@ -126,7 +121,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
 
     const templateName = getLocalizedText(template.name, locale);
     const currentTitle = state.title?.trim();
-    const untitledEn = t('Untitled CV', 'Başlıksız CV');
+    const untitledEn = 'Untitled CV';
     const title = !currentTitle || currentTitle === untitledEn ? `${templateName} CV` : state.title;
 
     return {
@@ -185,11 +180,11 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
       initialSnapshotRef.current = JSON.stringify(cvState);
       setHasUnsavedChanges(false);
       if (!silent) {
-        toast.success(t('CV saved successfully!', 'CV başarıyla kaydedildi!'));
+        toast.success('CV saved successfully!');
       }
       return true;
     } catch {
-      toast.error(t('Could not save CV. Please try again.', 'CV kaydedilemedi. Lütfen tekrar deneyin.'));
+      toast.error('Could not save CV. Please try again.');
       return false;
     } finally {
       setIsSaving(false);
@@ -331,7 +326,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
         const saved = await saveState(nextState, { silent: true });
         if (saved && typeof window !== 'undefined') {
           sessionStorage.removeItem(GUEST_DRAFT_STORAGE_KEY);
-          toast.success(t('Draft restored. Continue editing your CV.', 'Taslak geri yüklendi. CV düzenlemeye devam edebilirsin.'));
+          toast.success('Draft restored. Continue editing your CV.');
         }
       })();
     }
@@ -375,7 +370,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
   };
 
   const addCustomSection = () => {
-    dispatch({ type: 'ADD_SECTION', payload: { title: t('New Section', 'Yeni Bölüm') } });
+    dispatch({ type: 'ADD_SECTION', payload: { title: 'New Section' } });
     setIsPopoverOpen(false);
   };
 
@@ -439,37 +434,32 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
       <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('Leave without saving?', 'Kaydetmeden çıkılsın mı?')}</DialogTitle>
+            <DialogTitle>{'Leave without saving?'}</DialogTitle>
             <DialogDescription>
-              {t('If you leave now, your unsaved changes will be discarded.', 'Şimdi çıkarsan kaydedilmemiş değişiklikler silinecek.')}
+              {'If you leave now, your unsaved changes will be discarded.'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsLeaveDialogOpen(false)}>
-              {t('Stay', 'Kal')}
+              {'Stay'}
             </Button>
             <Button variant="destructive" onClick={handleConfirmLeave}>
-              {t('Leave', 'Çık')}
+              {'Leave'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <div className="mb-6">
         <Button variant="ghost" onClick={handleBack} className="-ml-3 px-3 text-slate-500 hover:bg-slate-100/50 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">
-          <ArrowLeft className="mr-2 h-4 w-4" /> {isAuthenticated ? t('Back to Dashboard', 'Panoya Dön') : t('Back to Landing', 'Anasayfaya Dön')}
+          <ArrowLeft className="mr-2 h-4 w-4" /> {isAuthenticated ? 'Back to Dashboard' : 'Back to Landing'}
         </Button>
       </div>
-
       <div className={isGuestLocked ? 'pointer-events-none select-none opacity-55 blur-[1px]' : ''}>
         {isAiDraft && (
           <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            <p className="font-semibold">{t('AI Draft Loaded', 'AI Taslağı Yüklendi')}</p>
+            <p className="font-semibold">{'AI Draft Loaded'}</p>
             <p className="mt-1 leading-relaxed">
-              {t(
-                'This draft was generated from the job description in English. Review every section and replace generic guidance with your actual experience, tools, dates, and measurable results before applying.',
-                'Bu taslak iş tanımından İngilizce olarak üretildi. Başvurmadan önce tüm bölümleri gözden geçirin ve genel yönlendirmeleri kendi gerçek deneyiminiz, araçlarınız, tarihleriniz ve ölçülebilir sonuçlarınızla değiştirin.',
-              )}
+              {'This draft was generated from the job description in English. Review every section and replace generic guidance with your actual experience, tools, dates, and measurable results before applying.'}
             </p>
           </div>
         )}
@@ -480,12 +470,12 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
               value={state.title}
               onChange={(e) => dispatch({ type: 'UPDATE_TITLE', payload: e.target.value })}
               className="w-full min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-b-2 border-transparent bg-transparent pb-1 text-2xl font-bold leading-tight outline-none transition-colors hover:border-slate-200 focus:border-primary sm:text-3xl md:text-4xl xl:text-5xl"
-              placeholder={t('CV Title', 'CV Başlığı')}
+              placeholder={'CV Title'}
             />
-            <p className="mt-2 text-lg leading-relaxed text-slate-500">{t('Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!', 'Bilgileri doldurup alt bölümler ekleyerek ATS uyumlu CV oluştur. Önizlemede sürükle-bırak ile sıralamayı değiştirebilirsin!')}</p>
+            <p className="mt-2 text-lg leading-relaxed text-slate-500">{'Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!'}</p>
             <div className="mt-4 w-full max-w-md">
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {t('Font & Letter Spacing', 'Yazı Tipi ve Harf Aralığı')}
+                {'Font & Letter Spacing'}
               </label>
               <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="w-full flex-1">
@@ -494,7 +484,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                     onValueChange={(value) => dispatch({ type: 'UPDATE_FONT_FAMILY', payload: value })}
                   >
                     <SelectTrigger className="bg-white">
-                      <SelectValue placeholder={t('Choose font', 'Yazı tipi seç')} />
+                      <SelectValue placeholder={'Choose font'} />
                     </SelectTrigger>
                     <SelectContent>
                       {CV_FONT_OPTIONS.map((option) => (
@@ -523,7 +513,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
             <div className="mt-4 w-full max-w-xl">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  {t('Page Margins (A4 / px)', 'Sayfa Kenar Boşlukları (A4 / px)')}
+                  {'Page Margins (A4 / px)'}
                 </label>
                 <div className="flex flex-wrap gap-1">
                   {PAGE_MARGIN_PRESETS.map((preset) => (
@@ -536,10 +526,10 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                       onClick={() => applyPageMarginPreset(preset.value)}
                     >
                       {preset.key === 'compact'
-                        ? t('Compact', 'Dar')
+                        ? 'Compact'
                         : preset.key === 'default'
-                          ? t('Default', 'Varsayılan')
-                          : t('Comfortable', 'Geniş')}
+                          ? 'Default'
+                          : 'Comfortable'}
                     </Button>
                   ))}
                   <Button
@@ -549,16 +539,16 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                     className="h-7 px-2 text-[11px]"
                     onClick={() => applyPageMarginPreset(54)}
                   >
-                    {t('Reset', 'Sıfırla')}
+                    {'Reset'}
                   </Button>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {([
-                  { key: 'top', label: t('Top', 'Üst') },
-                  { key: 'right', label: t('Right', 'Sağ') },
-                  { key: 'bottom', label: t('Bottom', 'Alt') },
-                  { key: 'left', label: t('Left', 'Sol') },
+                  { key: 'top', label: 'Top' },
+                  { key: 'right', label: 'Right' },
+                  { key: 'bottom', label: 'Bottom' },
+                  { key: 'left', label: 'Left' },
                 ] as const).map((item) => (
                   <div key={item.key}>
                     <label className="mb-1 block pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -577,10 +567,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                 ))}
               </div>
               <p className="mt-2 text-xs text-slate-500">
-                {t(
-                  'These margins are applied to the live A4 preview and the exported PDF.',
-                  'Bu kenar boşlukları canlı A4 önizlemeye ve dışa aktarılan PDF’e uygulanır.',
-                )}
+                {'These margins are applied to the live A4 preview and the exported PDF.'}
               </p>
             </div>
           </div>
@@ -593,25 +580,25 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                 className="gap-2 md:hidden"
               >
                 <Eye className="h-4 w-4" />
-                {t('Preview PDF', 'PDF Önizle')}
+                {'Preview PDF'}
               </Button>
             )}
             {isAuthenticated && (
-              <CvImportDialog locale={locale} />
+              <CvImportDialog />
             )}
             {isAuthenticated && (
               <Button onClick={handleSave} disabled={isSaving} className="gap-2">
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {t('Save CV', 'CV Kaydet')}
+                {'Save CV'}
               </Button>
             )}
           </div>
         </div>
-        <PersonalInfoForm locale={locale} />
+        <PersonalInfoForm />
 
         <div className="flex flex-col gap-4">
           {(state.sections || []).map((section) => (
-            <SectionCard key={section.id} section={section} locale={locale} />
+            <SectionCard key={section.id} section={section} />
           ))}
         </div>
 
@@ -619,12 +606,12 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
               <Button size="lg" className="rounded-full shadow-lg transition-all hover:shadow-xl">
-                <Plus className="mr-2" /> {t('Add Section', 'Bölüm Ekle')}
+                <Plus className="mr-2" /> {'Add Section'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-64 p-2" side="top" align="center">
               <div className="flex flex-col gap-1">
-                <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">{t('Pre-built Sections', 'Hazır Bölümler')}</div>
+                <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">{'Pre-built Sections'}</div>
                 {PREBUILT_SECTIONS.map((template) => (
                   <Button
                     key={template.title}
@@ -645,44 +632,40 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
                   onClick={addCustomSection}
                 >
                   <FileText className="mr-2 h-4 w-4" />
-                  {t('Custom Section', 'Özel Bölüm')}
+                  {'Custom Section'}
                 </Button>
               </div>
             </PopoverContent>
           </Popover>
         </div>
       </div>
-
       {isGuestLocked && !isAuthenticated && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-slate-950/60 p-4">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">
-              {t('Guest limit reached', 'Misafir limiti doldu')}
+              {'Guest limit reached'}
             </p>
             <h3 className="mt-2 text-2xl font-semibold text-slate-900">
-              {t('Continue with your template by signing in', 'Şablonla devam etmek için giriş yap')}
+              {'Continue with your template by signing in'}
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
-              {t(
-                'You made a few edits. To keep editing and save this CV, continue from the login page. If you leave now, your guest draft will be lost.',
-                'Birkaç düzenleme yaptın. CV düzenlemeye devam etmek ve kaydetmek için login sayfasından devam et. Şimdi çıkarsan misafir taslağın kaybolur.',
-              )}
+              {'You made a few edits. To keep editing and save this CV, continue from the login page. If you leave now, your guest draft will be lost.'}
             </p>
             <p className="mt-2 text-xs text-slate-500">
-              {t('Edits made in guest mode:', 'Misafir modunda yapılan düzenleme:')} {guestEditCount}
+              {'Edits made in guest mode:'} {guestEditCount}
             </p>
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
               <Button asChild className="w-full" onClick={persistGuestDraftForAuth}>
-                <Link href={loginHref}>{t('Go to Login', 'Login sayfasına git')}</Link>
+                <Link href={loginHref}>{'Go to Login'}</Link>
               </Button>
               <Button asChild variant="outline" className="w-full" onClick={persistGuestDraftForAuth}>
-                <Link href={registerHref}>{t('Create Account', 'Hesap oluştur')}</Link>
+                <Link href={registerHref}>{'Create Account'}</Link>
               </Button>
             </div>
           </div>
         </div>
       )}
-      <BuilderOnboardingModal locale={locale} />
+      <BuilderOnboardingModal />
     </div>
   );
 }

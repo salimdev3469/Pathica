@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import type { Locale } from '@/lib/locale';
 
 export type LegalPageSlug =
   | 'gizlilik-politikasi'

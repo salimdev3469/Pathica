@@ -1,5 +1,4 @@
-'use client';
-
+'use client';;
 import { Loader2, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -16,7 +15,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import type { Locale } from '@/lib/locale';
 
 type GenerateResponse = {
   cvId: string;
@@ -25,12 +23,9 @@ type GenerateResponse = {
 
 type GenerateCvFromJobButtonProps = {
   triggerClassName?: string;
-  locale?: Locale;
 };
 
 export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en' }: GenerateCvFromJobButtonProps) {
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
-
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [jobTitle, setJobTitle] = useState('');
@@ -44,7 +39,7 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
     setError('');
 
     if (normalizedLength < 40) {
-      setError(t('Please provide a more detailed job description (minimum 40 characters).', 'Lütfen daha detaylı bir iş tanımı girin (en az 40 karakter).'));
+      setError('Please provide a more detailed job description (minimum 40 characters).');
       return;
     }
 
@@ -62,7 +57,7 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
         const message =
           generateData && 'error' in generateData && typeof generateData.error === 'string'
             ? generateData.error
-            : t('Could not generate CV draft. Please try again.', 'CV taslağı oluşturulamadı. Lütfen tekrar deneyin.');
+            : 'Could not generate CV draft. Please try again.';
         throw new Error(message);
       }
 
@@ -74,14 +69,14 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
 
       const saveData = (await saveRes.json().catch(() => null)) as { error?: string } | null;
       if (!saveRes.ok) {
-        throw new Error(saveData?.error || t('Generated CV could not be saved.', 'Üretilen CV kaydedilemedi.'));
+        throw new Error(saveData?.error || 'Generated CV could not be saved.');
       }
 
       setOpen(false);
       router.push(`/cv/${generateData.cvId}?aiDraft=1`);
       router.refresh();
     } catch (requestError) {
-      const message = requestError instanceof Error ? requestError.message : t('Unexpected error occurred.', 'Beklenmeyen bir hata oluştu.');
+      const message = requestError instanceof Error ? requestError.message : 'Unexpected error occurred.';
       setError(message);
     } finally {
       setIsGenerating(false);
@@ -98,18 +93,14 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
             triggerClassName,
           )}
         >
-          <Sparkles className="h-4 w-4" /> {t('Generate from Job Description', 'İş Tanımından Üret')}
+          <Sparkles className="h-4 w-4" /> {'Generate from Job Description'}
         </Button>
       </DialogTrigger>
-
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{t('Generate CV with AI', 'AI ile CV Üret')}</DialogTitle>
+          <DialogTitle>{'Generate CV with AI'}</DialogTitle>
           <DialogDescription>
-            {t(
-              'Paste the full job description. AI extracts role priorities, builds a targeted draft framework, and opens it in the editor for personalization.',
-              'Tam iş tanımını yapıştırın. Yapay zeka rol önceliklerini çıkarır, hedefli bir taslak iskeleti oluşturur ve kişiselleştirmeniz için editörde açar.',
-            )}
+            {'Paste the full job description. AI extracts role priorities, builds a targeted draft framework, and opens it in the editor for personalization.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -117,22 +108,19 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
           <Input
             value={jobTitle}
             onChange={(event) => setJobTitle(event.target.value)}
-            placeholder={t('Target role title (optional)', 'Hedef rol başlığı (opsiyonel)')}
+            placeholder={'Target role title (optional)'}
             disabled={isGenerating}
           />
           <Textarea
             value={jobDescription}
             onChange={(event) => setJobDescription(event.target.value)}
             className="min-h-[220px]"
-            placeholder={t('Paste the complete job description here...', 'İş tanımını buraya yapıştırın...')}
+            placeholder={'Paste the complete job description here...'}
             disabled={isGenerating}
           />
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-500">
-              {t(
-                'Detailed requirements, tools, responsibilities and expectations improve quality.',
-                'Detaylı gereksinimler, araçlar ve sorumluluklar kaliteyi artırır.',
-              )}
+              {'Detailed requirements, tools, responsibilities and expectations improve quality.'}
             </span>
             <span className={normalizedLength >= 40 ? 'text-emerald-600' : 'text-slate-400'}>{normalizedLength} chars</span>
           </div>
@@ -141,11 +129,11 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={isGenerating}>
-            {t('Cancel', 'İptal')}
+            {'Cancel'}
           </Button>
           <Button onClick={handleGenerate} disabled={isGenerating || normalizedLength < 40} className="gap-2">
             {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            {isGenerating ? t('Generating...', 'Üretiliyor...') : t('Generate CV', 'CV Üret')}
+            {isGenerating ? 'Generating...' : 'Generate CV'}
           </Button>
         </DialogFooter>
       </DialogContent>

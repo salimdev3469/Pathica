@@ -18,12 +18,10 @@ export default async function NewCoverLetterPage() {
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
-    const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
-
     return (
         <div className="min-h-screen bg-slate-50 py-10 dark:bg-slate-950">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <CoverLetterBuilder cvs={cvs || []} locale={locale} />
+                <CoverLetterBuilder cvs={cvs || []} />
             </div>
         </div>
     );

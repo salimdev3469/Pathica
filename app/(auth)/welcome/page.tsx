@@ -1,9 +1,7 @@
-﻿'use client';
-
+﻿'use client';;
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TextShimmer } from '@/components/ui/text-shimmer';
-import { getClientLocale, type Locale } from '@/lib/locale';
 
 const LINES_BY_LOCALE: Record<Locale, readonly [string, string, string]> = {
   en: ['Setting up your dashboard...', 'Making everything ready for you...', 'Welcome'],

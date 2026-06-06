@@ -13,10 +13,12 @@ import { toast } from 'sonner';
 interface CvCardActionsProps {
     cvId: string;
     cvTitle: string;
-    locale: string;
 }
 
-export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsProps) {
+export default function CvCardActions({
+    cvId,
+    cvTitle
+}: CvCardActionsProps) {
     const router = useRouter();
     const [isDownloading, setIsDownloading] = useState(false);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -25,8 +27,6 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
     const [isDeleting, setIsDeleting] = useState(false);
     const [previewError, setPreviewError] = useState<string | null>(null);
     const [previewState, setPreviewState] = useState<CVState | null>(null);
-    const isTr = locale === 'tr';
-    const t = (en: string, tr: string) => (isTr ? tr : en);
 
     const handleDownload = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -66,10 +66,10 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
             a.remove();
             window.URL.revokeObjectURL(url);
 
-            toast.success(t('CV downloaded successfully!', 'CV başarıyla indirildi!'));
+            toast.success('CV downloaded successfully!');
         } catch (error) {
             console.error('Download error:', error);
-            const msg = error instanceof Error ? error.message : t('Failed to download CV', 'CV indirilemedi');
+            const msg = error instanceof Error ? error.message : 'Failed to download CV';
             toast.error(msg);
         } finally {
             setIsDownloading(false);
@@ -92,13 +92,13 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                 const message =
                     data && 'error' in data && typeof data.error === 'string'
                         ? data.error
-                        : t('Failed to load preview', 'Önizleme yüklenemedi');
+                        : 'Failed to load preview';
                 throw new Error(message);
             }
 
             setPreviewState(data as CVState);
         } catch (error) {
-            const message = error instanceof Error ? error.message : t('Failed to load preview', 'Önizleme yüklenemedi');
+            const message = error instanceof Error ? error.message : 'Failed to load preview';
             setPreviewError(message);
             setPreviewState(null);
         } finally {
@@ -120,14 +120,14 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
             const data = await response.json().catch(() => null) as { error?: string } | null;
 
             if (!response.ok) {
-                throw new Error(data?.error || t('Failed to delete CV', 'CV silinemedi'));
+                throw new Error(data?.error || 'Failed to delete CV');
             }
 
-            toast.success(t('CV deleted successfully.', 'CV başarıyla silindi.'));
+            toast.success('CV deleted successfully.');
             setIsDeleteDialogOpen(false);
             router.refresh();
         } catch (error) {
-            const message = error instanceof Error ? error.message : t('Failed to delete CV', 'CV silinemedi');
+            const message = error instanceof Error ? error.message : 'Failed to delete CV';
             toast.error(message);
         } finally {
             setIsDeleting(false);
@@ -143,7 +143,7 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                     asChild
                 >
                     <Link href={`/cv/${cvId}`}>
-                        <Edit2 className="mr-2 h-4 w-4" /> {t('Open Editor', 'Editörü Aç')}
+                        <Edit2 className="mr-2 h-4 w-4" /> {'Open Editor'}
                     </Link>
                 </Button>
 
@@ -154,14 +154,14 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                         className="h-9 w-full min-w-0 justify-center rounded-lg border-blue-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 sm:text-xs"
                         onClick={handleDownload}
                         disabled={isDownloading}
-                        title={t('Download PDF', 'PDF İndir')}
+                        title={'Download PDF'}
                     >
                         {isDownloading ? (
                             <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
                         ) : (
                             <Download className="h-3.5 w-3.5 shrink-0" />
                         )}
-                        <span className="min-w-0 truncate">{t('Download PDF', 'PDF İndir')}</span>
+                        <span className="min-w-0 truncate">{'Download PDF'}</span>
                     </Button>
 
                     <Button
@@ -170,14 +170,14 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                         className="h-9 w-full min-w-0 justify-center rounded-lg border-blue-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 sm:text-xs"
                         onClick={openPreview}
                         disabled={isPreviewLoading}
-                        title={t('Preview', 'Önizle')}
+                        title={'Preview'}
                     >
                         {isPreviewLoading ? (
                             <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
                         ) : (
                             <Eye className="h-3.5 w-3.5 shrink-0" />
                         )}
-                        <span className="min-w-0 truncate">{t('Preview', 'Önizle')}</span>
+                        <span className="min-w-0 truncate">{'Preview'}</span>
                     </Button>
                     <Button
                         type="button"
@@ -186,24 +186,23 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                         className="h-9 w-full min-w-0 justify-center rounded-lg border-rose-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-rose-500 transition hover:bg-rose-500/10 hover:border-rose-500/50 sm:text-xs"
                         onClick={openDeleteDialog}
                         disabled={isDeleting}
-                        title={t('Delete CV', 'CV Sil')}
+                        title={'Delete CV'}
                     >
                         {isDeleting ? (
                             <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
                         ) : (
                             <Trash2 className="h-3.5 w-3.5 shrink-0" />
                         )}
-                        <span className="min-w-0 truncate">{t('Delete CV', 'CV Sil')}</span>
+                        <span className="min-w-0 truncate">{'Delete CV'}</span>
                     </Button>
                 </div>
             </div>
-
             <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
                 <DialogContent className="w-[95vw] max-w-6xl">
                     <DialogHeader>
                         <DialogTitle>{cvTitle}</DialogTitle>
                         <DialogDescription>
-                            {t('Read-only CV preview', 'Salt okunur CV önizlemesi')}
+                            {'Read-only CV preview'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="max-h-[75vh] overflow-y-auto pr-1">
@@ -223,16 +222,12 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                     </div>
                 </DialogContent>
             </Dialog>
-
             <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => !isDeleting && setIsDeleteDialogOpen(open)}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle>{t('Delete this CV?', 'Bu CV silinsin mi?')}</DialogTitle>
+                        <DialogTitle>{'Delete this CV?'}</DialogTitle>
                         <DialogDescription>
-                            {t(
-                                'This action is permanent. The CV and its sections will be removed.',
-                                'Bu işlem kalıcıdır. CV ve içindeki bölümler tamamen silinecek.',
-                            )}
+                            {'This action is permanent. The CV and its sections will be removed.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
@@ -246,7 +241,7 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                             onClick={() => setIsDeleteDialogOpen(false)}
                             disabled={isDeleting}
                         >
-                            {t('Cancel', 'Vazgeç')}
+                            {'Cancel'}
                         </Button>
                         <Button
                             type="button"
@@ -255,7 +250,7 @@ export default function CvCardActions({ cvId, cvTitle, locale }: CvCardActionsPr
                             disabled={isDeleting}
                         >
                             {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
-                            {t('Delete Permanently', 'Kalıcı Olarak Sil')}
+                            {'Delete Permanently'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

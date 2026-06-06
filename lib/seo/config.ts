@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import type { Locale } from '@/lib/locale';
 
 export const SEO_LOCALES: readonly Locale[] = ['en', 'tr'];
 export const DEFAULT_SEO_LOCALE: Locale = 'en';

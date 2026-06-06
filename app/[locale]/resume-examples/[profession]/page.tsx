@@ -6,7 +6,6 @@ import { getProfessionBySlug, getProfessionPath, getProfessionStaticParams } fro
 
 interface ResumeExampleDetailPageProps {
   params: {
-    locale: string;
     profession: string;
   };
 }
@@ -65,5 +64,5 @@ export default function ResumeExampleDetailPage({ params }: ResumeExampleDetailP
     notFound();
   }
 
-  return <ProgrammaticProfessionDetailPage locale="en" profession={profession} />;
+  return <ProgrammaticProfessionDetailPage profession={profession} />;
 }

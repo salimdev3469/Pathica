@@ -12,7 +12,6 @@ type NewCVPageProps = {
 };
 
 export default async function NewCVPage({ searchParams }: NewCVPageProps) {
-  const locale = normalizeLocale(cookies().get(LOCALE_COOKIE_NAME)?.value);
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const template = getCvTemplateSeed(searchParams?.template)?.slug;

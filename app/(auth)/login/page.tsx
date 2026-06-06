@@ -1,5 +1,4 @@
-'use client';
-
+'use client';;
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,7 +7,6 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createBrowserClient } from '@/lib/supabase';
 import { buildAuthCallbackUrl } from '@/lib/auth-redirect';
-import { getClientLocale, type Locale } from '@/lib/locale';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +26,6 @@ export default function LoginPage() {
   const [authMessage, setAuthMessage] = useState<{ type: 'info' | 'success' | 'error'; text: string } | null>(null);
   const [locale, setLocale] = useState<Locale>('en');
 
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get('next') || '/dashboard';
@@ -42,7 +39,7 @@ export default function LoginPage() {
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setAuthMessage({ type: 'info', text: t('Signing in...', 'Giriş yapılıyor...') });
+    setAuthMessage({ type: 'info', text: 'Signing in...' });
 
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -51,13 +48,13 @@ export default function LoginPage() {
         setAuthMessage({ type: 'error', text: error.message });
         toast.error(error.message);
       } else {
-        setAuthMessage({ type: 'success', text: t('Login successful. Redirecting...', 'Giriş başarılı. Yönlendiriliyor...') });
-        toast.success(t('Logged in successfully', 'Giriş başarılı'));
+        setAuthMessage({ type: 'success', text: 'Login successful. Redirecting...' });
+        toast.success('Logged in successfully');
         window.location.assign(next);
       }
     } catch (error) {
       const message = getErrorMessage(error);
-      setAuthMessage({ type: 'error', text: `${message}. ${t('Please try again.', 'Lütfen tekrar deneyin.')}` });
+      setAuthMessage({ type: 'error', text: `${message}. ${'Please try again.'}` });
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -66,7 +63,7 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    setAuthMessage({ type: 'info', text: t('Redirecting to Google sign-in...', 'Google girişine yönlendiriliyor...') });
+    setAuthMessage({ type: 'info', text: 'Redirecting to Google sign-in...' });
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -90,35 +87,33 @@ export default function LoginPage() {
       <Link
         href="/"
         className="absolute right-4 top-4 z-30 rounded-full bg-white/90 p-2 shadow-md backdrop-blur transition-transform hover:scale-105"
-        aria-label={t('Back to landing page', 'Anasayfaya dön')}
+        aria-label={'Back to landing page'}
       >
         <>
           <Image src="/logo_pathica.png?v=20260308-theme" alt="Pathica logo" width={56} height={56} className="h-14 w-14 object-contain dark:hidden" />
           <Image src="/logo_pathica_footer.png?v=20260308-theme" alt="Pathica dark logo" width={56} height={56} className="hidden h-14 w-14 object-contain dark:block" />
         </>
       </Link>
-
       <div className="relative hidden w-1/2 border-r border-slate-200 bg-slate-900 lg:block">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.28),transparent_45%),radial-gradient(circle_at_75%_30%,rgba(16,185,129,0.22),transparent_42%),radial-gradient(circle_at_60%_85%,rgba(99,102,241,0.22),transparent_40%),linear-gradient(160deg,#0f172a_0%,#111827_45%,#020617_100%)]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-16 left-16 right-16 z-20">
           <h2 className="mb-4 text-4xl font-normal leading-tight tracking-[-0.04em] text-white">
-            {t("Don't let bad formatting", 'Kötü formatlama')} <br />
-            {t('ruin your chances.', 'şansını düşürmesin.')}
+            {"Don't let bad formatting"} <br />
+            {'ruin your chances.'}
           </h2>
           <p className="text-lg text-slate-300">
-            {t('Pathica helps you build ATS-compliant resumes that actually reach human recruiters.', 'Pathica, ATS uyumlu özgeçmişler hazırlayarak başvurularının gerçek insanlara ulaşmasına yardım eder.')}
+            {'Pathica helps you build ATS-compliant resumes that actually reach human recruiters.'}
           </p>
         </div>
       </div>
-
       <div className="flex w-full items-center justify-center p-4 sm:p-8 lg:w-1/2">
         <div className="w-full max-w-md space-y-8">
           <Card className="rounded-xl border-0 bg-transparent shadow-none sm:border sm:border-t-4 sm:border-t-slate-900 sm:bg-white sm:shadow-lg">
             <CardHeader className="space-y-1 pb-4">
-              <CardTitle className="text-center text-3xl font-medium tracking-tight text-slate-900">{t('Welcome back', 'Tekrar hoş geldin')}</CardTitle>
+              <CardTitle className="text-center text-3xl font-medium tracking-tight text-slate-900">{'Welcome back'}</CardTitle>
               <CardDescription className="text-center text-slate-500">
-                {t('Sign in to your account to continue', 'Devam etmek için hesabına giriş yap')}
+                {'Sign in to your account to continue'}
               </CardDescription>
             </CardHeader>
 
@@ -131,7 +126,7 @@ export default function LoginPage() {
               >
                 {isGoogleLoading ? (
                   <TextShimmer as="span" duration={1.2} className="text-sm [--base-color:#64748b] [--base-gradient-color:#0f172a]">
-                    {t('Redirecting to Google...', "Google'a yönlendiriliyor...")}
+                    {'Redirecting to Google...'}
                   </TextShimmer>
                 ) : (
                   <>
@@ -153,7 +148,7 @@ export default function LoginPage() {
                         fill="#EA4335"
                       />
                     </svg>
-                    {t('Continue with Google', 'Google ile devam et')}
+                    {'Continue with Google'}
                   </>
                 )}
               </Button>
@@ -163,7 +158,7 @@ export default function LoginPage() {
                   <span className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-slate-50 px-2 font-medium text-slate-500 sm:bg-white">{t('Or continue with e-mail', 'Veya e-posta ile devam et')}</span>
+                  <span className="bg-slate-50 px-2 font-medium text-slate-500 sm:bg-white">{'Or continue with e-mail'}</span>
                 </div>
               </div>
 
@@ -184,7 +179,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="password">{t('Password', 'Şifre')}</Label>
+                  <Label htmlFor="password">{'Password'}</Label>
                   <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="h-11 rounded-full px-4" />
                 </div>
 
@@ -193,11 +188,11 @@ export default function LoginPage() {
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       <TextShimmer as="span" duration={1.2} className="text-sm [--base-color:#bfdbfe] [--base-gradient-color:#ffffff]">
-                        {t('Signing in...', 'Giriş yapılıyor...')}
+                        {'Signing in...'}
                       </TextShimmer>
                     </>
                   ) : (
-                    t('Sign in', 'Giriş Yap')
+                    'Sign in'
                   )}
                 </Button>
               </form>
@@ -205,9 +200,9 @@ export default function LoginPage() {
 
             <CardFooter className="flex flex-col gap-2 rounded-b-xl border-t bg-slate-50/50 pt-4 sm:bg-white">
               <div className="text-center text-sm text-slate-500">
-                {t("Don't have an account?", 'Hesabın yok mu?')}{' '}
+                {"Don't have an account?"}{' '}
                 <Link href={`/register?next=${encodeURIComponent(next)}`} className="font-semibold text-slate-900 hover:underline">
-                  {t('Sign up', 'Kayıt ol')}
+                  {'Sign up'}
                 </Link>
               </div>
             </CardFooter>

@@ -6,9 +6,7 @@ import { getSeoLandingPagesByLocale } from '@/lib/seo/landing-pages';
 import { getProfessionListPath } from '@/lib/seo/professions';
 
 interface LocaleHubPageProps {
-  params: {
-    locale: string;
-  };
+  params: {};
 }
 
 export function generateStaticParams() {
@@ -19,9 +17,6 @@ export function generateMetadata({ params }: LocaleHubPageProps): Metadata {
   if (!isSeoLocale(params.locale)) {
     return {};
   }
-
-  const locale = params.locale;
-  const isTr = locale === 'tr';
 
   return {
     title: isTr ? 'CV Oluşturucu ve Ön Yazı Merkezi' : 'AI Resume Builder and Cover Letter Hub',
@@ -72,8 +67,6 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
     notFound();
   }
 
-  const locale = params.locale;
-  const isTr = locale === 'tr';
   const landingPages = getSeoLandingPagesByLocale(locale);
   const programmaticPath = getProfessionListPath(locale);
   const hubSteps = isTr
@@ -92,8 +85,8 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: isTr ? 'CV SEO İçerik Merkezi' : 'Resume SEO Content Hub',
-    inLanguage: locale,
     url: toAbsoluteUrl(localizedPath(locale)),
+
     mainEntity: {
       '@type': 'ItemList',
       itemListElement: [
@@ -110,7 +103,7 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
           url: toAbsoluteUrl(programmaticPath),
         },
       ],
-    },
+    }
   };
 
   return (

@@ -9,8 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import type { Locale } from '@/lib/locale';
 import Link from 'next/link';
 
-export default function CoverLetterEdit({ coverLetter, locale }: { coverLetter: any, locale: Locale }) {
-    const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
+export default function CoverLetterEdit({
+    coverLetter
+}: {
+    coverLetter: any,;
+}) {
     const router = useRouter();
 
     const [content, setContent] = useState(coverLetter.content || '');
@@ -42,7 +45,7 @@ export default function CoverLetterEdit({ coverLetter, locale }: { coverLetter: 
     };
 
     const handleDelete = async () => {
-        if (!confirm(t('Are you sure you want to delete this cover letter?', 'Bu ön yazıyı silmek istediğinize emin misiniz?'))) {
+        if (!confirm('Are you sure you want to delete this cover letter?')) {
             return;
         }
 
@@ -73,7 +76,7 @@ export default function CoverLetterEdit({ coverLetter, locale }: { coverLetter: 
                     </Button>
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                            {coverLetter.job_title || t('Cover Letter', 'Ön Yazı')}
+                            {coverLetter.job_title || 'Cover Letter'}
                         </h1>
                         <p className="text-sm text-slate-500">
                             {coverLetter.company_name}
@@ -83,22 +86,21 @@ export default function CoverLetterEdit({ coverLetter, locale }: { coverLetter: 
                 <div className="flex gap-2">
                     <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="h-10 px-4 rounded-lg">
                         {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
-                        {t('Delete', 'Sil')}
+                        {'Delete'}
                     </Button>
                     <Button onClick={handleSave} disabled={isSaving} className="h-10 px-4 rounded-lg bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200">
                         {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : (saveSuccess ? <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-400" /> : <Save className="w-4 h-4 mr-2" />)}
-                        {saveSuccess ? t('Saved', 'Kaydedildi') : t('Save', 'Kaydet')}
+                        {saveSuccess ? 'Saved' : 'Save'}
                     </Button>
                 </div>
             </div>
-
             <div className="mt-8 mx-auto w-full max-w-[820px] rounded bg-white shadow-2xl ring-1 ring-slate-900/5">
                 <div className="px-8 py-12 sm:px-16 sm:py-24">
                     <Textarea 
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         className="min-h-[800px] w-full resize-y border-0 bg-transparent p-0 font-serif text-[15px] leading-loose text-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-400"
-                        placeholder={t('Type your cover letter here...', 'Ön yazınızı buraya yazın...')}
+                        placeholder={'Type your cover letter here...'}
                     />
                 </div>
             </div>

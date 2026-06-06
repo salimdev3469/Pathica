@@ -1,20 +1,18 @@
 export function getPasswordPolicyError(password: string, locale: 'en' | 'tr'): string | null {
-  const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
-
   if (password.length < 12) {
-    return t('Use at least 12 characters.', 'En az 12 karakter kullanın.');
+    return 'Use at least 12 characters.';
   }
 
   if (!/[a-z]/.test(password)) {
-    return t('Add at least one lowercase letter.', 'En az bir küçük harf ekleyin.');
+    return 'Add at least one lowercase letter.';
   }
 
   if (!/[A-Z]/.test(password)) {
-    return t('Add at least one uppercase letter.', 'En az bir büyük harf ekleyin.');
+    return 'Add at least one uppercase letter.';
   }
 
   if (!/[0-9]/.test(password)) {
-    return t('Add at least one number.', 'En az bir rakam ekleyin.');
+    return 'Add at least one number.';
   }
 
   return null;
