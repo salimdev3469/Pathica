@@ -13,6 +13,7 @@ type GuestCVPageProps = {
 
 export default function GuestCVPage({ searchParams }: GuestCVPageProps) {
     const template = getCvTemplateSeed(searchParams?.template);
+    const locale = 'en';
 
     const initialState: CVState = {
         id: 'guest-cv',

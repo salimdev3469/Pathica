@@ -50,10 +50,7 @@ export async function POST(req: Request) {
     if (!fileEntry.size || fileEntry.size > MAX_FILE_SIZE_BYTES) {
       return NextResponse.json(
         {
-          error:
-            locale === 'tr'
-              ? 'Dosya boyutu 5MB altında olmalı.'
-              : 'File size must be below 5MB.',
+          error: 'File size must be below 5MB.',
         },
         { status: 400 },
       );
@@ -64,10 +61,7 @@ export async function POST(req: Request) {
     if (!hasAllowedMime && !hasAllowedExt) {
       return NextResponse.json(
         {
-          error:
-            locale === 'tr'
-              ? 'Lütfen PDF, DOC, DOCX veya TXT dosyası yükleyin.'
-              : 'Please upload a PDF, DOC, DOCX, or TXT file.',
+          error: 'Please upload a PDF, DOC, DOCX, or TXT file.',
         },
         { status: 400 },
       );
@@ -148,10 +142,7 @@ Rules:
     ) {
       return NextResponse.json(
         {
-          error:
-            locale === 'tr'
-              ? 'Dosya içeriği okunamadı. Daha net bir CV dosyası deneyin.'
-              : 'Could not parse content from the file. Please try a clearer resume file.',
+          error: 'Could not parse content from the file. Please try a clearer resume file.',
         },
         { status: 422 },
       );

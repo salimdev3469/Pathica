@@ -58,7 +58,7 @@ export default async function BillingPage() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">{'Billing & Credits'}</h1>
-            <p className="mt-2 text-sm text-slate-600">{getBillingSummaryText(locale)}</p>
+            <p className="mt-2 text-sm text-slate-600">{getBillingSummaryText('en')}</p>
           </div>
           <Button variant="outline" asChild>
             <Link href="/dashboard">{'Back to Dashboard'}</Link>
@@ -112,7 +112,7 @@ export default async function BillingPage() {
                 {'PDF export cost (after first free export)'}:{' '}
                 <strong>{PDF_EXPORT_CREDIT_COST}</strong> {'credits'}
               </p>
-              <p className="pt-1 text-xs text-slate-500">{getBillingSummaryText(locale)}</p>
+              <p className="pt-1 text-xs text-slate-500">{getBillingSummaryText('en')}</p>
             </CardContent>
           </Card>
         </div>
@@ -151,7 +151,7 @@ export default async function BillingPage() {
                       className="w-full"
                       label={configured ? 'Buy with Shopier' : 'Not Configured'}
                     />
-                    <p className="text-xs text-slate-500">{getBillingSummaryText(locale)}</p>
+                    <p className="text-xs text-slate-500">{getBillingSummaryText('en')}</p>
                   </CardContent>
                 </Card>
               );

@@ -88,7 +88,7 @@ export default function DashboardShell({
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="truncate">{locale === 'tr' ? item.labelTr : item.labelEn}</span>
+                  <span className="truncate">{item.labelEn}</span>
                 </Link>
               );
             })}
