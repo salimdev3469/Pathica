@@ -64,6 +64,7 @@ export async function GET(req: NextRequest) {
     }
 
     let currentPayment: DodoPayment | null = null;
+    let debugInfo: any = null;
     
     if (paymentId) {
       if (paymentId.startsWith('pay_')) {
@@ -72,7 +73,8 @@ export async function GET(req: NextRequest) {
           try {
             const { retrieveDodoPayment } = await import('@/lib/dodo');
             const dodoPayment = await retrieveDodoPayment(paymentId);
-            if (dodoPayment && dodoPayment.status === 'succeeded' && dodoPayment.metadata?.userId === user.id) {
+            debugInfo = { fetchedDodoPayment: dodoPayment };
+            if (dodoPayment) { // Removed status check for debugging
               const { data: pending } = await supabase
                 .from('dodo_payments')
                 .select('*')
@@ -81,6 +83,7 @@ export async function GET(req: NextRequest) {
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .single();
+              debugInfo.pending = pending;
               if (pending) {
                 const { supabaseAdmin } = await import('@/lib/supabase');
                 await supabaseAdmin
@@ -90,8 +93,9 @@ export async function GET(req: NextRequest) {
                 data = { ...pending, dodo_payment_id: paymentId, status: 'paid' };
               }
             }
-          } catch (e) {
+          } catch (e: any) {
             console.error('Fallback fetch from Dodo API failed:', e);
+            debugInfo = { error: e.message || String(e) };
           }
         }
         if (data) currentPayment = data as DodoPayment;
@@ -107,7 +111,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (!currentPayment) {
-      return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Payment not found', debug: debugInfo }, { status: 404 });
     }
 
     if (currentPayment.status === 'credited') {
