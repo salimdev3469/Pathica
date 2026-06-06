@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
     if (!legalAccepted) {
       return NextResponse.json(
-        { error: 'Ödemeye devam etmek için gerekli sözleşme ve bilgilendirme metinlerini kabul etmelisiniz.' },
+        { error: 'You must accept the required agreements and policies to proceed with the payment.' },
         { status: 400 },
       );
     }

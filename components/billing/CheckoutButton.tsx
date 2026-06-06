@@ -22,7 +22,7 @@ type CheckoutResponse = {
   error?: string;
 };
 
-const LEGAL_WARNING_MESSAGE = 'Ödemeye devam etmek için gerekli sözleşme ve bilgilendirme metinlerini kabul etmelisiniz.';
+const LEGAL_WARNING_MESSAGE = 'You must accept the required agreements and policies to proceed with the payment.';
 
 export default function CheckoutButton({ packageCode, disabled = false, className, label = 'Buy Credits', theme = 'light' }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
