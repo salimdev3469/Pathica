@@ -79,7 +79,7 @@ export default function RootLayout({
   const initialCookieConsent = cookieStore.get(COOKIE_CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased transition-colors duration-300`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <CssHealthCheck />
