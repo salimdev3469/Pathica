@@ -134,7 +134,7 @@ type HomeCinematicExperienceProps = {
   };
 };
 
-const PRE_PRICING_SLIDE_IDS = ['tailor', 'discover', 'flow', 'quote', 'stats'] as const;
+const PRE_PRICING_SLIDE_IDS = ['flow', 'quote', 'stats'] as const;
 const POST_PRICING_SLIDE_IDS = ['questions'] as const;
 const SLIDE_IDS = ['proof', ...PRE_PRICING_SLIDE_IDS, 'pricing', ...POST_PRICING_SLIDE_IDS] as const;
 const ACCENT_CLASS = 'text-[#9bd5ff]';
@@ -350,8 +350,6 @@ export function HomeCinematicExperience({
   const slideMeta = useMemo(
     () => [
       { id: 'proof', navLabel: navLabels.proof },
-      { id: 'tailor', navLabel: '' },
-      { id: 'discover', navLabel: '' },
       { id: 'flow', navLabel: navLabels.flow },
       { id: 'quote', navLabel: '' },
       { id: 'stats', navLabel: '' },
@@ -533,7 +531,7 @@ export function HomeCinematicExperience({
         </div>
       </header>
       <main>
-        <section className="relative min-h-[100svh] overflow-hidden border-b border-slate-700/30 pt-32">
+        <section className="relative min-h-[100svh] overflow-hidden border-b border-slate-700/30 pt-44 sm:pt-36 lg:pt-32">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(155,213,255,0.16),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(80,130,255,0.14),transparent_28%),linear-gradient(180deg,#06070b_0%,#090d16_58%,#08111d_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:110px_110px] opacity-[0.07]" />
 
@@ -542,16 +540,7 @@ export function HomeCinematicExperience({
             style={{ minHeight: `${heroCanvasHeight}px` }}
           >
             <div className="max-w-[48rem]">
-              <h1
-                className={cn(
-                  'mt-5 font-semibold leading-[0.9] tracking-[-0.07em] text-white',
-                  viewportDensity === 'tight'
-                    ? 'text-[clamp(2.3rem,4.8vw,4.2rem)]'
-                    : viewportDensity === 'compact'
-                      ? 'text-[clamp(2.55rem,5.5vw,4.85rem)]'
-                      : 'text-[clamp(2.8rem,6vw,5.65rem)]',
-                )}
-              >
+              <h1 className="mt-5 text-5xl sm:text-6xl lg:text-[5.5rem] font-semibold leading-[0.95] tracking-[-0.05em] text-white">
                 <span className="block">{heroTitleTop}</span>
                 <RotatingHeroLine
                   words={resolvedHeroAccentWords}
@@ -561,16 +550,7 @@ export function HomeCinematicExperience({
                 />
                 <span className="block">{heroTitleBottom}</span>
               </h1>
-              <p
-                className={cn(
-                  'mt-6 max-w-[33rem] text-white/66',
-                  viewportDensity === 'tight'
-                    ? 'max-w-[30rem] text-[15px] leading-6'
-                    : viewportDensity === 'compact'
-                      ? 'max-w-[31rem] text-[16px] leading-7'
-                      : 'max-w-[33rem] text-[16px] leading-7 sm:text-[1.05rem] sm:leading-8',
-                )}
-              >
+              <p className="mt-6 max-w-[33rem] text-[15px] sm:text-base lg:text-lg leading-7 sm:leading-8 text-white/70">
                 {heroSubtitle}
               </p>
 
@@ -1021,22 +1001,34 @@ function ProofSection({
       <div className="relative mt-10 md:mt-12 lg:mt-16">
         <div className="relative mx-auto w-full max-w-[620px]">
           <div className="mx-auto w-fit">
-            <ResumePagePreview
-              scale={density === 'tight' ? 0.65 : density === 'compact' ? 0.72 : 0.78}
-              className="border border-slate-200/90 bg-white shadow-[0_45px_110px_-55px_rgba(0,0,0,0.95)]"
-            />
+            <div className="hidden lg:block">
+              <ResumePagePreview
+                scale={0.78}
+                className="border border-slate-200/90 bg-white shadow-[0_45px_110px_-55px_rgba(0,0,0,0.95)]"
+              />
+            </div>
+            <div className="hidden md:block lg:hidden">
+              <ResumePagePreview
+                scale={0.65}
+                className="border border-slate-200/90 bg-white shadow-[0_45px_110px_-55px_rgba(0,0,0,0.95)]"
+              />
+            </div>
+            <div className="block md:hidden overflow-hidden">
+              <ResumePagePreview
+                scale={0.42}
+                className="border border-slate-200/90 bg-white shadow-[0_30px_60px_-30px_rgba(0,0,0,0.95)] mx-auto"
+              />
+            </div>
           </div>
 
           {/* Left Column (Desktop) */}
           <div className="absolute -left-48 top-6 z-20 hidden w-[17rem] flex-col gap-5 lg:flex">
             <ProofFindingCard findings={proof.findings} />
-            <ProofBulletRewriteCard />
           </div>
 
           {/* Right Column (Desktop) */}
           <div className="absolute -right-48 top-6 z-20 hidden w-[17rem] flex-col gap-5 lg:flex">
             <ProofScoreCard proof={proof} />
-            <ProofAIWriterCard />
           </div>
         </div>
 
@@ -1044,8 +1036,6 @@ function ProofSection({
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:hidden">
           <ProofFindingCard findings={proof.findings} />
           <ProofScoreCard proof={proof} />
-          <ProofBulletRewriteCard />
-          <ProofAIWriterCard />
         </div>
       </div>
     </div>
@@ -1188,7 +1178,22 @@ function QuoteSlide({
   density: ViewportDensity;
   activeQuoteIndex: number;
 }) {
-  const activeEntry = quote.entries[activeQuoteIndex] ?? quote.entries[0];
+  const [localIndex, setLocalIndex] = useState(activeQuoteIndex);
+  
+  useEffect(() => {
+    setLocalIndex(activeQuoteIndex);
+  }, [activeQuoteIndex]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.innerWidth >= 1024) return;
+    const interval = setInterval(() => {
+      setLocalIndex((prev) => (prev + 1) % quote.entries.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [quote.entries.length]);
+
+  const displayIndex = typeof window !== 'undefined' && window.innerWidth >= 1024 ? activeQuoteIndex : localIndex;
+  const activeEntry = quote.entries[displayIndex] ?? quote.entries[0];
 
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden">
@@ -1219,7 +1224,7 @@ function QuoteSlide({
                 className={cn(
                   'flex items-center justify-center rounded-xl border text-xs font-semibold shadow-[0_20px_40px_-28px_rgba(0,0,0,0.8)] transition-colors duration-300 overflow-hidden',
                   density === 'tight' ? 'h-10 w-10' : 'h-12 w-12',
-                  index === activeQuoteIndex
+                  index === displayIndex
                     ? 'border-[#9bd5ff]/40 bg-[#9bd5ff]/14 text-[#d8efff]'
                     : 'border-white/10 bg-white/[0.04] text-white/82',
                   index > 0 && '-ml-3',
@@ -1239,7 +1244,7 @@ function QuoteSlide({
         <div className="mt-6 flex items-center justify-center gap-3">
           {quote.entries.map((entry, index) => (
             <div key={entry.initials} className="flex items-center gap-3">
-              <span className={cn('h-px rounded-full transition-all duration-300', index === activeQuoteIndex ? 'w-10 bg-[#9bd5ff]' : 'w-6 bg-white/16')} />
+              <span className={cn('h-px rounded-full transition-all duration-300', index === displayIndex ? 'w-10 bg-[#9bd5ff]' : 'w-6 bg-white/16')} />
             </div>
           ))}
         </div>

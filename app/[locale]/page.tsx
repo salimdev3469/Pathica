@@ -43,10 +43,10 @@ export function generateMetadata({ params }: LocaleHubPageProps): Metadata {
     alternates: localeAlternates({
       en: localizedPath('en'),
       tr: localizedPath('tr'),
-    }, locale),
+    }, params.locale as 'en' | 'tr'),
     openGraph: {
       type: 'website',
-      url: localizedPath(locale),
+      url: localizedPath(params.locale as 'en' | 'tr'),
       title: false ? 'CV Oluşturucu ve Ön Yazı Merkezi | Pathica' : 'AI Resume Builder and Cover Letter Hub | Pathica',
       description: false
         ? 'CV oluşturucu, ön yazı oluşturucu ve ATS odaklı sayfalara tek merkezden hızlıca erişin.'
@@ -67,8 +67,8 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
     notFound();
   }
 
-  const landingPages = getSeoLandingPagesByLocale(locale);
-  const programmaticPath = getProfessionListPath(locale);
+  const landingPages = getSeoLandingPagesByLocale(params.locale as 'en' | 'tr');
+  const programmaticPath = getProfessionListPath(params.locale as 'en' | 'tr');
   const hubSteps = false
     ? [
         'İhtiyacına uygun sayfayı aç (CV oluşturma, ATS, ön yazı vb.).',
@@ -85,7 +85,7 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: false ? 'CV SEO İçerik Merkezi' : 'Resume SEO Content Hub',
-    url: toAbsoluteUrl(localizedPath(locale)),
+    url: toAbsoluteUrl(localizedPath(params.locale as 'en' | 'tr')),
 
     mainEntity: {
       '@type': 'ItemList',
@@ -94,7 +94,7 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
           '@type': 'ListItem',
           position: index + 1,
           name: page.h1,
-          url: toAbsoluteUrl(localizedPath(locale, page.slug)),
+          url: toAbsoluteUrl(localizedPath(params.locale as 'en' | 'tr', page.slug)),
         })),
         {
           '@type': 'ListItem',
@@ -107,7 +107,7 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
   };
 
   return (
-    <main lang={locale} className="min-h-screen bg-slate-50">
+    <main lang={params.locale} className="min-h-screen bg-slate-50">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
       <section className="border-b bg-white">
@@ -124,7 +124,7 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
               : 'Explore search-intent landing pages, ATS-focused content, and scalable programmatic role pages.'}
           </p>
           <div className="mt-6 rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-sm text-slate-700">
-            <p className="font-medium">{PRICING_MESSAGE[locale]}</p>
+            <p className="font-medium">{PRICING_MESSAGE[params.locale as 'en' | 'tr']}</p>
           </div>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
@@ -168,7 +168,7 @@ export default function LocaleHubPage({ params }: LocaleHubPageProps) {
                 <span className="rounded-full border bg-slate-50 px-3 py-1 text-xs text-slate-700">{page.primaryKeyword}</span>
               </div>
               <Link
-                href={localizedPath(locale, page.slug)}
+                href={localizedPath(params.locale as 'en' | 'tr', page.slug)}
                 className="mt-6 inline-flex h-10 items-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-900"
               >
                 {false ? 'Sayfayı Aç' : 'Open Page'}
