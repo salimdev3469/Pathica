@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       quantity: 1,
       customerEmail: user.email,
       customerName: userName || undefined,
-      returnUrl: `${appUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      returnUrl: `${appUrl}/payment/success`,
       metadata: {
         userId: user.id,
         email: user.email,
