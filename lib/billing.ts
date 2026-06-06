@@ -224,10 +224,12 @@ export async function createPendingDodoPayment(input: {
   sessionId: string;
   checkoutUrl: string;
   metadata?: Record<string, unknown>;
+  id?: string;
 }): Promise<DodoPayment> {
   const { data, error } = await supabaseAdmin
     .from('dodo_payments')
     .insert({
+      id: input.id || undefined,
       user_id: input.userId,
       buyer_email: normalizeEmail(input.buyerEmail),
       package_code: input.pkg.code,

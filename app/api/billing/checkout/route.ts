@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
 import { createDodoCheckoutSession } from '@/lib/dodo';
 import { createPendingDodoPayment, getWalletSnapshot } from '@/lib/billing';
 import { getBillingPackageByCode, getDodoProductId } from '@/lib/billing-config';
@@ -13,7 +14,7 @@ type CheckoutRequest = {
   legalAcceptedDocuments?: string[];
 };
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -54,12 +55,14 @@ export async function POST(req: Request) {
       user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || ''
     ).trim();
 
+    const internalId = uuidv4();
+
     const { sessionId, checkoutUrl } = await createDodoCheckoutSession({
       productId: dodoProductId,
       quantity: 1,
       customerEmail: user.email,
       customerName: userName || undefined,
-      returnUrl: `${appUrl}/payment/success`,
+      returnUrl: `${appUrl}/payment/success?internal_id=${internalId}`,
       metadata: {
         userId: user.id,
         email: user.email,
@@ -80,6 +83,7 @@ export async function POST(req: Request) {
       : [];
 
     const payment = await createPendingDodoPayment({
+      id: internalId,
       userId: user.id,
       buyerEmail: user.email,
       pkg,
