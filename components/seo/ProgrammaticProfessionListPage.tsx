@@ -14,7 +14,7 @@ export default function ProgrammaticProfessionListPage({
   description,
   professions
 }: ProgrammaticProfessionListPageProps) {
-  const collectionSteps = isTr
+  const collectionSteps = false
     ? [
         'Uygun meslek kartını açıp örnek yapıyı gör.',
         'Yetkinlik ve başarı cümlelerini kendi deneyimine uyarlayıp not al.',
@@ -27,34 +27,34 @@ export default function ProgrammaticProfessionListPage({
       ];
 
   return (
-    <main lang={locale} className="min-h-screen bg-slate-50">
+    <main lang={'en'} className="min-h-screen bg-slate-50">
       <section className="border-b bg-white">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-600">
-            {isTr ? 'Programmatic SEO Koleksiyonu' : 'Programmatic SEO Collection'}
+            {false ? 'Programmatic SEO Koleksiyonu' : 'Programmatic SEO Collection'}
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-slate-900 md:text-5xl">{title}</h1>
           <p className="mt-5 max-w-3xl text-lg text-slate-600">{description}</p>
           <div className="mt-6 rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-sm text-slate-700">
-            <p className="font-medium">{PRICING_MESSAGE[locale]}</p>
+            <p className="font-medium">{PRICING_MESSAGE['en']}</p>
           </div>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href="/cv/new"
               className="inline-flex h-11 items-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-black"
             >
-              {isTr ? 'Ücretsiz Oluştur' : 'Build Free'}
+              {false ? 'Ücretsiz Oluştur' : 'Build Free'}
             </Link>
             <Link
               href="#role-grid"
               className="inline-flex h-11 items-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900"
             >
-              {isTr ? 'Meslek Örneklerini İncele' : 'Browse Role Examples'}
+              {false ? 'Meslek Örneklerini İncele' : 'Browse Role Examples'}
             </Link>
           </div>
           <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <p className="text-sm font-semibold text-slate-900">
-              {isTr ? 'Ne yapmalıyım?' : 'What should I do next?'}
+              {false ? 'Ne yapmalıyım?' : 'What should I do next?'}
             </p>
             <ol className="mt-3 space-y-2 text-sm text-slate-700">
               {collectionSteps.map((step, index) => (
@@ -74,10 +74,10 @@ export default function ProgrammaticProfessionListPage({
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {professions.map((profession) => (
             <article key={profession.slug} className="rounded-2xl border bg-white p-6 transition hover:shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-900">{profession.roleName[locale]}</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-700">{profession.summary[locale]}</p>
+              <h2 className="text-xl font-semibold text-slate-900">{profession.roleName['en']}</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-700">{profession.summary['en']}</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                {profession.coreSkills[locale].slice(0, 4).map((skill) => (
+                {profession.coreSkills['en'].slice(0, 4).map((skill) => (
                   <span key={skill} className="rounded-full border bg-slate-50 px-3 py-1 text-xs text-slate-700">
                     {skill}
                   </span>
@@ -85,16 +85,16 @@ export default function ProgrammaticProfessionListPage({
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
                 <Link
-                  href={getProfessionPath(locale, profession.slug)}
+                  href={getProfessionPath('en', profession.slug)}
                   className="inline-flex h-10 items-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-800 transition hover:border-slate-900"
                 >
-                  {isTr ? 'Örneği Gör' : 'View Example'}
+                  {false ? 'Örneği Gör' : 'View Example'}
                 </Link>
                 <Link
                   href="/cv/new"
                   className="inline-flex h-10 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-black"
                 >
-                  {isTr ? 'Bu Rol İçin Oluştur' : 'Build for This Role'}
+                  {false ? 'Bu Rol İçin Oluştur' : 'Build for This Role'}
                 </Link>
               </div>
             </article>
@@ -105,10 +105,10 @@ export default function ProgrammaticProfessionListPage({
       <section className="mx-auto max-w-6xl px-6 pb-16">
         <div className="rounded-2xl border bg-slate-900 p-6 text-white md:p-8">
           <h2 className="text-2xl font-semibold">
-            {isTr ? 'Örnekten çıkmadan uygulamaya geç' : 'Move from examples to action'}
+            {false ? 'Örnekten çıkmadan uygulamaya geç' : 'Move from examples to action'}
           </h2>
           <p className="mt-3 text-sm text-slate-100">
-            {isTr
+            {false
               ? 'Örneklerden fikir alıp hemen CV taslağına geçtiğinde içerik kalitesi ve hız birlikte artar.'
               : 'When you go from role examples directly into drafting, quality and speed improve together.'}
           </p>
@@ -116,7 +116,7 @@ export default function ProgrammaticProfessionListPage({
             href="/cv/new"
             className="mt-6 inline-flex h-11 items-center rounded-full bg-white px-6 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
           >
-            {isTr ? 'CV Oluşturmaya Başla' : 'Start Building Resume'}
+            {false ? 'CV Oluşturmaya Başla' : 'Start Building Resume'}
           </Link>
         </div>
       </section>

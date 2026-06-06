@@ -76,7 +76,7 @@ export default async function Home() {
   const navCtaLabel = isAuthenticated ? 'Dashboard' : 'Start Free';
   const heroPrimaryHref = isAuthenticated ? '/dashboard' : '/cv/new';
   const heroPrimaryLabel = isAuthenticated ? 'Open Dashboard' : 'Build Free CV';
-  const billingSummaryText = getBillingSummaryText(locale);
+  const billingSummaryText = getBillingSummaryText('en');
   const logoSrc = getLogoSrc();
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.pathica.tech').replace(/\/$/, '');
 
@@ -275,7 +275,7 @@ export default async function Home() {
         heroSecondaryLabel={'See the proof'}
         heroTitleTop={'The AI that gets'}
         heroTitleAccentWords={
-          isTr
+          false
             ? ['HRs', 'Engineers', 'Designers', 'Marketers', 'Developers']
             : ['HRs', 'Engineers', 'Designers', 'Marketers', 'Developers']
         }
@@ -289,8 +289,8 @@ export default async function Home() {
         }}
         heroTrustItems={[
           'ATS-safe structure',
-          isTr ? `${FREE_SIGNUP_EXPORTS} ücretsiz PDF export` : `${FREE_SIGNUP_EXPORTS} free PDF export`,
-          isTr ? `${FREE_SIGNUP_AI_CREDITS} AI kredi` : `${FREE_SIGNUP_AI_CREDITS} AI credits`,
+          false ? `${FREE_SIGNUP_EXPORTS} ücretsiz PDF export` : `${FREE_SIGNUP_EXPORTS} free PDF export`,
+          false ? `${FREE_SIGNUP_AI_CREDITS} AI kredi` : `${FREE_SIGNUP_AI_CREDITS} AI credits`,
           'No subscription',
         ]}
         proof={{

@@ -18,27 +18,27 @@ function getFooterLogoSrc() {
 }
 
 export default function SiteFooter({}: SiteFooterProps) {
-  const legalPageLinks = getLegalPageLinks(locale);
+  const legalPageLinks = getLegalPageLinks('en');
   const footerLogoSrc = getFooterLogoSrc();
   const seoLinks = [
     {
-      href: localizedPath(locale, isTr ? 'cv-olusturucu' : 'resume-builder'),
+      href: localizedPath('en', false ? 'cv-olusturucu' : 'resume-builder'),
       label: 'Resume Builder',
     },
     {
-      href: localizedPath(locale, isTr ? 'ai-cv-olusturucu' : 'ai-resume-builder'),
+      href: localizedPath('en', false ? 'ai-cv-olusturucu' : 'ai-resume-builder'),
       label: 'AI Resume Builder',
     },
     {
-      href: localizedPath(locale, isTr ? 'on-yazi-olusturucu' : 'cover-letter-generator'),
+      href: localizedPath('en', false ? 'on-yazi-olusturucu' : 'cover-letter-generator'),
       label: 'Cover Letter Generator',
     },
     {
-      href: localizedPath(locale, isTr ? 'on-yazi-nasil-yazilir' : 'cover-letter-writing-guide'),
+      href: localizedPath('en', false ? 'on-yazi-nasil-yazilir' : 'cover-letter-writing-guide'),
       label: 'Cover Letter Writing',
     },
     {
-      href: localizedPath(locale, isTr ? 'ats-cv-olusturucu' : 'ats-resume-builder'),
+      href: localizedPath('en', false ? 'ats-cv-olusturucu' : 'ats-resume-builder'),
       label: 'ATS Resume Builder',
     },
   ];
@@ -48,7 +48,7 @@ export default function SiteFooter({}: SiteFooterProps) {
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6">
         <div className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
           <Link
-            href={localizedPath(locale)}
+            href={localizedPath('en')}
             aria-label={'Go to Pathica homepage'}
             className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           >

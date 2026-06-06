@@ -72,7 +72,7 @@ export function TemplateLibraryGrid({}: TemplateLibraryGridProps) {
           <div className="mx-auto mt-10 max-w-[460px] overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_28px_70px_-36px_rgba(15,23,42,0.2)]">
             <Image
               src="/template-previews/classic-ats-legacy.png?v=20260516a"
-              alt={getLocalizedText(template.previewAlt, locale)}
+              alt={getLocalizedText(template.previewAlt, 'en')}
               width={1592}
               height={2250}
               unoptimized

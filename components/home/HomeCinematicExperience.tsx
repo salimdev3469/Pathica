@@ -199,13 +199,13 @@ export function HomeCinematicExperience({
         setIsSupportOpen(false);
         setSupportEmail('');
         setSupportMessage('');
-        toast.success(locale === 'tr' ? 'Talebiniz alındı.' : 'Support ticket submitted.');
+        toast.success(false ? 'Talebiniz alındı.' : 'Support ticket submitted.');
       } else {
-        toast.error(locale === 'tr' ? 'Bir hata oluştu.' : 'Failed to submit ticket.');
+        toast.error(false ? 'Bir hata oluştu.' : 'Failed to submit ticket.');
       }
     } catch (e) {
       console.error(e);
-      toast.error(locale === 'tr' ? 'Bir hata oluştu.' : 'Failed to submit ticket.');
+      toast.error(false ? 'Bir hata oluştu.' : 'Failed to submit ticket.');
     } finally {
       setIsSubmittingSupport(false);
     }
@@ -435,7 +435,7 @@ export function HomeCinematicExperience({
     <div className="min-h-screen bg-[#05070b] text-white">
       <header className="fixed inset-x-0 top-0 z-50">
         <div className="bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-3.5 flex items-center justify-center text-center text-sm font-medium text-white border-b border-blue-400/20 shadow-[0_4px_20px_-5px_rgba(79,70,229,0.3)]">
-          {locale === 'tr' ? (
+          {false ? (
             <p className="flex items-center justify-center gap-1.5 flex-wrap">
               <span className="font-bold text-blue-50">Sınırsız & Ücretsiz:</span> 
               <span>Dilediğin kadar CV üret, depola ve Pathica linki ile sınırsız paylaş! +10 Kredi ve 1 PDF Export ilk kayıtta hediye.</span>
@@ -482,19 +482,19 @@ export function HomeCinematicExperience({
             <Dialog open={isSupportOpen} onOpenChange={setIsSupportOpen}>
               <DialogTrigger asChild>
                 <button className="hidden text-sm font-medium text-white/65 transition-colors hover:text-white md:inline-flex">
-                  {locale === 'tr' ? 'Destek' : 'Support'}
+                  {false ? 'Destek' : 'Support'}
                 </button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px] bg-[#0a101a] text-white border-white/10">
                 <DialogHeader>
-                  <DialogTitle className="text-white">{locale === 'tr' ? 'Destek Talebi' : 'Support Ticket'}</DialogTitle>
+                  <DialogTitle className="text-white">{false ? 'Destek Talebi' : 'Support Ticket'}</DialogTitle>
                   <DialogDescription className="text-white/60">
-                    {locale === 'tr' ? 'Sorularınız veya sorunlarınız için bize ulaşın.' : 'Contact us for any questions or issues.'}
+                    {false ? 'Sorularınız veya sorunlarınız için bize ulaşın.' : 'Contact us for any questions or issues.'}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSupportSubmit} className="grid gap-4 py-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="email" className="text-white/80">{locale === 'tr' ? 'E-posta' : 'Email'}</Label>
+                    <Label htmlFor="email" className="text-white/80">{false ? 'E-posta' : 'Email'}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -506,18 +506,18 @@ export function HomeCinematicExperience({
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="message" className="text-white/80">{locale === 'tr' ? 'Mesaj' : 'Message'}</Label>
+                    <Label htmlFor="message" className="text-white/80">{false ? 'Mesaj' : 'Message'}</Label>
                     <Textarea
                       id="message"
                       value={supportMessage}
                       onChange={(e) => setSupportMessage(e.target.value)}
-                      placeholder={locale === 'tr' ? 'Nasıl yardımcı olabiliriz?' : 'How can we help?'}
+                      placeholder={false ? 'Nasıl yardımcı olabiliriz?' : 'How can we help?'}
                       className="bg-white/5 border-white/10 text-white placeholder:text-white/30 min-h-[100px]"
                       required
                     />
                   </div>
                   <Button type="submit" disabled={isSubmittingSupport} className="bg-[#9bd5ff] text-slate-950 hover:bg-[#b5e2ff] border-0">
-                    {isSubmittingSupport ? (locale === 'tr' ? 'Gönderiliyor...' : 'Submitting...') : (locale === 'tr' ? 'Gönder' : 'Submit')}
+                    {isSubmittingSupport ? (false ? 'Gönderiliyor...' : 'Submitting...') : (false ? 'Gönder' : 'Submit')}
                   </Button>
                 </form>
               </DialogContent>
@@ -837,10 +837,10 @@ function HeroShowcase({
         <div className="relative z-10 flex h-full flex-col justify-between p-6">
           <div className="max-w-[15rem] pt-14">
             <p className="text-[1.72rem] font-semibold leading-[1.03] tracking-[-0.05em] text-white">
-              {locale === 'tr' ? 'Yaz, sıkılaştır, dışa aktar.' : 'Write, tailor, export.'}
+              {false ? 'Yaz, sıkılaştır, dışa aktar.' : 'Write, tailor, export.'}
             </p>
             <p className="mt-4 text-[14px] leading-6 text-white/58">
-              {locale === 'tr'
+              {false
                 ? 'Editör hareket ederken nihai A4 çıktıyı aynı sahnede gör. Platform hissi burada başlar.'
                 : 'See the moving editor and the final A4 output in the same scene. This is where the product feels real.'}
             </p>
@@ -854,10 +854,10 @@ function HeroShowcase({
               </div>
               <div className="rounded-[1.3rem] border border-white/10 bg-white/[0.04] px-4 py-3 backdrop-blur">
                 <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.18em] text-white/42">
-                  {locale === 'tr' ? 'çıktı' : 'output'}
+                  {false ? 'çıktı' : 'output'}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-white/68">
-                  {locale === 'tr' ? 'Recruiter-safe A4 ve export hazır PDF akışı.' : 'Recruiter-safe A4 and export-ready PDF flow.'}
+                  {false ? 'Recruiter-safe A4 ve export hazır PDF akışı.' : 'Recruiter-safe A4 and export-ready PDF flow.'}
                 </p>
               </div>
             </div>
@@ -865,7 +865,7 @@ function HeroShowcase({
             <div className="relative mr-1">
               <div className="absolute -left-24 top-8 z-20 rounded-[1.2rem] border border-white/10 bg-[#07101c]/92 px-4 py-3 shadow-[0_25px_55px_-32px_rgba(0,0,0,0.9)] backdrop-blur">
                 <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.2em] text-white/40">
-                  {locale === 'tr' ? 'anahtar eşleşme' : 'keyword match'}
+                  {false ? 'anahtar eşleşme' : 'keyword match'}
                 </p>
                 <p className="mt-2 text-[1.35rem] font-semibold tracking-[-0.05em] text-white">8 / 8</p>
               </div>
@@ -1056,15 +1056,15 @@ function ProofBulletRewriteCard({}: {}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#12131a]/92 p-5 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur">
       <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.2em] text-white/40">
-        {locale === 'tr' ? 'madde yeniden yazımı' : 'bullet rewrite'}
+        {false ? 'madde yeniden yazımı' : 'bullet rewrite'}
       </p>
       <div className="mt-4 space-y-4">
         <div>
           <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.15em] text-rose-400/80 font-semibold">
-            {locale === 'tr' ? 'ÖNCE' : 'BEFORE'}
+            {false ? 'ÖNCE' : 'BEFORE'}
           </p>
           <p className="mt-1.5 text-[12px] leading-5 text-white/54">
-            {locale === 'tr'
+            {false
               ? 'AWS EC2 üzerinde Docker ile bir Spring Boot uygulaması geliştirildi.'
               : 'Developed a Spring Boot app with Docker on AWS EC2.'}
           </p>
@@ -1072,10 +1072,10 @@ function ProofBulletRewriteCard({}: {}) {
         <div className="h-px w-full bg-white/8" />
         <div>
           <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.15em] text-[#9bd5ff] font-semibold">
-            {locale === 'tr' ? 'SONRA' : 'AFTER'}
+            {false ? 'SONRA' : 'AFTER'}
           </p>
           <p className="mt-1.5 text-[12px] leading-5 text-white/80 font-medium">
-            {locale === 'tr'
+            {false
               ? 'Spring Boot servislerini AWS EC2 üzerinde konteynerleştirerek canlıya alım süresini %40 kısalttı; güncellemeleri 30+ paydaşa günler yerine saatler içinde ulaştırdı.'
               : 'Cut deployment overhead 40% by containerizing Spring Boot services on AWS EC2, shipping releases to 30+ stakeholders in hours, not days.'}
           </p>
@@ -1089,19 +1089,19 @@ function ProofAIWriterCard({}: {}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#12131a]/92 p-5 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur">
       <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.2em] text-white/40">
-        {locale === 'tr' ? 'yapay zeka içerik yazarı' : 'ai content writer'}
+        {false ? 'yapay zeka içerik yazarı' : 'ai content writer'}
       </p>
       <h3 className="mt-3 text-[1.125rem] font-semibold tracking-[-0.04em] leading-snug text-white">
-        {locale === 'tr' ? 'Herhangi bir rol için madde işaretlerini yeniden yaz.' : 'Rewrite any bullet for any role.'}
+        {false ? 'Herhangi bir rol için madde işaretlerini yeniden yaz.' : 'Rewrite any bullet for any role.'}
       </h3>
       <p className="mt-2 text-[12px] leading-5 text-white/54">
-        {locale === 'tr' ? 'Sayısal sonuçlu, recruiter onaylı, saniyeler içinde.' : 'Quantified, recruiter-tested, in seconds.'}
+        {false ? 'Sayısal sonuçlu, recruiter onaylı, saniyeler içinde.' : 'Quantified, recruiter-tested, in seconds.'}
       </p>
       <button
         type="button"
         className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-400 px-4 py-2 text-xs font-semibold text-slate-950 transition-transform hover:scale-[1.02] active:scale-[0.98]"
       >
-        <span>{locale === 'tr' ? 'Madde oluştur' : 'Generate bullet'}</span>
+        <span>{false ? 'Madde oluştur' : 'Generate bullet'}</span>
         <ArrowRight className="h-3 w-3" />
       </button>
     </div>
@@ -1380,10 +1380,10 @@ function PricingSlide({
                 <div>
                   <p className="font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.28em] text-white/35">
                     {pkg.isPopular
-                      ? locale === 'tr'
+                      ? false
                         ? 'en dengeli'
                         : 'most balanced'
-                      : locale === 'tr'
+                      : false
                         ? 'kredi paketi'
                         : 'credit pack'}
                   </p>
@@ -1403,7 +1403,7 @@ function PricingSlide({
                 </div>
                 {pkg.isPopular ? (
                   <span className="font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.28em] text-[#9bd5ff]">
-                    {locale === 'tr' ? 'öne çıkan' : 'featured'}
+                    {false ? 'öne çıkan' : 'featured'}
                   </span>
                 ) : null}
               </div>
@@ -1443,7 +1443,7 @@ function PricingSlide({
                       ? 'bg-[#9bd5ff] text-slate-950 shadow-[0_20px_60px_-32px_rgba(155,213,255,0.85)] hover:bg-[#b5e2ff]'
                       : 'border border-white/12 bg-transparent text-white hover:bg-white/[0.05]',
                   )}
-                  label={pkg.isConfigured ? (locale === 'tr' ? 'Shopier ile Satın Al' : 'Buy with Shopier') : (locale === 'tr' ? 'Yapılandırılmadı' : 'Not Configured')}
+                  label={pkg.isConfigured ? (false ? 'Shopier ile Satın Al' : 'Buy with Shopier') : (false ? 'Yapılandırılmadı' : 'Not Configured')}
                   theme="dark"
                 />
               ) : (
@@ -1556,7 +1556,7 @@ function ProofFindingCard({
   return (
     <div className="rounded-2xl border border-white/10 bg-[#12131a] p-4 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)]">
       <p className="font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.28em] text-white/28">
-        {locale === 'tr' ? 'bulduklarımız' : 'what we found'}
+        {false ? 'bulduklarımız' : 'what we found'}
       </p>
       <div className="mt-5 space-y-5">
         {findings.map((item, index) => (
@@ -1752,7 +1752,7 @@ function TailorSlide({
                 <div className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#27C93F]/20" />
               </div>
               <div className="mx-auto font-[family:var(--font-geist-mono)] text-[12px] sm:text-[13px] text-white/40 uppercase tracking-[0.2em] translate-x-[-20px]">
-                {locale === 'tr' ? 'Yapay Zeka Çalışma Alanı' : 'AI Workspace'}
+                {false ? 'Yapay Zeka Çalışma Alanı' : 'AI Workspace'}
               </div>
             </div>
             
@@ -1760,10 +1760,10 @@ function TailorSlide({
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-white/40" />
-                  <span className="text-[13px] sm:text-[14px] font-medium text-white/60 uppercase tracking-wider">{locale === 'tr' ? 'İş Tanımı: Ürün Müdürü' : 'Job Description: Product Manager'}</span>
+                  <span className="text-[13px] sm:text-[14px] font-medium text-white/60 uppercase tracking-wider">{false ? 'İş Tanımı: Ürün Müdürü' : 'Job Description: Product Manager'}</span>
                 </div>
                 <div className="rounded-xl bg-white/[0.03] border border-white/5 p-6 text-[15px] sm:text-[17px] leading-[1.65] text-white/60">
-                  {locale === 'tr' ? (
+                  {false ? (
                     <>
                       Ekibimize katılacak, <span className="text-[#9bd5ff] bg-[#9bd5ff]/10 px-1.5 py-0.5 rounded-md font-medium text-white/80">Süreç Optimizasyonu</span> konusunda uzman ve <span className="text-[#9bd5ff] bg-[#9bd5ff]/10 px-1.5 py-0.5 rounded-md font-medium text-white/80">Çapraz Fonksiyonel</span> ekipleri yönetecek bir lider arıyoruz. <span className="text-[#9bd5ff] bg-[#9bd5ff]/10 px-1.5 py-0.5 rounded-md font-medium text-white/80">Veri Analizi</span> zorunludur.
                     </>
@@ -1778,20 +1778,20 @@ function TailorSlide({
               <div className="flex justify-center -my-4 relative z-10">
                 <button className="flex items-center gap-2 px-8 py-3 rounded-full bg-gradient-to-r from-pink-500/20 to-rose-400/20 border border-pink-500/30 text-pink-300 text-[15px] font-semibold backdrop-blur-md shadow-[0_0_20px_rgba(236,72,153,0.15)]">
                   <Sparkles className="w-5 h-5" />
-                  {locale === 'tr' ? 'Otomatik Uyarla' : 'Auto-Tailor'}
+                  {false ? 'Otomatik Uyarla' : 'Auto-Tailor'}
                 </button>
               </div>
 
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white/40" />
-                  <span className="text-[13px] sm:text-[14px] font-medium text-white/60 uppercase tracking-wider">{locale === 'tr' ? 'Senin CV\'n' : 'Your Resume'}</span>
+                  <span className="text-[13px] sm:text-[14px] font-medium text-white/60 uppercase tracking-wider">{false ? 'Senin CV\'n' : 'Your Resume'}</span>
                 </div>
                 <div className="rounded-xl bg-gradient-to-b from-[#161b22] to-[#0A0D14] border border-white/10 p-6 text-[15px] sm:text-[17px] leading-[1.65] text-white/90 shadow-inner">
                   <div className="flex items-start gap-3">
                     <span className="text-pink-400/80 mt-1">•</span>
                     <span>
-                      {locale === 'tr' ? (
+                      {false ? (
                         <>
                           <span className="text-white font-medium">Süreç Optimizasyonu</span> girişimlerini yöneterek %40 verimlilik artışı sağladı; <span className="text-white font-medium">Çapraz Fonksiyonel</span> ekipleri hizaladı ve <span className="text-white font-medium">Veri Analizi</span> ile kararları destekledi.
                         </>
@@ -1861,17 +1861,17 @@ function DiscoverSlide({
                 </svg>
                 <div className="flex flex-col items-center">
                   <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">88<span className="text-sm sm:text-base text-white/50">%</span></span>
-                  <span className="font-[family:var(--font-geist-mono)] text-[9px] sm:text-[10px] uppercase tracking-widest text-white/40 mt-0.5">{locale === 'tr' ? 'EŞLEŞME' : 'MATCH'}</span>
+                  <span className="font-[family:var(--font-geist-mono)] text-[9px] sm:text-[10px] uppercase tracking-widest text-white/40 mt-0.5">{false ? 'EŞLEŞME' : 'MATCH'}</span>
                 </div>
               </div>
               
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 rounded-full bg-[#27C93F] shadow-[0_0_10px_rgba(39,201,63,0.8)] animate-pulse" />
-                  <span className="font-[family:var(--font-geist-mono)] text-[11px] sm:text-xs font-medium uppercase tracking-[0.15em] text-white/60">{locale === 'tr' ? 'ATS TARAYICI' : 'ATS SCANNER'}</span>
+                  <span className="font-[family:var(--font-geist-mono)] text-[11px] sm:text-xs font-medium uppercase tracking-[0.15em] text-white/60">{false ? 'ATS TARAYICI' : 'ATS SCANNER'}</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">Alex Morgan</h3>
-                <p className="text-sm sm:text-base text-white/50 mt-1">{locale === 'tr' ? 'Başvurulan Rol: Ürün Müdürü' : 'Applying for: Product Manager'}</p>
+                <p className="text-sm sm:text-base text-white/50 mt-1">{false ? 'Başvurulan Rol: Ürün Müdürü' : 'Applying for: Product Manager'}</p>
               </div>
             </div>
 
@@ -1880,7 +1880,7 @@ function DiscoverSlide({
               <div className="rounded-2xl border border-[#27C93F]/20 bg-[#27C93F]/[0.02] p-6 shadow-inner">
                 <div className="flex items-center gap-2.5 mb-5">
                   <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#27C93F]" />
-                  <span className="text-xs sm:text-sm font-semibold text-white/80 uppercase tracking-wider">{locale === 'tr' ? 'Tespit Edildi' : 'Identified'}</span>
+                  <span className="text-xs sm:text-sm font-semibold text-white/80 uppercase tracking-wider">{false ? 'Tespit Edildi' : 'Identified'}</span>
                 </div>
                 <div className="flex flex-wrap gap-2.5">
                   <span className="px-3 py-1.5 rounded-md bg-[#27C93F]/10 border border-[#27C93F]/20 text-xs sm:text-sm font-medium text-[#27C93F]">Agile</span>
@@ -1894,7 +1894,7 @@ function DiscoverSlide({
               <div className="rounded-2xl border border-[#FFBD2E]/20 bg-[#FFBD2E]/[0.02] p-6 shadow-inner">
                 <div className="flex items-center gap-2.5 mb-5">
                   <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-[#FFBD2E]" />
-                  <span className="text-xs sm:text-sm font-semibold text-white/80 uppercase tracking-wider">{locale === 'tr' ? 'Eksik' : 'Missing'}</span>
+                  <span className="text-xs sm:text-sm font-semibold text-white/80 uppercase tracking-wider">{false ? 'Eksik' : 'Missing'}</span>
                 </div>
                 <div className="flex flex-wrap gap-2.5">
                   <span className="px-3 py-1.5 rounded-md bg-[#FFBD2E]/10 border border-[#FFBD2E]/20 text-xs sm:text-sm font-medium text-[#FFBD2E]">GTM Strategy</span>

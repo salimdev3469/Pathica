@@ -11,8 +11,8 @@ export default function SeoLandingPageView({
   page,
   alternates
 }: SeoLandingPageProps) {
-  const pageUrl = toAbsoluteUrl(alternates[locale]);
-  const journeySteps = isTr
+  const pageUrl = toAbsoluteUrl(alternates['en']);
+  const journeySteps = false
     ? [
         'Ücretsiz oluşturma ekranını aç.',
         'CV içeriğini bu sayfadaki önerilere göre ilana uyarlayıp güçlendir.',
@@ -57,8 +57,8 @@ export default function SeoLandingPageView({
         {
           '@type': 'ListItem',
           position: 1,
-          name: isTr ? 'SEO Sayfaları' : 'SEO Pages',
-          item: toAbsoluteUrl(`/${locale}`),
+          name: false ? 'SEO Sayfaları' : 'SEO Pages',
+          item: toAbsoluteUrl(`/${'en'}`),
         },
         {
           '@type': 'ListItem',
@@ -71,13 +71,13 @@ export default function SeoLandingPageView({
   ];
 
   return (
-    <main lang={locale} className="min-h-screen bg-slate-50">
+    <main lang={'en'} className="min-h-screen bg-slate-50">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
       <section className="border-b bg-white">
         <div className="mx-auto max-w-5xl px-6 py-14 md:py-20">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-600">
-            {isTr ? 'Arama Niyeti Odaklı Sayfa' : 'Search-Intent Landing Page'}
+            {false ? 'Arama Niyeti Odaklı Sayfa' : 'Search-Intent Landing Page'}
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-slate-900 md:text-5xl">
             {page.h1}
@@ -85,7 +85,7 @@ export default function SeoLandingPageView({
           <p className="mt-5 max-w-3xl text-lg text-slate-600">{page.intro}</p>
 
           <div className="mt-7 rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-sm text-slate-700">
-            <p className="font-medium">{PRICING_MESSAGE[locale]}</p>
+            <p className="font-medium">{PRICING_MESSAGE['en']}</p>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-2 text-xs text-slate-600">
@@ -99,7 +99,7 @@ export default function SeoLandingPageView({
 
           <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <p className="text-sm font-semibold text-slate-900">
-              {isTr ? 'Ne yapacağın net: 3 adımda başla' : 'Clear next step: start in 3 actions'}
+              {false ? 'Ne yapacağın net: 3 adımda başla' : 'Clear next step: start in 3 actions'}
             </p>
             <ol className="mt-3 space-y-2 text-sm text-slate-700">
               {journeySteps.map((step, index) => (
@@ -121,10 +121,10 @@ export default function SeoLandingPageView({
               {page.ctaLabel}
             </Link>
             <Link
-              href={isTr ? '/tr/cv-ornekleri' : '/en/resume-examples'}
+              href={false ? '/tr/cv-ornekleri' : '/en/resume-examples'}
               className="inline-flex h-11 items-center rounded-full border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900"
             >
-              {isTr ? 'Meslek Bazlı Örnekler' : 'Role-Based Examples'}
+              {false ? 'Meslek Bazlı Örnekler' : 'Role-Based Examples'}
             </Link>
           </div>
         </div>
@@ -132,7 +132,7 @@ export default function SeoLandingPageView({
 
       <section className="mx-auto max-w-5xl px-6 py-12">
         <div className="rounded-2xl border bg-white p-6 md:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">{isTr ? 'Bu Sayfa Ne Sağlar?' : 'What This Page Delivers'}</h2>
+          <h2 className="text-2xl font-semibold text-slate-900">{false ? 'Bu Sayfa Ne Sağlar?' : 'What This Page Delivers'}</h2>
           <p className="mt-4 text-slate-700">{page.searchIntent}</p>
         </div>
       </section>
@@ -147,9 +147,9 @@ export default function SeoLandingPageView({
           ))}
         </div>
         <aside className="mt-4 rounded-2xl border bg-white p-5 lg:sticky lg:top-24 lg:mt-0">
-          <p className="text-sm font-semibold text-slate-900">{isTr ? 'Hemen Uygula' : 'Apply It Now'}</p>
+          <p className="text-sm font-semibold text-slate-900">{false ? 'Hemen Uygula' : 'Apply It Now'}</p>
           <p className="mt-2 text-sm text-slate-700">
-            {isTr
+            {false
               ? 'Bu sayfadaki önerileri bekletmeden CV ekranında uygulayıp dakikalar içinde sürümünü hazırla.'
               : 'Apply this page guidance immediately in the builder and produce your next version in minutes.'}
           </p>
@@ -165,10 +165,10 @@ export default function SeoLandingPageView({
       <section className="mx-auto max-w-5xl px-6 pb-12">
         <div className="rounded-2xl border bg-slate-900 p-6 text-white md:p-8">
           <h2 className="text-2xl font-semibold">
-            {isTr ? 'Hazırsan şimdi CV oluşturma ekranına geç' : 'If you are ready, move to the builder now'}
+            {false ? 'Hazırsan şimdi CV oluşturma ekranına geç' : 'If you are ready, move to the builder now'}
           </h2>
           <p className="mt-3 text-sm text-slate-100">
-            {isTr
+            {false
               ? 'Plan net: oluştur, ilana göre optimize et, ücretsiz önizle. Export kararı her zaman sende.'
               : 'Simple path: build, tailor to the role, preview free. You decide when to export.'}
           </p>
@@ -180,10 +180,10 @@ export default function SeoLandingPageView({
               {page.ctaLabel}
             </Link>
             <Link
-              href={isTr ? '/tr/cv-ornekleri' : '/en/resume-examples'}
+              href={false ? '/tr/cv-ornekleri' : '/en/resume-examples'}
               className="inline-flex h-11 items-center rounded-full border border-white/40 px-6 text-sm font-semibold text-white transition hover:border-white"
             >
-              {isTr ? 'Önce Örnekleri İncele' : 'Review Examples First'}
+              {false ? 'Önce Örnekleri İncele' : 'Review Examples First'}
             </Link>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default function SeoLandingPageView({
 
       <section className="mx-auto max-w-5xl px-6 pb-16">
         <div className="rounded-2xl border bg-white p-6 md:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">{isTr ? 'Sık Sorulan Sorular' : 'Frequently Asked Questions'}</h2>
+          <h2 className="text-2xl font-semibold text-slate-900">{false ? 'Sık Sorulan Sorular' : 'Frequently Asked Questions'}</h2>
           <div className="mt-6 space-y-5">
             {page.faq.map((item) => (
               <article key={item.question}>

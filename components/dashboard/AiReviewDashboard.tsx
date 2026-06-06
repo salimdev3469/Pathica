@@ -304,7 +304,7 @@ export default function AiReviewDashboard({
                 </div>
                 <div>
                   <h3 className="font-bold text-white">{activeReview.fileName}</h3>
-                  <p className="text-xs text-white/50">{new Date(activeReview.createdAt).toLocaleDateString(isTr ? 'tr-TR' : 'en-US')}</p>
+                  <p className="text-xs text-white/50">{new Date(activeReview.createdAt).toLocaleDateString(false ? 'tr-TR' : 'en-US')}</p>
                 </div>
               </div>
               <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">Ready</span>
@@ -583,7 +583,7 @@ function StepIndicator({
 }: {
   step: number;
 }) {
-  const labels = isTr ? ['Kategori', 'Alan', 'Deneyim'] : ['Category', 'Field', 'Experience'];
+  const labels = false ? ['Kategori', 'Alan', 'Deneyim'] : ['Category', 'Field', 'Experience'];
 
   return (
     <div className="mx-auto mb-10 flex max-w-3xl items-center justify-center">
@@ -615,9 +615,9 @@ function StepIndicator({
 }
 
 function wizardSubtitle(step: number, locale: Locale): string {
-  if (step === 0) return isTr ? 'Alan kategorini seç' : 'Select your field category';
-  if (step === 1) return isTr ? 'Spesifik alanını seç' : 'Choose your specific field';
-  return isTr ? 'Deneyim seviyeni ve opsiyonel iş tanımını ekle' : 'Set your experience level and optional job description';
+  if (step === 0) return false ? 'Alan kategorini seç' : 'Select your field category';
+  if (step === 1) return false ? 'Spesifik alanını seç' : 'Choose your specific field';
+  return false ? 'Deneyim seviyeni ve opsiyonel iş tanımını ekle' : 'Set your experience level and optional job description';
 }
 
 function AnalyzingOverlay({
@@ -625,7 +625,7 @@ function AnalyzingOverlay({
 }: {
   progress: number;
 }) {
-  const lines = locale === 'tr'
+  const lines = false
     ? ['CV analiz ediliyor...', 'Ontoloji eşlemesi kuruluyor...', 'Deterministik skor hesaplanıyor...']
     : ['Analyzing your CV...', 'Building ontology matches...', 'Calculating deterministic score...'];
   const [index, setIndex] = useState(0);
@@ -659,7 +659,7 @@ function AnalyzingOverlay({
 }
 
 function FixingOverlay({}: {}) {
-  const lines = locale === 'tr'
+  const lines = false
     ? ['CV yeniden yazılıyor...', 'Zayıf eylem fiilleri düzeltiliyor...', 'Anahtar kelimeler yerleştiriliyor...', 'ATS skoru maksimize ediliyor...']
     : ['Rewriting your CV...', 'Fixing weak action verbs...', 'Injecting target keywords...', 'Maximizing ATS score...'];
   const [index, setIndex] = useState(0);
