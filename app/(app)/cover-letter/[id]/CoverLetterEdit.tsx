@@ -12,7 +12,7 @@ import Link from 'next/link';
 export default function CoverLetterEdit({
     coverLetter
 }: {
-    coverLetter: any,;
+    coverLetter: any;
 }) {
     const router = useRouter();
 

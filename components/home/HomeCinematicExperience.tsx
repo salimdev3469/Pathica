@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import LanguageToggle from '@/components/language-toggle';
+
 import CheckoutButton from '@/components/billing/CheckoutButton';
 import type { CVState } from '@/context/CVContext';
 import { CV_PAGE_HEIGHT_PX, CV_PAGE_WIDTH_PX } from '@/lib/cv-layout';
@@ -478,7 +478,7 @@ export function HomeCinematicExperience({
           </nav>
 
           <div className="flex items-center gap-3 sm:gap-4">
-            <LanguageToggle tone="dark" className="hidden sm:inline-flex" />
+
             <Dialog open={isSupportOpen} onOpenChange={setIsSupportOpen}>
               <DialogTrigger asChild>
                 <button className="hidden text-sm font-medium text-white/65 transition-colors hover:text-white md:inline-flex">

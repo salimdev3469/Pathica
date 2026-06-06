@@ -20,7 +20,7 @@ type CV = {
 export default function CoverLetterBuilder({
     cvs
 }: {
-    cvs: CV[],;
+    cvs: CV[];
 }) {
     const router = useRouter();
 
