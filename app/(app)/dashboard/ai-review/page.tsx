@@ -123,7 +123,7 @@ export default async function AiReviewDashboardPage() {
   }));
 
   return (
-    <DashboardShell active="aiReview" userEmail={user.email} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing || reviewSchemaMissing}>
+    <DashboardShell active="aiReview" userEmail={user.email} userName={user.user_metadata?.full_name} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing || reviewSchemaMissing}>
       <AiReviewDashboard
         locale={locale}
         initialReviews={initialReviews}

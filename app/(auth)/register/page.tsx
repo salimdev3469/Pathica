@@ -22,6 +22,7 @@ function getErrorMessage(error: unknown): string {
 }
 
 export default function RegisterPage() {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [honeypot, setHoneypot] = useState('');
@@ -84,6 +85,9 @@ export default function RegisterPage() {
         password,
         options: {
           emailRedirectTo: signupCallbackUrl,
+          data: {
+            full_name: fullName,
+          },
         },
       });
 
@@ -247,6 +251,11 @@ export default function RegisterPage() {
                     value={honeypot}
                     onChange={(e) => setHoneypot(e.target.value)}
                   />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="fullName">{t('Full Name', 'Ad Soyad')}</Label>
+                  <Input id="fullName" type="text" placeholder={t('John Doe', 'Ahmet Yılmaz')} value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-11 rounded-full px-4" />
                 </div>
 
                 <div className="grid gap-2">

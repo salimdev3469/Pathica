@@ -496,3 +496,20 @@ create policy "Users can view their own resume review files"
 create policy "Users can delete their own resume review files"
   on storage.objects for delete
   using ( bucket_id = 'resume_reviews_files' and auth.uid()::text = (storage.foldername(name))[1] );
+
+create table if not exists public.support_tickets (
+    id uuid default gen_random_uuid() primary key,
+    user_id uuid references auth.users(id) on delete set null,
+    email text not null,
+    message text not null,
+    status text default 'open' check (status in ('open', 'closed')),
+    created_at timestamp with time zone default now() not null
+);
+
+create index if not exists idx_support_tickets_created_at
+    on public.support_tickets(created_at desc);
+
+alter table public.support_tickets enable row level security;
+
+-- Only admins should read/update. Anyone can insert via API (so we'll use service_role in the API endpoint).
+-- We can add a policy to allow authenticated users to view their own, but since they don't have a dashboard for it right now, we can skip it.

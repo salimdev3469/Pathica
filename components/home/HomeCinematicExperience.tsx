@@ -16,6 +16,11 @@ import {
 } from 'lucide-react';
 import { CVTemplate } from '@/components/pdf/CVTemplate';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 import LanguageToggle from '@/components/language-toggle';
 import CheckoutButton from '@/components/billing/CheckoutButton';
 import type { CVState } from '@/context/CVContext';
@@ -179,6 +184,36 @@ export function HomeCinematicExperience({
   const [activeSlideId, setActiveSlideId] = useState<(typeof SLIDE_IDS)[number]>('proof');
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
   const [isDesktop, setIsDesktop] = useState(true);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [supportEmail, setSupportEmail] = useState('');
+  const [supportMessage, setSupportMessage] = useState('');
+  const [isSubmittingSupport, setIsSubmittingSupport] = useState(false);
+
+  const handleSupportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supportEmail || !supportMessage) return;
+    setIsSubmittingSupport(true);
+    try {
+      const res = await fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: supportEmail, message: supportMessage }),
+      });
+      if (res.ok) {
+        setIsSupportOpen(false);
+        setSupportEmail('');
+        setSupportMessage('');
+        toast.success(locale === 'tr' ? 'Talebiniz alındı.' : 'Support ticket submitted.');
+      } else {
+        toast.error(locale === 'tr' ? 'Bir hata oluştu.' : 'Failed to submit ticket.');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error(locale === 'tr' ? 'Bir hata oluştu.' : 'Failed to submit ticket.');
+    } finally {
+      setIsSubmittingSupport(false);
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
@@ -429,11 +464,49 @@ export function HomeCinematicExperience({
 
           <div className="flex items-center gap-3 sm:gap-4">
             <LanguageToggle locale={locale} tone="dark" className="hidden sm:inline-flex" />
-            {!isAuthenticated && (
-              <Link href="/login" className="hidden text-sm font-medium text-white/65 transition-colors hover:text-white md:inline-flex">
-                {locale === 'tr' ? 'Giriş Yap' : 'Sign In'}
-              </Link>
-            )}
+            <Dialog open={isSupportOpen} onOpenChange={setIsSupportOpen}>
+              <DialogTrigger asChild>
+                <button className="hidden text-sm font-medium text-white/65 transition-colors hover:text-white md:inline-flex">
+                  {locale === 'tr' ? 'Destek' : 'Support'}
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] bg-[#0a101a] text-white border-white/10">
+                <DialogHeader>
+                  <DialogTitle className="text-white">{locale === 'tr' ? 'Destek Talebi' : 'Support Ticket'}</DialogTitle>
+                  <DialogDescription className="text-white/60">
+                    {locale === 'tr' ? 'Sorularınız veya sorunlarınız için bize ulaşın.' : 'Contact us for any questions or issues.'}
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSupportSubmit} className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email" className="text-white/80">{locale === 'tr' ? 'E-posta' : 'Email'}</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={supportEmail}
+                      onChange={(e) => setSupportEmail(e.target.value)}
+                      placeholder="E.g. name@example.com"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="message" className="text-white/80">{locale === 'tr' ? 'Mesaj' : 'Message'}</Label>
+                    <Textarea
+                      id="message"
+                      value={supportMessage}
+                      onChange={(e) => setSupportMessage(e.target.value)}
+                      placeholder={locale === 'tr' ? 'Nasıl yardımcı olabiliriz?' : 'How can we help?'}
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 min-h-[100px]"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={isSubmittingSupport} className="bg-[#9bd5ff] text-slate-950 hover:bg-[#b5e2ff] border-0">
+                    {isSubmittingSupport ? (locale === 'tr' ? 'Gönderiliyor...' : 'Submitting...') : (locale === 'tr' ? 'Gönder' : 'Submit')}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
             <Button
               asChild
               className="h-11 rounded-full border-0 bg-[#9bd5ff] px-5 text-sm font-semibold text-slate-950 shadow-[0_20px_55px_-28px_rgba(155,213,255,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b5e2ff] sm:px-6"
@@ -966,7 +1039,7 @@ function ProofSection({
 
 function ProofBulletRewriteCard({ locale }: { locale: Locale }) {
   return (
-    <div className="rounded-[1.8rem] border border-white/10 bg-[#12131a]/92 p-5 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur">
+    <div className="rounded-2xl border border-white/10 bg-[#12131a]/92 p-5 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur">
       <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.2em] text-white/40">
         {locale === 'tr' ? 'madde yeniden yazımı' : 'bullet rewrite'}
       </p>
@@ -999,7 +1072,7 @@ function ProofBulletRewriteCard({ locale }: { locale: Locale }) {
 
 function ProofAIWriterCard({ locale }: { locale: Locale }) {
   return (
-    <div className="rounded-[1.8rem] border border-white/10 bg-[#12131a]/92 p-5 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur">
+    <div className="rounded-2xl border border-white/10 bg-[#12131a]/92 p-5 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur">
       <p className="font-[family:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.2em] text-white/40">
         {locale === 'tr' ? 'yapay zeka içerik yazarı' : 'ai content writer'}
       </p>
@@ -1057,7 +1130,7 @@ function WorkflowSlide({ workflow, density }: { workflow: HomeCinematicExperienc
             <div
               key={step.number}
               className={cn(
-                'flex flex-col rounded-[1.8rem] border border-white/10 bg-white/[0.03] shadow-[0_24px_90px_-46px_rgba(0,0,0,0.85)]',
+                'flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_24px_90px_-46px_rgba(0,0,0,0.85)]',
                 density === 'tight' ? 'min-h-[16.5rem] p-3.5' : density === 'compact' ? 'min-h-[17.8rem] p-4' : 'min-h-[19rem] p-[1.125rem]',
               )}
             >
@@ -1132,7 +1205,7 @@ function QuoteSlide({
               <div
                 key={entry.author}
                 className={cn(
-                  'flex items-center justify-center rounded-xl border text-xs font-semibold shadow-[0_20px_40px_-28px_rgba(0,0,0,0.8)] transition-colors duration-300',
+                  'flex items-center justify-center rounded-xl border text-xs font-semibold shadow-[0_20px_40px_-28px_rgba(0,0,0,0.8)] transition-colors duration-300 overflow-hidden',
                   density === 'tight' ? 'h-10 w-10' : 'h-12 w-12',
                   index === activeQuoteIndex
                     ? 'border-[#9bd5ff]/40 bg-[#9bd5ff]/14 text-[#d8efff]'
@@ -1140,7 +1213,12 @@ function QuoteSlide({
                   index > 0 && '-ml-3',
                 )}
               >
-                {entry.initials}
+                {/* @ts-ignore */}
+                {entry.avatar ? (
+                  <Image src={(entry as any).avatar} alt={entry.author} width={48} height={48} className="object-cover h-full w-full" />
+                ) : (
+                  entry.initials
+                )}
               </div>
             ))}
           </div>
@@ -1181,7 +1259,7 @@ function StatsSlide({ stats, density }: { stats: HomeCinematicExperienceProps['s
             <div
               key={badge.label}
               className={cn(
-                'relative overflow-hidden rounded-[1.55rem] border shadow-[0_24px_90px_-46px_rgba(0,0,0,0.85)]',
+                'relative overflow-hidden rounded-2xl border shadow-[0_24px_90px_-46px_rgba(0,0,0,0.85)]',
                 density === 'tight' ? 'min-h-[6.25rem] p-4' : 'min-h-[6.9rem] p-[1.125rem]',
                 index % 3 === 1
                   ? 'border-[#9bd5ff]/30 bg-[linear-gradient(180deg,rgba(155,213,255,0.1),rgba(255,255,255,0.03))]'
@@ -1277,7 +1355,7 @@ function PricingSlide({
             <div
               key={pkg.id}
               className={cn(
-                'flex flex-col rounded-[1.9rem] border shadow-[0_24px_90px_-46px_rgba(0,0,0,0.88)]',
+                'flex flex-col rounded-2xl border shadow-[0_24px_90px_-46px_rgba(0,0,0,0.88)]',
                 density === 'tight'
                   ? 'min-h-[18.2rem] p-3.5'
                   : density === 'compact'
@@ -1468,7 +1546,7 @@ function ProofFindingCard({
   findings: HomeCinematicExperienceProps['proof']['findings'];
 }) {
   return (
-    <div className="rounded-[1.8rem] border border-white/10 bg-[#12131a] p-4 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)]">
+    <div className="rounded-2xl border border-white/10 bg-[#12131a] p-4 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)]">
       <p className="font-[family:var(--font-geist-mono)] text-xs uppercase tracking-[0.28em] text-white/28">
         {locale === 'tr' ? 'bulduklarımız' : 'what we found'}
       </p>
@@ -1487,7 +1565,7 @@ function ProofFindingCard({
 
 function ProofScoreCard({ proof }: { proof: HomeCinematicExperienceProps['proof'] }) {
   return (
-    <div className="rounded-[1.8rem] border border-white/10 bg-[#12131a] p-4 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)]">
+    <div className="rounded-2xl border border-white/10 bg-[#12131a] p-4 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)]">
       <div className="flex justify-center">
         <div className="relative flex h-24 w-24 items-center justify-center rounded-full border-[5px] border-[#9bd5ff]">
           <div className="text-center">
@@ -1652,7 +1730,7 @@ function TailorSlide({ locale, density }: { locale: Locale; density: ViewportDen
 
         <div className="relative flex h-full w-full items-center justify-center xl:min-h-[600px] mt-10 xl:mt-0 px-4 sm:px-0">
           <div className={cn(
-            "w-full max-w-[34rem] xl:max-w-[38rem] mx-auto rounded-[2rem] border border-white/10 bg-[#0A0D14]/90 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col",
+            "w-full max-w-[34rem] xl:max-w-[38rem] mx-auto rounded-2xl border border-white/10 bg-[#0A0D14]/90 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col",
             density === 'tight' ? 'scale-90' : density === 'compact' ? 'scale-95' : 'scale-100'
           )}>
             <div className="flex items-center gap-2.5 px-6 py-4 border-b border-white/5 bg-white/[0.02]">
@@ -1760,7 +1838,7 @@ function DiscoverSlide({ locale, density }: { locale: Locale; density: ViewportD
             density === 'tight' ? 'scale-90' : density === 'compact' ? 'scale-95' : 'scale-100'
           )}>
             {/* Top Dashboard Card */}
-            <div className="flex items-center gap-6 sm:gap-8 rounded-[2rem] border border-white/10 bg-[#0c121e]/90 p-6 sm:p-8 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur-xl">
+            <div className="flex items-center gap-6 sm:gap-8 rounded-2xl border border-white/10 bg-[#0c121e]/90 p-6 sm:p-8 shadow-[0_30px_90px_-46px_rgba(0,0,0,0.9)] backdrop-blur-xl">
               <div className="relative flex shrink-0 items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full border-[6px] sm:border-[8px] border-[#27C93F]/20">
                 <svg className="absolute inset-0 w-full h-full -rotate-90">
                   <circle cx="50%" cy="50%" r="42%" stroke="currentColor" strokeWidth="12%" fill="none" className="text-[#27C93F]" strokeDasharray="264" strokeDashoffset="31.6" strokeLinecap="round" />
@@ -1783,7 +1861,7 @@ function DiscoverSlide({ locale, density }: { locale: Locale; density: ViewportD
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {/* Found Keywords */}
-              <div className="rounded-[1.8rem] border border-[#27C93F]/20 bg-[#27C93F]/[0.02] p-6 shadow-inner">
+              <div className="rounded-2xl border border-[#27C93F]/20 bg-[#27C93F]/[0.02] p-6 shadow-inner">
                 <div className="flex items-center gap-2.5 mb-5">
                   <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#27C93F]" />
                   <span className="text-xs sm:text-sm font-semibold text-white/80 uppercase tracking-wider">{locale === 'tr' ? 'Tespit Edildi' : 'Identified'}</span>
@@ -1797,7 +1875,7 @@ function DiscoverSlide({ locale, density }: { locale: Locale; density: ViewportD
               </div>
 
               {/* Missing Keywords */}
-              <div className="rounded-[1.8rem] border border-[#FFBD2E]/20 bg-[#FFBD2E]/[0.02] p-6 shadow-inner">
+              <div className="rounded-2xl border border-[#FFBD2E]/20 bg-[#FFBD2E]/[0.02] p-6 shadow-inner">
                 <div className="flex items-center gap-2.5 mb-5">
                   <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-[#FFBD2E]" />
                   <span className="text-xs sm:text-sm font-semibold text-white/80 uppercase tracking-wider">{locale === 'tr' ? 'Eksik' : 'Missing'}</span>

@@ -110,7 +110,7 @@ export default async function DashboardPage() {
   const atsByCvId = await buildAtsByCvId(supabase, cvList, cvIds);
 
   return (
-    <DashboardShell active="resumes" userEmail={user.email} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing}>
+    <DashboardShell active="resumes" userEmail={user.email} userName={user.user_metadata?.full_name} locale={locale} wallet={wallet} billingSchemaMissing={billingSchemaMissing}>
       <section className="mb-7 rounded-xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>

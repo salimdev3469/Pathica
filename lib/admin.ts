@@ -42,3 +42,35 @@ export async function listLoginLogs(): Promise<LoginLog[]> {
     return [];
   }
 }
+
+export type SupportTicket = {
+  id: string;
+  user_id: string | null;
+  email: string;
+  message: string;
+  status: 'open' | 'closed';
+  created_at: string;
+};
+
+export async function listSupportTickets(): Promise<SupportTicket[]> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('support_tickets')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (error) {
+      if (error.code === '42P01') {
+        return [];
+      }
+      console.error('Error fetching support tickets:', error);
+      return [];
+    }
+
+    return data as SupportTicket[];
+  } catch (error) {
+    console.error('Unexpected error fetching support tickets:', error);
+    return [];
+  }
+}

@@ -385,6 +385,7 @@ export default async function Home() {
               author: 'Sarah J.',
               role: t('HR Specialist · London', 'İK Uzmanı · Londra'),
               initials: 'SJ',
+              avatar: '/girl1.png',
             },
             {
               text: t(
@@ -394,6 +395,7 @@ export default async function Home() {
               author: 'David M.',
               role: t('Data Analyst · Berlin', 'Veri Analisti · Berlin'),
               initials: 'DM',
+              avatar: '/man1.png',
             },
             {
               text: t(
@@ -403,6 +405,7 @@ export default async function Home() {
               author: 'Elif T.',
               role: t('Product Designer · Istanbul', 'Ürün Tasarımcısı · İstanbul'),
               initials: 'ET',
+              avatar: '/girl2.png',
             },
           ],
         }}

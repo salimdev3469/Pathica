@@ -10,6 +10,7 @@ import type { WalletSnapshot } from '@/lib/billing';
 type DashboardShellProps = {
   active: 'resumes' | 'coverLetters' | 'aiReview';
   userEmail?: string | null;
+  userName?: string | null;
   locale: Locale;
   wallet?: Pick<WalletSnapshot, 'creditBalance' | 'freeExportsRemaining'>;
   billingSchemaMissing?: boolean;
@@ -22,7 +23,7 @@ const NAV_ITEMS = [
   { id: 'aiReview', href: '/dashboard/ai-review', labelEn: 'AI Review', labelTr: 'AI Review', icon: Brain },
 ] as const;
 
-export default function DashboardShell({ active, userEmail, locale, wallet, billingSchemaMissing, children }: DashboardShellProps) {
+export default function DashboardShell({ active, userEmail, userName, locale, wallet, billingSchemaMissing, children }: DashboardShellProps) {
   const t = (en: string, tr: string) => (locale === 'tr' ? tr : en);
 
   return (
@@ -59,7 +60,14 @@ export default function DashboardShell({ active, userEmail, locale, wallet, bill
                   </div>
                 </>
               )}
-              <LogoutButton locale={locale} className="h-10 rounded-xl border border-white/10 px-3 sm:px-4 text-xs sm:text-sm font-medium bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors" />
+              {userName ? (
+                <div className="flex items-center gap-2 sm:gap-3 rounded-xl border border-white/10 bg-white/5 pl-3 sm:pl-4 pr-1.5 py-1.5">
+                  <span className="max-w-[100px] sm:max-w-[150px] truncate text-xs sm:text-sm font-medium text-white/90">{userName}</span>
+                  <LogoutButton locale={locale} className="h-7 sm:h-8 rounded-lg bg-white/10 hover:bg-red-500/20 hover:text-red-300 px-2 sm:px-3 text-[10px] sm:text-xs transition-colors text-white/70" />
+                </div>
+              ) : (
+                <LogoutButton locale={locale} className="h-10 rounded-xl border border-white/10 px-3 sm:px-4 text-xs sm:text-sm font-medium bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors" />
+              )}
             </div>
           </div>
 
