@@ -34,6 +34,7 @@ export default function BillingReturnStatus({ paymentId, sessionId }: BillingRet
   const [data, setData] = useState<ReturnPayload | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [didAutoRedirect, setDidAutoRedirect] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const query = useMemo(() => {
     const params = new URLSearchParams();
@@ -78,13 +79,23 @@ export default function BillingReturnStatus({ paymentId, sessionId }: BillingRet
     const paymentStatus = String(data?.payment?.status || '').toLowerCase();
     if (paymentStatus !== 'credited' || didAutoRedirect) return;
 
-    setDidAutoRedirect(true);
-    const timer = setTimeout(() => {
-      router.replace('/dashboard?billing=payment_success');
-    }, 1200);
+    if (countdown === null) {
+      setCountdown(5);
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, [data?.payment?.status, didAutoRedirect, router]);
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown((prev) => (prev !== null ? prev - 1 : null));
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+
+    if (countdown === 0) {
+      setDidAutoRedirect(true);
+      router.replace('/dashboard?billing=payment_success');
+    }
+  }, [data?.payment?.status, didAutoRedirect, router, countdown]);
 
   if (!query) {
     return <p className="text-sm text-slate-600">Payment status information is not available.</p>;
@@ -142,7 +153,10 @@ export default function BillingReturnStatus({ paymentId, sessionId }: BillingRet
             <strong>{data.wallet.freeExportsRemaining}</strong>
           </p>
           {String(data?.payment?.status || '').toLowerCase() === 'credited' ? (
-            <p className="mt-2 text-xs text-emerald-700">Payment verified. Redirecting to dashboard...</p>
+            <p className="mt-2 text-xs text-emerald-700">
+              Payment verified. Redirecting to dashboard in {countdown ?? 5} second
+              {(countdown ?? 5) !== 1 ? 's' : ''}...
+            </p>
           ) : null}
         </div>
       ) : null}
