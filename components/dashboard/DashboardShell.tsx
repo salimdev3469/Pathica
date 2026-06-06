@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Brain, FileText, Mail } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 import LiveTokenCounter from '@/components/billing/LiveTokenCounter';
+import ThemeToggle from '@/components/theme-toggle';
 import type { Locale } from '@/lib/locale';
 import type { WalletSnapshot } from '@/lib/billing';
 
@@ -102,6 +103,9 @@ export default function DashboardShell({ active, userEmail, userName, locale, wa
         ) : null}
         {children}
       </main>
+      <div className="fixed bottom-5 right-5 z-[100]">
+        <ThemeToggle />
+      </div>
     </div>
   );
 }

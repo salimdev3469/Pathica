@@ -5,7 +5,6 @@ import './globals.css';
 import CssHealthCheck from '@/components/CssHealthCheck';
 import { ThemeProvider } from '@/components/theme-provider';
 import NavigationFeedback from '@/components/NavigationFeedback';
-import ThemeToggle from '@/components/theme-toggle';
 import SiteFooter from '@/components/layout/SiteFooter';
 import { LOCALE_COOKIE_NAME, normalizeLocale } from '@/lib/locale';
 import { getBaseUrl } from '@/lib/seo/config';
@@ -91,9 +90,6 @@ export default function RootLayout({
           <SiteFooter locale={locale} />
           <CookieConsentBanner locale={locale} initialConsentValue={initialCookieConsent} />
           <Toaster />
-          <div className="fixed bottom-5 right-5 z-[100]">
-            <ThemeToggle />
-          </div>
         </ThemeProvider>
       </body>
     </html>
