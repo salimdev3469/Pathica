@@ -436,13 +436,11 @@ export function HomeCinematicExperience({
         <div className="bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-2.5 text-center text-sm font-medium text-white border-b border-blue-400/20 shadow-[0_4px_20px_-5px_rgba(79,70,229,0.3)]">
           {locale === 'tr' ? (
             <p className="flex items-center justify-center gap-1.5 flex-wrap">
-              <Sparkles className="h-4 w-4 text-blue-200 inline" />
               <span className="font-bold text-blue-50">Sınırsız & Ücretsiz:</span> 
               <span>Dilediğin kadar CV üret, depola ve Pathica linki ile sınırsız paylaş! +10 Kredi ve 1 PDF Export ilk kayıtta hediye.</span>
             </p>
           ) : (
             <p className="flex items-center justify-center gap-1.5 flex-wrap">
-              <Sparkles className="h-4 w-4 text-blue-200 inline" />
               <span className="font-bold text-blue-50">Unlimited & Free:</span> 
               <span>Create, store, and share CVs via Pathica link as much as you want! +10 Credits and 1 PDF Export free on signup.</span>
             </p>
