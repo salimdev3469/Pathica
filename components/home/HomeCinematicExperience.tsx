@@ -433,7 +433,7 @@ export function HomeCinematicExperience({
   return (
     <div className="min-h-screen bg-[#05070b] text-white">
       <header className="fixed inset-x-0 top-0 z-50">
-        <div className="bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-2.5 text-center text-sm font-medium text-white border-b border-blue-400/20 shadow-[0_4px_20px_-5px_rgba(79,70,229,0.3)]">
+        <div className="bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-3.5 flex items-center justify-center text-center text-sm font-medium text-white border-b border-blue-400/20 shadow-[0_4px_20px_-5px_rgba(79,70,229,0.3)]">
           {locale === 'tr' ? (
             <p className="flex items-center justify-center gap-1.5 flex-wrap">
               <span className="font-bold text-blue-50">Sınırsız & Ücretsiz:</span> 
@@ -446,7 +446,7 @@ export function HomeCinematicExperience({
             </p>
           )}
         </div>
-        <div className="bg-[#05070b]/78 backdrop-blur-xl border-b border-white/5">
+        <div className="bg-[#05070b]/78 backdrop-blur-xl">
           <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
             <button type="button" onClick={scrollToHero} className="group flex items-center" aria-label="Pathica home">
               <Image
