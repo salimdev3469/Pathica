@@ -58,18 +58,14 @@ export async function GET(req: NextRequest) {
 
     const paymentId = String(req.nextUrl.searchParams.get('payment_id') || '').trim();
     const sessionId = String(req.nextUrl.searchParams.get('session_id') || '').trim();
-    const internalId = String(req.nextUrl.searchParams.get('internal_id') || '').trim();
 
-    if (!paymentId && !sessionId && !internalId) {
-      return NextResponse.json({ error: 'payment_id, session_id or internal_id is required' }, { status: 400 });
+    if (!paymentId && !sessionId) {
+      return NextResponse.json({ error: 'payment_id or session_id is required' }, { status: 400 });
     }
 
     let currentPayment: DodoPayment | null = null;
     
-    if (internalId) {
-      const { data } = await supabase.from('dodo_payments').select('*').eq('id', internalId).eq('user_id', user.id).maybeSingle();
-      if (data) currentPayment = data as DodoPayment;
-    } else if (paymentId) {
+    if (paymentId) {
       const { data } = await supabase.from('dodo_payments').select('*').eq('id', paymentId).eq('user_id', user.id).maybeSingle();
       if (data) currentPayment = data as DodoPayment;
     } else if (sessionId) {

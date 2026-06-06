@@ -6,7 +6,6 @@ type PaymentSuccessPageProps = {
   searchParams: {
     payment_id?: string;
     session_id?: string;
-    internal_id?: string;
   };
 };
 
@@ -22,11 +21,7 @@ export default function PaymentSuccessPage({ searchParams }: PaymentSuccessPageP
           </p>
 
           <div className="mt-6">
-            <BillingReturnStatus
-              paymentId={searchParams.payment_id}
-              sessionId={searchParams.session_id}
-              internalId={searchParams.internal_id}
-            />
+            <BillingReturnStatus paymentId={searchParams.payment_id} sessionId={searchParams.session_id} />
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">

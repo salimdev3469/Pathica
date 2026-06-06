@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 type BillingReturnStatusProps = {
   paymentId?: string;
   sessionId?: string;
-  internalId?: string;
 };
 
 type ReturnPayload = {
@@ -30,7 +29,7 @@ type ReturnPayload = {
   } | null;
 };
 
-export default function BillingReturnStatus({ paymentId, sessionId, internalId }: BillingReturnStatusProps) {
+export default function BillingReturnStatus({ paymentId, sessionId }: BillingReturnStatusProps) {
   const router = useRouter();
   const [data, setData] = useState<ReturnPayload | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,9 +39,8 @@ export default function BillingReturnStatus({ paymentId, sessionId, internalId }
     const params = new URLSearchParams();
     if (paymentId) params.set('payment_id', paymentId);
     if (sessionId) params.set('session_id', sessionId);
-    if (internalId) params.set('internal_id', internalId);
     return params.toString();
-  }, [paymentId, sessionId, internalId]);
+  }, [paymentId, sessionId]);
 
   const fetchStatus = useCallback(async () => {
     if (!query) return;
