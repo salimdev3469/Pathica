@@ -34,12 +34,12 @@ export default function DashboardShell({
     <div className="min-h-screen bg-[#05070b] text-white">
       <header className="border-b border-white/5 bg-transparent">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
             <Link href="/" className="shrink-0">
               <Image src="/logo_pathica_footer.png" alt={'Pathica logo'} width={200} height={200} className="h-16 w-auto object-contain sm:h-20" />
             </Link>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex w-full flex-wrap items-center justify-center gap-2 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-3">
               {wallet && (
                 <>
                   <div className="hidden lg:block">
