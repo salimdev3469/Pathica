@@ -64,7 +64,7 @@ export default function RegisterPage() {
         // Pretend it succeeded to fool the bot
         setStatusMessage({
           type: 'success',
-          text: 'Account created. Check your email to verify your account.',
+          text: 'Account created. Redirecting...',
         });
         toast.success('Registration successful');
         setIsLoading(false);
@@ -98,10 +98,11 @@ export default function RegisterPage() {
           window.location.assign(`/welcome?next=${encodeURIComponent(next)}`);
         } else {
           setStatusMessage({
-            type: 'info',
-            text: 'Account created! We sent a verification link to your email. You MUST click the link to activate your account before logging in.',
+            type: 'success',
+            text: 'Account created. Redirecting to login...',
           });
-          toast.success('Please check your email', { duration: 8000 });
+          toast.success('Registration successful', { duration: 3000 });
+          window.location.assign(`/login?next=${encodeURIComponent(next)}`);
         }
       }
     } catch (error) {
@@ -263,7 +264,7 @@ export default function RegisterPage() {
                     className="h-11 rounded-full px-4"
                   />
                   <p className="text-xs text-slate-500">
-                    {'Use at least 12 characters with uppercase, lowercase, and a number.'}
+                    {'Use at least 12 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character.'}
                   </p>
                 </div>
 

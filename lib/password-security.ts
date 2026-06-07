@@ -15,6 +15,10 @@ export function getPasswordPolicyError(password: string, locale: 'en' | 'tr'): s
     return 'Add at least one number.';
   }
 
+  if (!/[^a-zA-Z0-9]/.test(password)) {
+    return 'Add at least one special character.';
+  }
+
   return null;
 }
 
