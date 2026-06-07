@@ -428,6 +428,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
   return (
     <div
       className="custom-scrollbar relative mx-auto w-full max-w-2xl flex-1 overflow-y-auto overscroll-y-contain px-4 py-5 pb-8 md:min-h-0 md:p-8"
+      data-lenis-prevent="true"
       style={{ fontFamily: "var(--font-geist-sans), 'Segoe UI', 'Noto Sans', Arial, sans-serif" }}
     >
       <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>

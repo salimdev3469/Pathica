@@ -513,6 +513,7 @@ export function CVPreview() {
             <div
                 ref={containerRef}
                 className="custom-scrollbar flex flex-1 items-start justify-center overflow-y-auto overscroll-y-contain bg-slate-200 p-4 pt-12 md:min-h-0 md:p-8 md:pt-16"
+                data-lenis-prevent="true"
             >
                 {/* Wrapper to handle scaling */}
                 <div style={{

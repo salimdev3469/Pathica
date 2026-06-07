@@ -220,7 +220,7 @@ export default function CvCardActions({
                             {'Read-only CV preview'}
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="max-h-[75vh] overflow-y-auto pr-1">
+                    <div className="max-h-[75vh] overflow-y-auto pr-1" data-lenis-prevent="true">
                         {isPreviewLoading ? (
                             <div className="flex h-[60vh] items-center justify-center">
                                 <Loader2 className="h-6 w-6 animate-spin text-slate-500" />

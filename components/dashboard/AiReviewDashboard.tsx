@@ -118,7 +118,7 @@ export default function AiReviewDashboard({
   const [field, setField] = useState<ReviewFieldId>('general_software');
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevelId>('mid');
   const [jobDescription, setJobDescription] = useState('');
-  const [activeReview, setActiveReview] = useState<AiReviewClientReview | null>(initialReviews[0] || null);
+  const [activeReview, setActiveReview] = useState<AiReviewClientReview | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(8);
   const [billingOpen, setBillingOpen] = useState(false);
@@ -138,7 +138,6 @@ export default function AiReviewDashboard({
         if (!response.ok) return;
         setReviews(payload.reviews || []);
         setStats(payload.stats || initialStats);
-        setActiveReview((current) => current || payload.reviews?.[0] || null);
       } catch {
         // History is non-critical; upload/review flow still works.
       }
@@ -441,7 +440,7 @@ function ReviewWizard(props: {
           <DialogDescription className="text-sm sm:text-base">{wizardSubtitle(props.step, props.locale)}</DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-7">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-7" data-lenis-prevent="true">
           <StepIndicator step={props.step} />
 
           {props.selectedFile ? (
@@ -874,7 +873,7 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
               PDF'i Aç
             </a>
           </div>
-          <div className="flex h-[450px] overflow-auto rounded-2xl bg-slate-100 p-2 dark:bg-slate-950 justify-center">
+          <div className="flex h-[450px] overflow-auto rounded-2xl bg-slate-100 p-2 dark:bg-slate-950 justify-center" data-lenis-prevent="true">
             {renderCvTemplate(mobileScale)}
           </div>
         </div>
@@ -884,10 +883,10 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
 
   return (
     <>
-      <div className="hidden md:block h-[620px] overflow-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-950">
+      <div className="hidden md:block h-[620px] overflow-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-950" data-lenis-prevent="true">
         {renderCvTemplate(desktopScale)}
       </div>
-      <div className="flex md:hidden h-[450px] overflow-auto rounded-2xl bg-slate-100 p-2 dark:bg-slate-950 justify-center">
+      <div className="flex md:hidden h-[450px] overflow-auto rounded-2xl bg-slate-100 p-2 dark:bg-slate-950 justify-center" data-lenis-prevent="true">
         {renderCvTemplate(mobileScale)}
       </div>
     </>

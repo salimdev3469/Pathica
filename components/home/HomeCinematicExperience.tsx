@@ -1476,7 +1476,7 @@ function FaqSlide({
           </h2>
         </div>
 
-        <div className={cn('overflow-y-auto pr-2 sm:pr-4', density === 'tight' ? 'max-h-[48vh]' : density === 'compact' ? 'max-h-[50vh]' : 'max-h-[52vh]')}>
+        <div className={cn('overflow-y-auto pr-2 sm:pr-4', density === 'tight' ? 'max-h-[48vh]' : density === 'compact' ? 'max-h-[50vh]' : 'max-h-[52vh]')} data-lenis-prevent="true">
           {faq.items.map((item, index) => {
             const isOpen = index === openFaqIndex;
             return (

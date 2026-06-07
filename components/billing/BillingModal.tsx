@@ -30,7 +30,7 @@ export default function BillingModal({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950 p-0 text-white shadow-2xl">
+      <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950 p-0 text-white shadow-2xl" data-lenis-prevent="true">
         <DialogHeader className="border-b border-white/10 p-7">
           <DialogTitle className="text-3xl font-black">{title}</DialogTitle>
           <DialogDescription className="text-white/60">
