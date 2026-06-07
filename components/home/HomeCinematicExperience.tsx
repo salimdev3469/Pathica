@@ -225,8 +225,15 @@ export function HomeCinematicExperience({
     () => (heroTitleAccentWords?.length ? heroTitleAccentWords : heroTitleAccent ? [heroTitleAccent] : []),
     [heroTitleAccent, heroTitleAccentWords],
   );
-  const preStackViewportCount = 1 + Math.max(PRE_PRICING_SLIDE_IDS.length - 1, 0) * PRE_PINNED_SCROLL_STEP_VH + PINNED_STACK_TAIL_HOLD_VH;
+  const effectivePreSlideCount = PRE_PRICING_SLIDE_IDS.length + Math.max(0, quote.entries.length - 1);
+  const preStackViewportCount = 1 + Math.max(effectivePreSlideCount - 1, 0) * PRE_PINNED_SCROLL_STEP_VH + PINNED_STACK_TAIL_HOLD_VH;
   const postStackViewportCount = 1 + Math.max(POST_PRICING_SLIDE_IDS.length - 1, 0) * POST_PINNED_SCROLL_STEP_VH + PINNED_STACK_TAIL_HOLD_VH;
+
+  const getBasePreSlideIndex = useCallback((virtualIndex: number) => {
+    if (virtualIndex <= 0) return 0;
+    if (virtualIndex <= quote.entries.length) return 1;
+    return 2;
+  }, [quote.entries.length]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -255,14 +262,15 @@ export function HomeCinematicExperience({
         const rect = preStackRef.current.getBoundingClientRect();
         const totalScrollable = Math.max(currentViewportHeight * (preStackViewportCount - 1), 1);
         const scrolled = clamp(-rect.top, 0, totalScrollable);
-        const nextIndex = clamp(scrolled / (currentViewportHeight * PRE_PINNED_SCROLL_STEP_VH), 0, PRE_PRICING_SLIDE_IDS.length - 1);
+        const nextIndex = clamp(scrolled / (currentViewportHeight * PRE_PINNED_SCROLL_STEP_VH), 0, effectivePreSlideCount - 1);
         const preTop = window.scrollY + rect.top;
         const preBottom = preTop + preStackRef.current.offsetHeight;
 
         setPreProgressIndex(nextIndex);
 
         if (viewportMarker >= preTop && viewportMarker < preBottom) {
-          nextActiveSlideId = PRE_PRICING_SLIDE_IDS[resolveHeldSlideIndex(nextIndex, PRE_PRICING_SLIDE_IDS.length)] ?? 'proof';
+          const virtualIndex = resolveHeldSlideIndex(nextIndex, effectivePreSlideCount);
+          nextActiveSlideId = PRE_PRICING_SLIDE_IDS[getBasePreSlideIndex(virtualIndex)] ?? 'proof';
         }
       }
 
@@ -321,7 +329,7 @@ export function HomeCinematicExperience({
       window.removeEventListener('scroll', scheduleUpdate);
       window.removeEventListener('resize', handleResize);
     };
-  }, [postStackViewportCount, preStackViewportCount]);
+  }, [postStackViewportCount, preStackViewportCount, effectivePreSlideCount, getBasePreSlideIndex]);
 
   useEffect(() => {
     if (resolvedHeroAccentWords.length <= 1 || prefersReducedMotion) return;
@@ -333,9 +341,11 @@ export function HomeCinematicExperience({
     return () => window.clearInterval(intervalId);
   }, [resolvedHeroAccentWords, prefersReducedMotion]);
 
-  const activePreSlideIndex = prefersReducedMotion
+  const activeVirtualPreSlideIndex = prefersReducedMotion
     ? Math.round(preProgressIndex)
-    : resolveHeldSlideIndex(preProgressIndex, PRE_PRICING_SLIDE_IDS.length);
+    : resolveHeldSlideIndex(preProgressIndex, effectivePreSlideCount);
+  const activePreSlideIndex = getBasePreSlideIndex(activeVirtualPreSlideIndex);
+  
   const activePostSlideIndex = prefersReducedMotion
     ? Math.round(postProgressIndex)
     : resolveHeldSlideIndex(postProgressIndex, POST_PRICING_SLIDE_IDS.length);
@@ -344,8 +354,9 @@ export function HomeCinematicExperience({
   const heroCanvasHeight = Math.max(viewportHeight - 80, 560);
   const slideBottomInset = viewportDensity === 'tight' ? 74 : viewportDensity === 'compact' ? 82 : 90;
   const slideCanvasHeight = Math.max(viewportHeight - 80 - slideBottomInset, 420);
-  const quoteScrollProgress = clamp((preProgressIndex - 3) / 0.8, 0, 0.999);
-  const activeQuoteIndex = Math.min(quote.entries.length - 1, Math.floor(quoteScrollProgress * quote.entries.length));
+  
+  const quoteStartIndex = 1;
+  const activeQuoteIndex = Math.round(clamp(preProgressIndex - quoteStartIndex, 0, quote.entries.length - 1));
 
   const slideMeta = useMemo(
     () => [
@@ -386,7 +397,8 @@ export function HomeCinematicExperience({
       }
     } else if (PRE_PRICING_SLIDE_IDS.includes(slideId as (typeof PRE_PRICING_SLIDE_IDS)[number]) && preStackRef.current) {
       const slideIndex = PRE_PRICING_SLIDE_IDS.findIndex((s) => s === slideId);
-      top = preStackRef.current.getBoundingClientRect().top + window.scrollY + slideIndex * window.innerHeight * PRE_PINNED_SCROLL_STEP_VH;
+      const virtualIndex = slideIndex === 2 ? quote.entries.length + 1 : slideIndex;
+      top = preStackRef.current.getBoundingClientRect().top + window.scrollY + virtualIndex * window.innerHeight * PRE_PINNED_SCROLL_STEP_VH;
     } else if (slideId === 'pricing' && pricingSectionRef.current) {
       top = pricingSectionRef.current.getBoundingClientRect().top + window.scrollY;
     } else if (POST_PRICING_SLIDE_IDS.includes(slideId as (typeof POST_PRICING_SLIDE_IDS)[number]) && postStackRef.current) {
