@@ -404,11 +404,11 @@ function MetricCard({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
-      <p className="mb-2 text-sm font-semibold text-gray-500">{label}</p>
-      <div className="flex items-end justify-center gap-2">
-        <span className="text-5xl font-black tracking-tight text-[#111827]">{value}</span>
-        <span className="pb-1 text-sm font-semibold text-emerald-400">{hint}</span>
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm text-center">
+      <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-semibold text-gray-500">{label}</p>
+      <div className="flex items-end justify-center gap-1.5 sm:gap-2">
+        <span className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#111827]">{value}</span>
+        <span className="pb-0.5 sm:pb-1 text-xs sm:text-sm font-semibold text-emerald-400">{hint}</span>
       </div>
     </div>
   );

@@ -109,7 +109,7 @@ export default function DashboardShell({
                     }`}
                   >
                     <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    <span>{item.labelEn}</span>
+                    <span className="whitespace-nowrap">{item.labelEn}</span>
                   </Link>
                 );
               })}
