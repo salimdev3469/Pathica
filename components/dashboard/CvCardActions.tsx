@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Download, Eye, Loader2, Edit2, Trash2 } from 'lucide-react';
+import { Download, Eye, Loader2, Edit2, Trash2, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ReadOnlyViewer } from '@/components/cv-builder/ReadOnlyViewer';
 import type { CVState } from '@/context/CVContext';
 import { toast } from 'sonner';
@@ -138,63 +139,77 @@ export default function CvCardActions({
         <>
             <div className="flex flex-col gap-2 mt-4">
                 <Button
-                    variant="ghost"
-                    className="h-10 w-full rounded-xl border border-orange-500/30 bg-orange-500/5 text-orange-500 transition hover:bg-orange-500/10 hover:border-orange-500/50 hover:text-orange-400 text-sm font-medium"
+                    variant="outline"
+                    className="h-10 w-full rounded-xl border border-[#EAE2DA] bg-white text-[#171717] shadow-sm transition hover:bg-slate-50 hover:border-[#FFD6BA] text-sm font-bold"
                     asChild
                 >
                     <Link href={`/cv/${cvId}`}>
-                        <Edit2 className="mr-2 h-4 w-4" /> {'Open Editor'}
+                        <Edit2 className="mr-2 h-4 w-4 text-[#FF6B1A]" /> {'Open Editor'}
                     </Link>
                 </Button>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="flex items-center gap-2">
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-orange-500/30 bg-zinc-950 px-2 text-[11px] font-medium text-orange-500 transition hover:bg-orange-500/10 hover:border-orange-500/50 sm:text-xs"
+                        className="h-9 flex-1 min-w-0 justify-center rounded-lg border-[#EAE2DA] bg-white px-2 text-[11px] font-semibold text-[#6B7280] shadow-sm transition hover:bg-slate-50 hover:text-[#171717] sm:text-xs"
                         onClick={handleDownload}
                         disabled={isDownloading}
                         title={'Download PDF'}
                     >
                         {isDownloading ? (
-                            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+                            <Loader2 className="mr-1.5 h-3.5 w-3.5 shrink-0 animate-spin" />
                         ) : (
-                            <Download className="h-3.5 w-3.5 shrink-0" />
+                            <Download className="mr-1.5 h-3.5 w-3.5 shrink-0" />
                         )}
-                        <span className="min-w-0 truncate">{'Download PDF'}</span>
+                        <span className="min-w-0 truncate">{'Download'}</span>
                     </Button>
 
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-orange-500/30 bg-zinc-950 px-2 text-[11px] font-medium text-orange-500 transition hover:bg-orange-500/10 hover:border-orange-500/50 sm:text-xs"
+                        className="h-9 flex-1 min-w-0 justify-center rounded-lg border-[#EAE2DA] bg-white px-2 text-[11px] font-semibold text-[#6B7280] shadow-sm transition hover:bg-slate-50 hover:text-[#171717] sm:text-xs"
                         onClick={openPreview}
                         disabled={isPreviewLoading}
                         title={'Preview'}
                     >
                         {isPreviewLoading ? (
-                            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+                            <Loader2 className="mr-1.5 h-3.5 w-3.5 shrink-0 animate-spin" />
                         ) : (
-                            <Eye className="h-3.5 w-3.5 shrink-0" />
+                            <Eye className="mr-1.5 h-3.5 w-3.5 shrink-0" />
                         )}
                         <span className="min-w-0 truncate">{'Preview'}</span>
                     </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-rose-500/30 bg-zinc-950 px-2 text-[11px] font-medium text-rose-500 transition hover:bg-rose-500/10 hover:border-rose-500/50 sm:text-xs"
-                        onClick={openDeleteDialog}
-                        disabled={isDeleting}
-                        title={'Delete CV'}
-                    >
-                        {isDeleting ? (
-                            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
-                        ) : (
-                            <Trash2 className="h-3.5 w-3.5 shrink-0" />
-                        )}
-                        <span className="min-w-0 truncate">{'Delete CV'}</span>
-                    </Button>
+
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 w-9 shrink-0 p-0 justify-center rounded-lg border-[#EAE2DA] bg-white text-[#6B7280] shadow-sm transition hover:bg-slate-50 hover:text-[#171717]"
+                                title="More actions"
+                            >
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent align="end" className="w-40 rounded-xl border border-[#EAE2DA] bg-white p-1.5 shadow-lg">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start rounded-lg px-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                                onClick={openDeleteDialog}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? (
+                                    <Loader2 className="mr-2 h-3.5 w-3.5 shrink-0 animate-spin" />
+                                ) : (
+                                    <Trash2 className="mr-2 h-3.5 w-3.5 shrink-0" />
+                                )}
+                                {'Delete CV'}
+                            </Button>
+                        </PopoverContent>
+                    </Popover>
                 </div>
             </div>
             <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>

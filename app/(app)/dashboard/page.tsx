@@ -104,6 +104,8 @@ export default async function DashboardPage() {
   }
 
   const atsByCvId = await buildAtsByCvId(supabase, cvList, cvIds);
+  const firstCv = cvList.length > 0 ? cvList[0] : null;
+  const firstCvAts = firstCv ? atsByCvId.get(firstCv.id) : null;
 
   return (
     <DashboardShell
@@ -112,18 +114,19 @@ export default async function DashboardPage() {
       userName={user.user_metadata?.full_name}
       wallet={wallet}
       billingSchemaMissing={billingSchemaMissing}>
-      <section className="mb-7 rounded-xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      
+      <section className="mb-7 rounded-2xl border border-[#EAE2DA] bg-white p-6 sm:p-8 shadow-sm">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">{'My Resumes'}</h1>
-            <p className="mt-2 text-sm text-white/60">
-              {'Manage your CVs, improve ATS score, and jump back into editing quickly.'}
+            <h1 className="text-3xl font-black tracking-tight text-[#171717]">{'Your career workspace'}</h1>
+            <p className="mt-2 text-base text-[#6B7280]">
+              {'Create, improve and export job-ready resumes in minutes.'}
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <GenerateCvFromJobButton />
-            <Button asChild className="h-11 gap-2 rounded-xl bg-orange-600 px-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-md">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <GenerateCvFromJobButton triggerClassName="h-12 w-full sm:w-auto rounded-xl bg-[#FF6B1A] px-6 text-base text-white font-bold hover:bg-[#E85D0F] shadow-lg shadow-[#FF6B1A]/20 transition" />
+            <Button asChild className="h-12 gap-2 rounded-xl border border-[#EAE2DA] bg-white px-6 text-base text-[#171717] font-semibold hover:bg-slate-50 transition">
               <Link href="/cv/new">
                 <Plus className="h-4 w-4" /> {'New CV'}
               </Link>
@@ -131,28 +134,45 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
-      <section className="mb-7 overflow-hidden rounded-xl bg-gradient-to-r from-orange-600/20 via-rose-600/20 to-amber-600/20 border border-orange-500/30 p-[1px]">
-        <div className="flex flex-col sm:flex-row items-center justify-between bg-zinc-950/90 backdrop-blur-xl rounded-xl p-5 sm:p-6">
+
+      {firstCv && (
+        <section className="mb-7 rounded-2xl border border-[#EAE2DA] bg-white p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-sm font-bold text-[#FF6B1A] mb-1">Recommended next step</p>
+            <p className="text-base font-medium text-[#171717]">
+              {firstCvAts?.score !== null
+                ? `Your latest CV has an ATS score of ${firstCvAts.score}. Improve it to 80+ before applying.`
+                : 'Review your latest CV to discover what can be improved.'}
+            </p>
+          </div>
+          <Button asChild className="h-10 shrink-0 rounded-xl bg-[#FFF0E5] text-[#FF6B1A] hover:bg-[#FFD6BA] font-bold">
+            <Link href={`/dashboard/ai-review`}>
+              {firstCvAts?.score !== null ? 'Improve with AI' : 'Get ATS Score'}
+            </Link>
+          </Button>
+        </section>
+      )}
+
+      <section className="mb-7 overflow-hidden rounded-2xl bg-[#FFF0E5] border border-[#FFD6BA]">
+        <div className="flex flex-col sm:flex-row items-center justify-between p-5 sm:p-6">
           <div className="flex items-start sm:items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-[#FF6B1A] shadow-sm">
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">
-                {'Unlimited Free CV Storage & Sharing'}
-              </h2>
-              <p className="mt-1 text-sm text-white/70">
-                {'Create and store as many CVs as you want for free. Share them anytime with a single Pathica link, just like Google Drive.'}
+              <p className="text-base font-bold text-[#171717]">
+                {'Store unlimited resumes and share them with one Pathica link.'}
               </p>
             </div>
           </div>
           <div className="mt-4 sm:mt-0 shrink-0">
-            <div className="inline-flex items-center rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-blue-300">
+            <div className="inline-flex items-center rounded-full border border-[#FFD6BA] bg-white px-3 py-1 text-xs font-bold tracking-wide text-[#FF6B1A]">
               {'Always Free'}
             </div>
           </div>
         </div>
       </section>
+
       {cvList.length > 0 ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {cvList.map((cv) => {
@@ -162,35 +182,44 @@ export default async function DashboardPage() {
             return (
               <Card
                 key={cv.id}
-                className="group rounded-xl border-white/10 bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20"
+                className="group flex flex-col rounded-2xl border-[#EAE2DA] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#FFD6BA]"
               >
-                <CardHeader>
+                <CardHeader className="flex-1">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <CardTitle className="min-w-0 flex-1 text-xl leading-tight text-white">
+                    <CardTitle className="min-w-0 flex-1 text-xl leading-tight text-[#171717]">
                       <span className="block break-words pr-1 [overflow-wrap:anywhere]">{cv.title}</span>
                     </CardTitle>
                     <CvShareActions cvId={cv.id} cvTitle={cv.title} atsScore={ats.score} />
                   </div>
-                  <CardDescription className="flex items-center gap-1 text-white/50">
+                  <CardDescription className="flex items-center gap-1 text-[#6B7280]">
                     <Calendar className="h-3 w-3" />
-                    {'Updated'}{' '}
-                    {formatDistanceToNow(new Date(cv.updated_at))}{' '}
-                    {'ago'}
+                    {'Updated'} {formatDistanceToNow(new Date(cv.updated_at))} {'ago'}
                   </CardDescription>
-                  <div className="pt-1">
+                  <div className="pt-4">
                     {ats.score !== null ? (
-                      <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${getAtsScoreStyles(ats.score)}`}>
-                        ATS {'Score'}: {ats.score}/100
-                      </span>
+                      <div className="flex flex-col gap-2.5">
+                        <div className="flex items-center">
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ${getAtsScoreStyles(ats.score)}`}>
+                            ATS Score: {ats.score}/100
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${ats.score >= 75 ? 'bg-[#22C55E]' : ats.score >= 50 ? 'bg-[#FB923C]' : 'bg-[#EF4444]'}`} style={{ width: `${ats.score}%` }} />
+                        </div>
+                      </div>
                     ) : (
-                      <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-white/70">
-                        ATS {'Score'}: {'Pending'}
+                      <span className="inline-flex items-center rounded-full border border-[#EAE2DA] bg-slate-50 px-2.5 py-1 text-xs font-semibold text-[#6B7280]">
+                        Not reviewed yet
                       </span>
                     )}
-                    {localizedReason ? <AtsReason reason={localizedReason} /> : null}
+                    {localizedReason ? (
+                      <div className="mt-3 text-sm text-[#6B7280]">
+                        <AtsReason reason={localizedReason} />
+                      </div>
+                    ) : null}
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <CvCardActions cvId={cv.id} cvTitle={cv.title} />
                 </CardContent>
               </Card>
@@ -198,18 +227,18 @@ export default async function DashboardPage() {
           })}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/20 bg-white/[0.02] py-20">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#EAE2DA] bg-white py-20 shadow-sm">
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#FFF0E5] text-[#FF6B1A]">
             <FileText className="h-10 w-10" />
           </div>
-          <h3 className="mb-2 text-xl font-semibold text-white">{'No CVs yet'}</h3>
-          <p className="mb-6 max-w-sm text-center text-white/60">
-            {'Create your first CV and start optimizing it for ATS and recruiter readability.'}
+          <h3 className="mb-2 text-xl font-bold text-[#171717]">{'Your next application starts here'}</h3>
+          <p className="mb-6 max-w-sm text-center text-[#6B7280]">
+            {'Create a job-ready CV in minutes.'}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <GenerateCvFromJobButton
-              triggerClassName="h-12 rounded-xl border-slate-300 px-5 text-sm font-semibold" />
-            <Button asChild className="h-12 rounded-xl bg-orange-600 px-6 text-white hover:bg-orange-700 shadow-lg shadow-orange-500/20">
+              triggerClassName="h-12 w-full sm:w-auto rounded-xl bg-[#FF6B1A] px-6 text-white font-bold hover:bg-[#E85D0F] shadow-lg shadow-[#FF6B1A]/20 transition" />
+            <Button asChild className="h-12 rounded-xl border border-[#EAE2DA] bg-white px-6 text-[#171717] font-bold hover:bg-slate-50 transition">
               <Link href="/cv/new">
                 <Plus className="mr-2 h-5 w-5" /> {'Create Your First CV'}
               </Link>
@@ -292,15 +321,15 @@ async function buildAtsByCvId(
 }
 
 function getAtsScoreStyles(score: number) {
-  if (score >= 80) {
-    return 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-400/10 dark:text-emerald-300';
+  if (score >= 75) {
+    return 'bg-[#DCFCE7] text-[#166534]'; // green
   }
 
-  if (score >= 60) {
-    return 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-400/40 dark:bg-amber-400/10 dark:text-amber-300';
+  if (score >= 50) {
+    return 'bg-[#FFEDD5] text-[#9A3412]'; // orange
   }
 
-  return 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/40 dark:bg-rose-400/10 dark:text-rose-300';
+  return 'bg-[#FEE2E2] text-[#991B1B]'; // red
 }
 
 function localizeAtsReason(reason: string, locale: Locale): string {

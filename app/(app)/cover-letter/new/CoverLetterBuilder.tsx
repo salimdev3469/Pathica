@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Sparkles, AlertCircle, ArrowLeft, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import type { Locale } from '@/lib/locale';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import BillingModal, { type BillingPackageView } from '@/components/billing/BillingModal';
+import { COVER_LETTER_CREDIT_COST } from '@/lib/billing-config';
 
 type CV = {
     id: string;
@@ -19,10 +21,14 @@ type CV = {
 
 export default function CoverLetterBuilder({
     cvs,
-    userName
+    userName,
+    billingPackages,
+    billingSchemaMissing
 }: {
     cvs: CV[];
     userName?: string;
+    billingPackages: BillingPackageView[];
+    billingSchemaMissing: boolean;
 }) {
     const router = useRouter();
 
@@ -38,6 +44,7 @@ export default function CoverLetterBuilder({
     const [error, setError] = useState('');
     const [generatedText, setGeneratedText] = useState('');
     const [copied, setCopied] = useState(false);
+    const [billingOpen, setBillingOpen] = useState(false);
 
     const copyToClipboard = async (text: string) => {
         if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
@@ -179,7 +186,7 @@ export default function CoverLetterBuilder({
 
             if (!res.ok) {
                 if (res.status === 402 || data.code === 'INSUFFICIENT_CREDITS') {
-                    router.push('/billing?reason=insufficient_credits&feature=cover_letter');
+                    setBillingOpen(true);
                     return;
                 }
                 throw new Error(data.error || 'Failed to generate cover letter.');
@@ -200,42 +207,42 @@ export default function CoverLetterBuilder({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 relative">
             <div className="flex items-center gap-4">
                 <Button variant="ghost" asChild className="h-10 w-10 p-0 rounded-full">
                     <Link href="/dashboard"><ArrowLeft className="h-5 w-5" /></Link>
                 </Button>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                    <h1 className="text-2xl font-bold tracking-tight text-white">
                         {'Cover Letter Builder'}
                     </h1>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-white/60">
                         {'Generate a tailored cover letter using your job details, with CV as optional context.'}
                     </p>
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="shadow-sm border-slate-200 dark:border-slate-800">
+                <Card className="rounded-2xl border border-white/10 bg-white/[0.02] shadow-sm">
                     <CardHeader>
-                        <CardTitle className="text-lg">{'Details'}</CardTitle>
-                        <CardDescription>{'Configure your cover letter settings.'}</CardDescription>
+                        <CardTitle className="text-lg text-white">{'Details'}</CardTitle>
+                        <CardDescription className="text-white/50">{'Configure your cover letter settings.'}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="cv-select">{'Select Base CV (Optional)'}</Label>
+                            <Label htmlFor="cv-select" className="text-white">{'Select Base CV (Optional)'}</Label>
                             <select 
                                 id="cv-select"
                                 value={selectedCvId} 
                                 onChange={e => setSelectedCvId(e.target.value)}
-                                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300"
+                                className="flex h-10 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/30 focus:ring-4 focus:ring-white/10"
                             >
-                                <option value="">{'Continue without CV'}</option>
+                                <option value="" className="bg-zinc-950 text-white">{'Continue without CV'}</option>
                                 {cvs.map(cv => (
-                                    <option key={cv.id} value={cv.id}>{cv.title}</option>
+                                    <option key={cv.id} value={cv.id} className="bg-zinc-950 text-white">{cv.title}</option>
                                 ))}
                             </select>
                             {cvs.length === 0 && (
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-white/50">
                                     {'No saved CV found. You can still generate a cover letter.'}
                                 </p>
                             )}
@@ -243,36 +250,38 @@ export default function CoverLetterBuilder({
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="job-title">{'Job Title'}</Label>
+                                <Label htmlFor="job-title" className="text-white">{'Job Title'}</Label>
                                 <Input 
                                     id="job-title" 
                                     placeholder={'e.g. Frontend Developer'} 
                                     value={jobTitle} 
                                     onChange={e => setJobTitle(e.target.value)} 
+                                    className="rounded-xl border-white/10 bg-white/5 text-white placeholder:text-white/30 focus:border-white/30 focus:ring-4 focus:ring-white/10"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="company">{'Company'}</Label>
+                                <Label htmlFor="company" className="text-white">{'Company'}</Label>
                                 <Input 
                                     id="company" 
                                     placeholder={'e.g. Google'} 
                                     value={company} 
                                     onChange={e => setCompany(e.target.value)} 
+                                    className="rounded-xl border-white/10 bg-white/5 text-white placeholder:text-white/30 focus:border-white/30 focus:ring-4 focus:ring-white/10"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="job-description">{'Job Description'}</Label>
+                            <Label htmlFor="job-description" className="text-white">{'Job Description'}</Label>
                             <Textarea 
                                 id="job-description" 
                                 placeholder={'Paste the job description here...'}
-                                className="min-h-[120px]"
+                                className="min-h-[120px] rounded-xl border-white/10 bg-white/5 text-white placeholder:text-white/30 focus:border-white/30 focus:ring-4 focus:ring-white/10"
                                 value={jobDescription}
                                 onChange={e => setJobDescription(e.target.value)}
                             />
                             {!jobDescription && (
-                                <div className="flex items-center gap-2 mt-1 text-amber-600 dark:text-amber-500 text-xs bg-amber-50 dark:bg-amber-400/10 p-2 rounded-md border border-amber-200 dark:border-amber-400/20">
+                                <div className="flex items-center gap-2 mt-1 text-amber-500 text-xs bg-amber-500/10 p-2 rounded-xl border border-amber-500/20">
                                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                     <span>{'For a more personalized cover letter, we recommend adding the job description.'}</span>
                                 </div>
@@ -281,52 +290,52 @@ export default function CoverLetterBuilder({
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="language">{'Language'}</Label>
+                                <Label htmlFor="language" className="text-white">{'Language'}</Label>
                                 <select 
                                     id="language"
                                     value={language} 
                                     onChange={e => setLanguage(e.target.value)}
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 dark:border-slate-800 dark:bg-slate-950"
+                                    className="flex h-10 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/30 focus:ring-4 focus:ring-white/10"
                                 >
-                                    <option value="tr">Türkçe</option>
-                                    <option value="en">English</option>
-                                    <option value="de">Deutsch</option>
+                                    <option value="tr" className="bg-zinc-950 text-white">Türkçe</option>
+                                    <option value="en" className="bg-zinc-950 text-white">English</option>
+                                    <option value="de" className="bg-zinc-950 text-white">Deutsch</option>
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="tone">{'Tone'}</Label>
+                                <Label htmlFor="tone" className="text-white">{'Tone'}</Label>
                                 <select 
                                     id="tone"
                                     value={tone} 
                                     onChange={e => setTone(e.target.value)}
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 dark:border-slate-800 dark:bg-slate-950"
+                                    className="flex h-10 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/30 focus:ring-4 focus:ring-white/10"
                                 >
-                                    <option value="professional">{'Professional'}</option>
-                                    <option value="enthusiastic">{'Enthusiastic'}</option>
-                                    <option value="confident">{'Confident'}</option>
+                                    <option value="professional" className="bg-zinc-950 text-white">{'Professional'}</option>
+                                    <option value="enthusiastic" className="bg-zinc-950 text-white">{'Enthusiastic'}</option>
+                                    <option value="confident" className="bg-zinc-950 text-white">{'Confident'}</option>
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="length">{'Length'}</Label>
+                                <Label htmlFor="length" className="text-white">{'Length'}</Label>
                                 <select 
                                     id="length"
                                     value={length} 
                                     onChange={e => setLength(e.target.value)}
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 dark:border-slate-800 dark:bg-slate-950"
+                                    className="flex h-10 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/30 focus:ring-4 focus:ring-white/10"
                                 >
-                                    <option value="short">{'Short'}</option>
-                                    <option value="medium">{'Medium'}</option>
-                                    <option value="long">{'Long'}</option>
+                                    <option value="short" className="bg-zinc-950 text-white">{'Short'}</option>
+                                    <option value="medium" className="bg-zinc-950 text-white">{'Medium'}</option>
+                                    <option value="long" className="bg-zinc-950 text-white">{'Long'}</option>
                                 </select>
                             </div>
                         </div>
-                        {error && <p className="text-sm text-rose-600 font-medium">{error}</p>}
+                        {error && <p className="text-sm text-rose-500 font-medium">{error}</p>}
                     </CardContent>
                     <CardFooter>
                         <Button 
                             onClick={handleGenerate} 
                             disabled={isGenerating} 
-                            className="w-full gap-2 bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+                            className="w-full gap-2 rounded-xl bg-white text-slate-950 hover:bg-white/90 shadow-lg"
                         >
                             {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                             {isGenerating ? 'Generating...' : 'Generate Cover Letter'}
@@ -334,10 +343,10 @@ export default function CoverLetterBuilder({
                     </CardFooter>
                 </Card>
 
-                <Card className="shadow-sm border-slate-200 dark:border-slate-800 h-full flex flex-col">
+                <Card className="rounded-2xl border border-white/10 bg-white/[0.02] shadow-sm h-full flex flex-col">
                     <CardHeader>
                         <div className="flex items-center justify-between gap-3">
-                            <CardTitle className="text-lg">{'Result'}</CardTitle>
+                            <CardTitle className="text-lg text-white">{'Result'}</CardTitle>
                             <div className="flex items-center gap-2">
                                 <Button
                                     type="button"
@@ -345,7 +354,7 @@ export default function CoverLetterBuilder({
                                     size="sm"
                                     onClick={handleDownloadDoc}
                                     disabled={!generatedText.trim() || isGenerating}
-                                    className="gap-2"
+                                    className="gap-2 rounded-lg border-white/10 bg-transparent text-white hover:bg-white/10"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                                     {'Download'}
@@ -356,25 +365,70 @@ export default function CoverLetterBuilder({
                                     size="sm"
                                     onClick={handleCopy}
                                     disabled={!generatedText.trim() || isGenerating}
-                                    className="gap-2"
+                                    className="gap-2 rounded-lg border-white/10 bg-transparent text-white hover:bg-white/10"
                                 >
                                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                                     {copied ? 'Copied' : 'Copy'}
                                 </Button>
                             </div>
                         </div>
-                        <CardDescription>{'Your generated cover letter will appear here.'}</CardDescription>
+                        <CardDescription className="text-white/50">{'Your generated cover letter will appear here.'}</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 flex flex-col h-full min-h-[400px]">
                         <Textarea 
                             value={generatedText}
                             onChange={(e) => setGeneratedText(e.target.value)}
                             placeholder={'Click generate to create your tailored cover letter. Once generated, you can edit it here.'}
-                            className="flex-1 resize-none h-full min-h-[300px] bg-slate-50/50 dark:bg-slate-900/50 p-4 leading-relaxed"
+                            className="flex-1 resize-none h-full min-h-[300px] rounded-xl border border-white/10 bg-white/5 p-4 leading-relaxed text-white placeholder:text-white/30 focus:border-white/30 focus:ring-4 focus:ring-white/10"
                             readOnly={isGenerating}
                         />
                     </CardContent>
                 </Card>
+            </div>
+            
+            {isGenerating && <GeneratingOverlay />}
+            
+            <BillingModal
+                open={billingOpen}
+                onOpenChange={setBillingOpen}
+                packages={billingPackages}
+                creditCost={COVER_LETTER_CREDIT_COST}
+                billingSchemaMissing={billingSchemaMissing}
+                title="Generate Cover Letter"
+                description="You need credits to generate a new cover letter."
+            />
+        </div>
+    );
+}
+
+function GeneratingOverlay() {
+    const lines = [
+        'Reading your selected CV...',
+        'Extracting key skills and experiences...',
+        'Matching with job requirements...',
+        'Writing your professional cover letter...',
+        'Almost there, finalizing the draft...'
+    ];
+    const [index, setIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = window.setInterval(() => setIndex((current) => (current + 1) % lines.length), 2000);
+        return () => window.clearInterval(interval);
+    }, [lines.length]);
+
+    return (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-zinc-950/90 backdrop-blur-md px-6">
+            <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-800">
+                <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-500 via-orange-600 to-indigo-500 transition-all duration-500 dark:from-emerald-400 dark:via-orange-400 dark:to-indigo-400" />
+            </div>
+            <div className="flex flex-col items-center gap-6 text-center">
+                <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400">
+                    <Sparkles className="h-12 w-12 animate-pulse" />
+                    <div className="absolute inset-0 animate-ping rounded-2xl border border-orange-500/30" />
+                </div>
+                <div className="py-2 text-3xl font-semibold leading-[1.25] md:text-5xl text-white">
+                    {lines[index]}
+                </div>
             </div>
         </div>
     );

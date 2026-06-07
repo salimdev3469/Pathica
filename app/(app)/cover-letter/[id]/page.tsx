@@ -26,7 +26,11 @@ export default async function EditCoverLetterPage({ params }: { params: { id: st
     return (
         <div className="min-h-screen bg-slate-50 py-10 dark:bg-slate-950">
             <div className="mx-auto max-w-3xl px-4 sm:px-6">
-                <CoverLetterEdit coverLetter={coverLetter} />
+                <CoverLetterEdit 
+                    coverLetter={coverLetter} 
+                    userName={user.user_metadata?.full_name || user.email?.split('@')[0] || 'Applicant'}
+                    userEmail={user.email || ''}
+                />
             </div>
         </div>
     );

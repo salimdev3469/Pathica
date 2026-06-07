@@ -135,9 +135,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Could not consume AI entitlement.' }, { status: 500 });
     }
 
+    const userMetadata = user.user_metadata || {};
+    const fullName = [userMetadata.first_name, userMetadata.last_name].filter(Boolean).join(' ') || userMetadata.full_name || '';
+    const email = user.email || '';
+
     const generated = await generateCvDraft(jobDescription, jobTitle || null, extractedKeywords);
     const cvId = crypto.randomUUID();
-    const cvState = buildCvState(cvId, generated, jobDescription, jobTitle || null, extractedKeywords);
+    const cvState = buildCvState(cvId, generated, jobDescription, jobTitle || null, extractedKeywords, fullName, email);
 
     const { data: cvRow, error: cvCreateError } = await supabase
       .from('cvs')
@@ -274,6 +278,8 @@ function buildCvState(
   sourceInput: string,
   targetRoleTitle: string | null,
   extractedKeywords: string[],
+  fullName: string,
+  email: string,
 ): CvStatePayload {
   const fallback = buildGuidedDraft(sourceInput, targetRoleTitle, extractedKeywords);
 
@@ -305,8 +311,8 @@ function buildCvState(
     id: cvId,
     title,
     personalInfo: {
-      fullName: '',
-      email: '',
+      fullName: fullName,
+      email: email,
       phone: '',
       location: '',
       linkedin: '',
@@ -547,7 +553,7 @@ function extractKeywords(text: string): string[] {
 }
 
 function asString(value: unknown): string {
-  return typeof value === 'string' ? value : '';
+  return typeof value === 'string' ? value.replace(/\*\*/g, '') : '';
 }
 
 function sanitizeField(value: string, maxLength: number): string {

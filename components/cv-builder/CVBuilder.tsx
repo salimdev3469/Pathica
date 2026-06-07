@@ -458,7 +458,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
           <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             <p className="font-semibold">{'AI Draft Loaded'}</p>
             <p className="mt-1 leading-relaxed">
-              {'This draft was generated from the job description in English. Review every section and replace generic guidance with your actual experience, tools, dates, and measurable results before applying.'}
+              {'Please edit your keyword-optimized CV according to your own information.'}
             </p>
           </div>
         )}

@@ -24,15 +24,15 @@ export default function AtsReason({
     }, [shouldTruncate, trimmedReason]);
 
     return (
-        <div className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+        <div className="mt-2 text-sm leading-relaxed text-[#6B7280]">
             <p>
-                {'Why'}: {isExpanded || !shouldTruncate ? trimmedReason : previewText}
+                <span className="font-bold text-[#171717]">Tip:</span> {isExpanded || !shouldTruncate ? trimmedReason : previewText}
             </p>
             {shouldTruncate ? (
                 <button
                     type="button"
                     onClick={() => setIsExpanded((current) => !current)}
-                    className="mt-1 text-xs font-semibold text-slate-700 underline underline-offset-2 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
+                    className="mt-1 text-xs font-semibold text-[#FF6B1A] underline underline-offset-2 hover:text-[#E85D0F]"
                 >
                     {isExpanded ? 'Show less' : 'Show more'}
                 </button>

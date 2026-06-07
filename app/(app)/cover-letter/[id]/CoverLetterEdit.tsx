@@ -2,17 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, ArrowLeft, Save, Trash2, CheckCircle2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Save, Trash2, CheckCircle2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import type { Locale } from '@/lib/locale';
 import Link from 'next/link';
 
 export default function CoverLetterEdit({
-    coverLetter
+    coverLetter,
+    userName,
+    userEmail,
 }: {
     coverLetter: any;
+    userName?: string;
+    userEmail?: string;
 }) {
     const router = useRouter();
 
@@ -67,9 +69,33 @@ export default function CoverLetterEdit({
         }
     };
 
+    const handlePrint = () => {
+        window.print();
+    };
+
+    const currentDate = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 print:space-y-0 print:bg-white">
+            <style jsx global>{`
+                @media print {
+                    @page { margin: 0; size: auto; }
+                    body { margin: 0; background-color: white !important; }
+                    .print\\:hidden { display: none !important; }
+                    .print\\:p-0 { padding: 0 !important; }
+                    .print\\:shadow-none { box-shadow: none !important; }
+                    .print\\:ring-0 { box-shadow: none !important; }
+                    .print\\:bg-white { background-color: white !important; }
+                    .print\\:block { display: block !important; }
+                    textarea { resize: none !important; height: auto !important; overflow: hidden !important; border: none !important; }
+                }
+            `}</style>
+            
+            <div className="flex items-center justify-between print:hidden">
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" asChild className="h-10 w-10 p-0 rounded-full">
                         <Link href="/dashboard"><ArrowLeft className="h-5 w-5" /></Link>
@@ -83,7 +109,11 @@ export default function CoverLetterEdit({
                         </p>
                     </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button variant="outline" onClick={handlePrint} className="h-10 px-4 rounded-lg bg-white dark:bg-slate-900 dark:text-slate-100">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download PDF
+                    </Button>
                     <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="h-10 px-4 rounded-lg">
                         {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
                         {'Delete'}
@@ -94,13 +124,28 @@ export default function CoverLetterEdit({
                     </Button>
                 </div>
             </div>
-            <div className="mt-8 mx-auto w-full max-w-[820px] rounded bg-white shadow-2xl ring-1 ring-slate-900/5">
-                <div className="px-8 py-12 sm:px-16 sm:py-24">
+
+            <div className="mt-8 mx-auto w-full max-w-[820px] rounded bg-white shadow-2xl ring-1 ring-slate-900/5 print:m-0 print:max-w-none print:shadow-none print:ring-0 print:bg-white print:p-8">
+                <div className="px-8 py-12 sm:px-16 sm:py-16 print:p-0 flex flex-col min-h-[1050px] print:min-h-0">
+                    <div className="mb-10 pb-6 border-b border-slate-200 print:border-slate-300">
+                        <h1 className="text-3xl font-bold text-slate-900 font-serif tracking-tight">{userName}</h1>
+                        <div className="mt-2 text-sm text-slate-500 font-serif flex flex-col sm:flex-row sm:gap-4">
+                            {userEmail && <span>{userEmail}</span>}
+                            <span>{currentDate}</span>
+                        </div>
+                    </div>
+                    
                     <Textarea 
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="min-h-[800px] w-full resize-y border-0 bg-transparent p-0 font-serif text-[15px] leading-loose text-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-400"
+                        className="flex-1 w-full resize-y border-0 bg-transparent p-0 font-serif text-[15px] leading-loose text-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-400"
                         placeholder={'Type your cover letter here...'}
+                        onInput={(e) => {
+                            const target = e.target as HTMLTextAreaElement;
+                            target.style.height = "auto";
+                            target.style.height = `${target.scrollHeight}px`;
+                        }}
+                        style={{ height: "auto", minHeight: "800px" }}
                     />
                 </div>
             </div>

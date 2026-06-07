@@ -1,7 +1,7 @@
 'use client';;
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, Brain } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { TextShimmer } from '@/components/ui/text-shimmer';
 import { cn } from '@/lib/utils';
 
 type GenerateResponse = {
@@ -84,6 +85,7 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
@@ -126,17 +128,55 @@ export default function GenerateCvFromJobButton({ triggerClassName, locale = 'en
           </div>
           {error ? <p className="text-sm text-rose-600">{error}</p> : null}
         </div>
-
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={isGenerating}>
             {'Cancel'}
           </Button>
           <Button onClick={handleGenerate} disabled={isGenerating || normalizedLength < 40} className="gap-2">
-            {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            {isGenerating ? 'Generating...' : 'Generate CV'}
+            <Sparkles className="h-4 w-4" />
+            {'Generate CV'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    {isGenerating ? <GeneratingOverlay /> : null}
+    </>
+  );
+}
+
+function GeneratingOverlay() {
+  const lines = [
+    'Analyzing job description...',
+    'Extracting core requirements...',
+    'Building CV framework...',
+    'Optimizing keywords for ATS...'
+  ];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setIndex((current) => (current + 1) % lines.length), 1800);
+    return () => window.clearInterval(interval);
+  }, [lines.length]);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
+      <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-200 dark:bg-slate-800">
+        <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-500 via-orange-600 to-indigo-500 transition-all duration-500 dark:from-emerald-400 dark:via-orange-400 dark:to-indigo-400" />
+      </div>
+      <div className="flex flex-col items-center gap-6 text-center">
+        <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-600 dark:text-blue-300">
+          <Brain className="h-12 w-12 animate-pulse" />
+          <div className="absolute inset-0 animate-ping rounded-2xl border border-orange-500/30" />
+        </div>
+        <TextShimmer
+          key={lines[index]}
+          as="p"
+          duration={1.1}
+          className="py-2 text-4xl font-semibold leading-[1.25] md:text-6xl [--base-color:#2563eb] [--base-gradient-color:#93c5fd]"
+        >
+          {lines[index]}
+        </TextShimmer>
+      </div>
+    </div>
   );
 }
