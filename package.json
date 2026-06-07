@@ -34,6 +34,7 @@
     "dodopayments": "^2.36.0",
     "dodopayments-checkout": "^1.9.4",
     "framer-motion": "^12.35.0",
+    "lenis": "^1.3.23",
     "lucide-react": "^0.575.0",
     "mammoth": "^1.12.0",
     "next": "14.2.35",

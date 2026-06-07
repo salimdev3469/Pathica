@@ -70,6 +70,8 @@ export const metadata: Metadata = {
   },
 };
 
+import SmoothScrolling from '@/components/layout/SmoothScrolling';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -84,9 +86,11 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <CssHealthCheck />
           <NavigationFeedback />
-          {children}
-          <SiteFooter />
-          <CookieConsentBanner initialConsentValue={initialCookieConsent} />
+          <SmoothScrolling>
+            {children}
+            <SiteFooter />
+            <CookieConsentBanner initialConsentValue={initialCookieConsent} />
+          </SmoothScrolling>
           <Toaster />
         </ThemeProvider>
       </body>
