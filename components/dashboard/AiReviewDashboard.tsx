@@ -297,17 +297,17 @@ export default function AiReviewDashboard({
       {activeReview ? (
         <section className="flex flex-col gap-5 xl:flex-row">
           <div className="w-full xl:w-[45%] shrink-0 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 text-white/50">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-white/50">
                   <FileText className="h-5 w-5" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-white">{activeReview.fileName}</h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate font-bold text-white">{activeReview.fileName}</h3>
                   <p className="text-xs text-white/50">{new Date(activeReview.createdAt).toLocaleDateString(false ? 'tr-TR' : 'en-US')}</p>
                 </div>
               </div>
-              <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">Ready</span>
+              <span className="shrink-0 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">Ready</span>
             </div>
             <ResumePreview review={activeReview} />
           </div>
@@ -439,24 +439,24 @@ function ReviewWizard(props: {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent className="flex h-full w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-[#05070b] p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-2xl">
-        <DialogHeader className="shrink-0 border-b border-white/10 p-5 sm:p-8">
-          <DialogTitle className="text-3xl font-black">{'AI Resume Review'}</DialogTitle>
-          <DialogDescription>{wizardSubtitle(props.step, props.locale)}</DialogDescription>
+      <DialogContent className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-[#05070b] p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-2xl">
+        <DialogHeader className="shrink-0 border-b border-white/10 p-4 sm:p-8">
+          <DialogTitle className="text-2xl sm:text-3xl font-black">{'AI Resume Review'}</DialogTitle>
+          <DialogDescription className="text-sm sm:text-base">{wizardSubtitle(props.step, props.locale)}</DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-7">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-7">
           <StepIndicator step={props.step} />
 
           {props.selectedFile ? (
-            <div className="mx-auto mb-8 max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
+            <div className="mx-auto mb-6 sm:mb-8 max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs sm:text-sm text-white/70">
               <FileText className="mr-2 inline h-4 w-4" />
               {props.selectedFile.name} · {(props.selectedFile.size / 1024 / 1024).toFixed(2)} MB
             </div>
           ) : null}
 
           {props.step === 0 ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
               {AI_REVIEW_ONTOLOGY.categories.map((item) => {
                 const Icon = CATEGORY_ICONS[item.id] || Target;
                 const isSelected = props.category === item.id;
@@ -465,17 +465,17 @@ function ReviewWizard(props: {
                     key={item.id}
                     type="button"
                     onClick={() => props.onCategorySelect(item.id)}
-                    className={`rounded-2xl border p-7 text-center transition hover:-translate-y-0.5 hover:shadow-lg ${
+                    className={`rounded-2xl border p-4 sm:p-7 text-center transition hover:-translate-y-0.5 hover:shadow-lg ${
                       isSelected
                         ? 'border-white/30 bg-white/10 text-white shadow-xl'
                         : 'border-white/10 bg-white/[0.02] hover:bg-white/5'
                     }`}
                   >
-                    <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/5 text-white/50 shadow-sm">
-                      <Icon className="h-9 w-9" />
+                    <div className="mx-auto mb-3 sm:mb-5 flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl bg-white/5 text-white/50 shadow-sm">
+                      <Icon className="h-7 w-7 sm:h-9 sm:w-9" />
                     </div>
-                    <h3 className="text-xl font-black text-white">{item.label}</h3>
-                    <p className={`mt-2 text-sm ${isSelected ? 'text-white/80' : 'text-white/50'}`}>{item.description}</p>
+                    <h3 className="text-lg sm:text-xl font-black text-white">{item.label}</h3>
+                    <p className={`mt-1 sm:mt-2 text-xs sm:text-sm ${isSelected ? 'text-white/80' : 'text-white/50'}`}>{item.description}</p>
                   </button>
                 );
               })}
@@ -484,15 +484,15 @@ function ReviewWizard(props: {
 
           {props.step === 1 ? (
             <div className="mx-auto max-w-5xl text-center">
-              <h3 className="mb-2 text-3xl font-black">{AI_REVIEW_ONTOLOGY.categories.find((item) => item.id === props.category)?.label}</h3>
-              <p className="mb-8 text-slate-500">{'Select your specific field'}</p>
-              <div className="flex flex-wrap justify-center gap-3">
+              <h3 className="mb-2 text-2xl sm:text-3xl font-black">{AI_REVIEW_ONTOLOGY.categories.find((item) => item.id === props.category)?.label}</h3>
+              <p className="mb-6 sm:mb-8 text-sm sm:text-base text-slate-500">{'Select your specific field'}</p>
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                 {props.fieldsForCategory.map((item) => (
                   <button
                     key={item.id}
                     type="button"
                     onClick={() => props.onFieldSelect(item.id)}
-                    className={`rounded-full border px-6 py-3 text-base font-bold transition ${
+                    className={`rounded-full border px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition ${
                       props.field === item.id
                         ? 'border-white/30 bg-white/10 text-white shadow-lg'
                         : 'border-white/10 bg-transparent text-white/70 hover:border-white/30 hover:text-white'
@@ -507,34 +507,34 @@ function ReviewWizard(props: {
 
           {props.step === 2 ? (
             <div className="mx-auto max-w-5xl">
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                 {AI_REVIEW_ONTOLOGY.experienceLevels.map((level) => (
                   <button
                     key={level.id}
                     type="button"
                     onClick={() => props.onExperienceSelect(level.id)}
-                    className={`min-w-32 rounded-2xl border px-6 py-4 text-center transition ${
+                    className={`min-w-28 sm:min-w-32 rounded-2xl border px-4 sm:px-6 py-3 sm:py-4 text-center transition ${
                       props.experienceLevel === level.id
                         ? 'border-white/30 bg-white/10 text-white shadow-lg'
                         : 'border-white/10 bg-transparent text-white/70 hover:border-white/30 hover:text-white'
                     }`}
                   >
-                    <span className="block text-lg font-black">{level.label}</span>
-                    <span className="text-sm opacity-70">{level.range}</span>
+                    <span className="block text-base sm:text-lg font-black">{level.label}</span>
+                    <span className="text-xs sm:text-sm opacity-70">{level.range}</span>
                   </button>
                 ))}
               </div>
 
-              <label className="mt-9 block">
-                <span className="mb-3 flex items-center gap-2 text-lg font-bold">
-                  <Zap className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+              <label className="mt-6 sm:mt-9 block">
+                <span className="mb-2 sm:mb-3 flex items-center gap-2 text-base sm:text-lg font-bold">
+                  <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-300" />
                   {'Add job description (optional)'}
                 </span>
                 <textarea
                   value={props.jobDescription}
                   onChange={(event) => props.onJobDescriptionChange(event.target.value)}
-                  rows={6}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition focus:border-white/30 focus:ring-4 focus:ring-white/10 placeholder:text-white/30"
+                  rows={5}
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 text-sm text-white outline-none transition focus:border-white/30 focus:ring-4 focus:ring-white/10 placeholder:text-white/30"
                   placeholder={'Paste the job description to score keyword coverage mathematically.'}
                 />
               </label>
@@ -548,7 +548,7 @@ function ReviewWizard(props: {
               variant="outline"
               onClick={() => props.setStep(Math.max(0, props.step - 1))}
               disabled={props.step === 0}
-              className="h-12 rounded-xl px-5 border-white/10 bg-transparent text-white hover:bg-white/10"
+              className="h-10 sm:h-12 rounded-xl px-4 sm:px-5 border-white/10 bg-transparent text-sm sm:text-base text-white hover:bg-white/10"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               {'Back'}
@@ -558,7 +558,7 @@ function ReviewWizard(props: {
               <Button
                 onClick={() => props.setStep(Math.min(2, props.step + 1))}
                 disabled={!canGoNext}
-                className="h-12 rounded-xl bg-blue-600 px-7 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+                className="h-10 sm:h-12 rounded-xl bg-blue-600 px-6 sm:px-7 text-sm sm:text-base font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
               >
                 {'Next'}
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -566,7 +566,7 @@ function ReviewWizard(props: {
             ) : (
               <Button
                 onClick={props.onStart}
-                className="h-12 rounded-xl bg-blue-600 px-8 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+                className="h-10 sm:h-12 rounded-xl bg-blue-600 px-6 sm:px-8 text-sm sm:text-base font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
               >
                 {'Start Review'}
               </Button>
@@ -586,7 +586,7 @@ function StepIndicator({
   const labels = false ? ['Kategori', 'Alan', 'Deneyim'] : ['Category', 'Field', 'Experience'];
 
   return (
-    <div className="mx-auto mb-10 flex max-w-3xl items-center justify-center">
+    <div className="mx-auto mb-6 sm:mb-10 flex max-w-3xl items-center justify-center">
       {labels.map((label, index) => {
         const isComplete = index < step;
         const isActive = index === step;
@@ -594,18 +594,18 @@ function StepIndicator({
           <div key={label} className="flex items-center">
             <div className="text-center">
               <div
-                className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-2xl font-black ${
+                className={`mx-auto flex h-10 w-10 sm:h-16 sm:w-16 items-center justify-center rounded-full text-lg sm:text-2xl font-black ${
                   isComplete || isActive
                     ? 'bg-white text-slate-950 shadow-sm'
                     : 'bg-white/5 text-white/30'
                 }`}
               >
-                {isComplete ? <Check className="h-7 w-7" /> : index + 1}
+                {isComplete ? <Check className="h-5 w-5 sm:h-7 sm:w-7" /> : index + 1}
               </div>
-              <p className={`mt-3 text-sm font-bold ${isComplete || isActive ? 'text-white' : 'text-white/30'}`}>{label}</p>
+              <p className={`mt-2 sm:mt-3 text-xs sm:text-sm font-bold ${isComplete || isActive ? 'text-white' : 'text-white/30'}`}>{label}</p>
             </div>
             {index < labels.length - 1 ? (
-              <div className={`mx-5 h-1 w-24 rounded-full ${index < step ? 'bg-white' : 'bg-white/10'} sm:w-36`} />
+              <div className={`mx-2 sm:mx-5 h-1 w-8 sm:w-24 lg:w-36 rounded-full ${index < step ? 'bg-white' : 'bg-white/10'}`} />
             ) : null}
           </div>
         );

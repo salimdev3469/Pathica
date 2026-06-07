@@ -18,9 +18,11 @@ type CV = {
 };
 
 export default function CoverLetterBuilder({
-    cvs
+    cvs,
+    userName
 }: {
     cvs: CV[];
+    userName?: string;
 }) {
     const router = useRouter();
 
@@ -77,6 +79,62 @@ export default function CoverLetterBuilder({
         } catch {
             toast.error('Could not copy the cover letter.');
         }
+    };
+
+    const handleDownloadDoc = () => {
+        const text = generatedText.trim();
+        if (!text) return;
+
+        // Create a simple HTML document formatted for A4 printing/editing in Word
+        const htmlContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+                <meta charset='utf-8'>
+                <title>Cover Letter</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        font-size: 11pt;
+                        line-height: 1.5;
+                        color: #000;
+                    }
+                    @page {
+                        size: A4;
+                        margin: 2.54cm; /* 1 inch margin */
+                    }
+                    .header {
+                        margin-bottom: 24px;
+                    }
+                    .name {
+                        font-size: 14pt;
+                        font-weight: bold;
+                    }
+                    .content {
+                        white-space: pre-wrap;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="name">${userName || 'Your Name'}</div>
+                </div>
+                <div class="content">${text.replace(/\\n/g, '<br>')}</div>
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob(['\\ufeff', htmlContent], {
+            type: 'application/msword'
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = \`Cover_Letter_\${userName?.replace(/\\s+/g, '_') || 'Document'}.doc\`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     const handleGenerate = async () => {
@@ -213,7 +271,7 @@ export default function CoverLetterBuilder({
                             {!jobDescription && (
                                 <div className="flex items-center gap-2 mt-1 text-amber-600 dark:text-amber-500 text-xs bg-amber-50 dark:bg-amber-400/10 p-2 rounded-md border border-amber-200 dark:border-amber-400/20">
                                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                    <span>{'Daha kişiselleştirilmiş bir ön yazı için iş ilanı metnini eklemeniz önerilir.'}</span>
+                                    <span>{'For a more personalized cover letter, we recommend adding the job description.'}</span>
                                 </div>
                             )}
                         </div>
@@ -277,17 +335,30 @@ export default function CoverLetterBuilder({
                     <CardHeader>
                         <div className="flex items-center justify-between gap-3">
                             <CardTitle className="text-lg">{'Result'}</CardTitle>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={handleCopy}
-                                disabled={!generatedText.trim() || isGenerating}
-                                className="gap-2"
-                            >
-                                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                {copied ? 'Copied' : 'Copy'}
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleDownloadDoc}
+                                    disabled={!generatedText.trim() || isGenerating}
+                                    className="gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                    {'Download'}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleCopy}
+                                    disabled={!generatedText.trim() || isGenerating}
+                                    className="gap-2"
+                                >
+                                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                    {copied ? 'Copied' : 'Copy'}
+                                </Button>
+                            </div>
                         </div>
                         <CardDescription>{'Your generated cover letter will appear here.'}</CardDescription>
                     </CardHeader>
