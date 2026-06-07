@@ -872,6 +872,9 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
               </div>
             </div>
           </div>
+        </div>
+      </>
+    );
   }
 
   return (
