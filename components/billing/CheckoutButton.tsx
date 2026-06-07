@@ -24,6 +24,9 @@ type CheckoutResponse = {
 
 const LEGAL_WARNING_MESSAGE = 'You must accept the required agreements and policies to proceed with the payment.';
 
+let isDodoInitialized = false;
+
+
 export default function CheckoutButton({ packageCode, disabled = false, className, label = 'Buy Credits', theme = 'light' }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isConsentChecked, setIsConsentChecked] = useState(false);
@@ -31,29 +34,47 @@ export default function CheckoutButton({ packageCode, disabled = false, classNam
   const consentId = `checkout-consent-${packageCode}`;
 
   useEffect(() => {
-    try {
-      DodoPayments.Initialize({
-        mode: process.env.NEXT_PUBLIC_DODO_ENV === 'live' ? 'live' : 'test',
-        displayType: 'overlay',
-        onEvent: (event) => {
-          switch (event.event_type) {
-            case 'checkout.opened':
-              setIsLoading(false);
-              break;
-            case 'checkout.closed':
-              setIsLoading(false);
-              break;
-            case 'checkout.error':
-              setIsLoading(false);
-              toast.error('Payment error. Please try again.');
-              break;
-          }
-        },
-      });
-      setSdkReady(true);
-    } catch (error) {
-      console.error('Failed to initialize Dodo Payments SDK:', error);
+    if (!isDodoInitialized) {
+      try {
+        DodoPayments.Initialize({
+          mode: process.env.NEXT_PUBLIC_DODO_ENV === 'live' ? 'live' : 'test',
+          displayType: 'overlay',
+          onEvent: (event) => {
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('dodo-checkout-event', { detail: event }));
+            }
+          },
+        });
+        isDodoInitialized = true;
+      } catch (error) {
+        console.error('Failed to initialize Dodo Payments SDK:', error);
+      }
     }
+    
+    setSdkReady(isDodoInitialized);
+
+    const handleDodoEvent = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const event = customEvent.detail;
+      if (!event) return;
+      
+      switch (event.event_type) {
+        case 'checkout.opened':
+        case 'checkout.closed':
+        case 'checkout.error':
+          setIsLoading(false);
+          break;
+      }
+
+      if (event.event_type === 'checkout.error') {
+        toast.error('Payment error. Please try again.');
+      }
+    };
+
+    window.addEventListener('dodo-checkout-event', handleDodoEvent);
+    return () => {
+      window.removeEventListener('dodo-checkout-event', handleDodoEvent);
+    };
   }, []);
 
   const handleClick = async () => {
