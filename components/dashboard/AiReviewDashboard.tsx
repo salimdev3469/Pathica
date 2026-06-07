@@ -281,7 +281,7 @@ export default function AiReviewDashboard({
           </div>
         </div>
       </section>
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <MetricCard icon={Target} label={'Target Score'} value={`${stats.targetScore}+`} hint="Hire Zone" tone="emerald" />
         <MetricCard icon={TrendingUp} label={'Your Best'} value={stats.bestScore === null ? '--' : String(stats.bestScore)} hint="/100" tone="slate" />
         <MetricCard icon={Brain} label={'Reviews'} value={String(stats.reviewCount)} hint={'completed'} tone="blue" />
@@ -834,7 +834,16 @@ function ScoreDonut({ score }: { score: number }) {
 
 function ResumePreview({ review }: { review: AiReviewClientReview }) {
   const cvState = useMemo(() => normalizedResumeToCvState(review.normalizedResume), [review.normalizedResume]);
-  const scale = 0.55;
+  const desktopScale = 0.55;
+  const mobileScale = 0.38;
+
+  const renderCvTemplate = (scale: number) => (
+    <div style={{ width: CV_PAGE_WIDTH_PX * scale, height: CV_PAGE_HEIGHT_PX * scale }} className="mx-auto">
+      <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: CV_PAGE_WIDTH_PX }}>
+        <CVTemplate cv={cvState} previewMode />
+      </div>
+    </div>
+  );
 
   if (review.filePath && review.fileType === 'pdf') {
     return (
@@ -860,17 +869,13 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
               href={`/api/ai-review/${review.id}/file`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-[#111827] shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-700"
+              className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-700"
             >
               PDF'i Aç
             </a>
           </div>
-          <div className="h-[500px] overflow-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-950">
-            <div style={{ width: CV_PAGE_WIDTH_PX * scale, height: CV_PAGE_HEIGHT_PX * scale }}>
-              <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: CV_PAGE_WIDTH_PX }}>
-                <CVTemplate cv={cvState} previewMode />
-              </div>
-            </div>
+          <div className="flex h-[450px] overflow-auto rounded-2xl bg-slate-100 p-2 dark:bg-slate-950 justify-center">
+            {renderCvTemplate(mobileScale)}
           </div>
         </div>
       </>
@@ -878,13 +883,14 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
   }
 
   return (
-    <div className="h-[620px] overflow-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-950">
-      <div style={{ width: CV_PAGE_WIDTH_PX * scale, height: CV_PAGE_HEIGHT_PX * scale }}>
-        <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: CV_PAGE_WIDTH_PX }}>
-          <CVTemplate cv={cvState} previewMode />
-        </div>
+    <>
+      <div className="hidden md:block h-[620px] overflow-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-950">
+        {renderCvTemplate(desktopScale)}
       </div>
-    </div>
+      <div className="flex md:hidden h-[450px] overflow-auto rounded-2xl bg-slate-100 p-2 dark:bg-slate-950 justify-center">
+        {renderCvTemplate(mobileScale)}
+      </div>
+    </>
   );
 }
 
