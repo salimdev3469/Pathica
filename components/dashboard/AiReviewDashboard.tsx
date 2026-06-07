@@ -323,24 +323,24 @@ export default function AiReviewDashboard({
         </div>
 
         {reviews.length > 0 ? (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2">
             {reviews.map((review) => (
               <button
                 key={review.id}
                 type="button"
                 onClick={() => setActiveReview(review)}
-                className={`rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${
+                className={`rounded-2xl border p-3 sm:p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md overflow-hidden ${
                   activeReview?.id === review.id
                     ? 'border-blue-200 bg-blue-50'
                     : 'border-gray-200 bg-gray-50 hover:bg-blue-50'
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-bold text-[#111827]">{review.fileName}</p>
-                    <p className="mt-1 text-xs text-gray-500">{review.headline}</p>
+                <div className="flex items-start justify-between gap-2 sm:gap-3 w-full">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-[#111827] truncate sm:whitespace-normal text-sm sm:text-base">{review.fileName}</p>
+                    <p className="mt-1 text-xs text-gray-500 truncate sm:whitespace-normal">{review.headline}</p>
                   </div>
-                  <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-[#111827]">{review.score}/100</span>
+                  <span className="shrink-0 rounded-full bg-blue-100/50 sm:bg-blue-50 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-bold text-blue-800 sm:text-[#111827]">{review.score}/100</span>
                 </div>
               </button>
             ))}
