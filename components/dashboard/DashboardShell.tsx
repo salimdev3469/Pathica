@@ -45,12 +45,12 @@ export default function DashboardShell({
       </div>
       <header className="border-b border-[#E5E7EB] bg-white/60 backdrop-blur-md sticky top-0 z-40">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 sm:gap-5 px-3 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-row items-center justify-between gap-2 overflow-hidden">
+          <div className="flex flex-row items-center justify-between gap-2 flex-wrap">
             <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
               <Image src="/logo_pathica.png" alt={'Pathica logo'} width={200} height={200} className="h-8 sm:h-14 lg:h-16 w-auto object-contain" />
             </Link>
 
-            <div className="flex w-auto items-center justify-end gap-1.5 sm:gap-4 shrink-0 overflow-x-auto no-scrollbar pb-1 -mb-1">
+            <div className="flex flex-1 items-center justify-end gap-1.5 sm:gap-4 flex-wrap">
               {wallet && (
                 <Link href="/billing" className="hover:opacity-90 transition-opacity shrink-0">
                   <LiveTokenCounter
