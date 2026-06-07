@@ -31,7 +31,7 @@ export default function DashboardShell({
   children
 }: DashboardShellProps) {
   return (
-    <div className="min-h-screen bg-[#05070b] text-white">
+    <div className="min-h-screen bg-zinc-950 text-white">
       <header className="border-b border-white/5 bg-transparent">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">

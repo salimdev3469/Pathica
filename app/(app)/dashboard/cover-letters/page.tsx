@@ -75,7 +75,7 @@ export default async function CoverLettersDashboardPage() {
           </div>
           <Button
             asChild
-            className="h-11 gap-2 rounded-xl bg-blue-600 px-5 text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
+            className="h-11 gap-2 rounded-xl bg-orange-600 px-5 text-white shadow-lg shadow-orange-500/20 transition hover:-translate-y-0.5 hover:bg-orange-700"
           >
             <Link href="/cover-letter/new">
               <Plus className="h-4 w-4" /> {'New Cover Letter'}
@@ -103,7 +103,7 @@ export default async function CoverLettersDashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild variant="outline" className="h-10 w-full rounded-xl border-blue-500/30 bg-[#05070b] text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 text-sm font-medium">
+                <Button asChild variant="outline" className="h-10 w-full rounded-xl border-orange-500/30 bg-zinc-950 text-orange-500 transition hover:bg-orange-500/10 hover:border-orange-500/50 text-sm font-medium">
                   <Link href={`/cover-letter/${coverLetter.id}`}>{'Edit / View'}</Link>
                 </Button>
               </CardContent>

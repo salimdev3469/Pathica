@@ -25,8 +25,8 @@ export default function DashboardWelcomeModal({}: {}) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-0">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={handleFinish} />
-      <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/10 bg-[#05070b] text-white shadow-2xl animate-in zoom-in-95 fade-in duration-300">
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+      <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-950 text-white shadow-2xl animate-in zoom-in-95 fade-in duration-300">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-500 via-indigo-500 to-purple-500" />
         
         <div className="p-8 sm:p-10">
           <div className="flex justify-end mb-6">
@@ -43,7 +43,7 @@ export default function DashboardWelcomeModal({}: {}) {
           </p>
           
           <div className="grid gap-4 sm:grid-cols-2">
-            <Button asChild className="h-12 w-full rounded-xl bg-blue-600 font-semibold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition">
+            <Button asChild className="h-12 w-full rounded-xl bg-orange-600 font-semibold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-700 transition">
               <Link href="/cv/new" onClick={handleFinish}>
                 <FileText className="mr-2 h-5 w-5" />
                 {'Create CV'}

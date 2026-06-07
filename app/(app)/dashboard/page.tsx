@@ -123,7 +123,7 @@ export default async function DashboardPage() {
 
           <div className="flex flex-col gap-2 sm:flex-row">
             <GenerateCvFromJobButton />
-            <Button asChild className="h-11 gap-2 rounded-xl bg-blue-600 px-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-md">
+            <Button asChild className="h-11 gap-2 rounded-xl bg-orange-600 px-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-md">
               <Link href="/cv/new">
                 <Plus className="h-4 w-4" /> {'New CV'}
               </Link>
@@ -131,10 +131,10 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
-      <section className="mb-7 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-purple-600/20 border border-blue-500/30 p-[1px]">
-        <div className="flex flex-col sm:flex-row items-center justify-between bg-[#0a101a]/90 backdrop-blur-xl rounded-xl p-5 sm:p-6">
+      <section className="mb-7 overflow-hidden rounded-xl bg-gradient-to-r from-orange-600/20 via-rose-600/20 to-amber-600/20 border border-orange-500/30 p-[1px]">
+        <div className="flex flex-col sm:flex-row items-center justify-between bg-zinc-950/90 backdrop-blur-xl rounded-xl p-5 sm:p-6">
           <div className="flex items-start sm:items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400">
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
@@ -147,7 +147,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="mt-4 sm:mt-0 shrink-0">
-            <div className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-blue-300">
+            <div className="inline-flex items-center rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-blue-300">
               {'Always Free'}
             </div>
           </div>
@@ -209,7 +209,7 @@ export default async function DashboardPage() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <GenerateCvFromJobButton
               triggerClassName="h-12 rounded-xl border-slate-300 px-5 text-sm font-semibold" />
-            <Button asChild className="h-12 rounded-xl bg-blue-600 px-6 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20">
+            <Button asChild className="h-12 rounded-xl bg-orange-600 px-6 text-white hover:bg-orange-700 shadow-lg shadow-orange-500/20">
               <Link href="/cv/new">
                 <Plus className="mr-2 h-5 w-5" /> {'Create Your First CV'}
               </Link>

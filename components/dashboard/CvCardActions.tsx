@@ -139,7 +139,7 @@ export default function CvCardActions({
             <div className="flex flex-col gap-2 mt-4">
                 <Button
                     variant="ghost"
-                    className="h-10 w-full rounded-xl border border-blue-500/30 bg-blue-500/5 text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 hover:text-blue-400 text-sm font-medium"
+                    className="h-10 w-full rounded-xl border border-orange-500/30 bg-orange-500/5 text-orange-500 transition hover:bg-orange-500/10 hover:border-orange-500/50 hover:text-orange-400 text-sm font-medium"
                     asChild
                 >
                     <Link href={`/cv/${cvId}`}>
@@ -151,7 +151,7 @@ export default function CvCardActions({
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-blue-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 sm:text-xs"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-orange-500/30 bg-zinc-950 px-2 text-[11px] font-medium text-orange-500 transition hover:bg-orange-500/10 hover:border-orange-500/50 sm:text-xs"
                         onClick={handleDownload}
                         disabled={isDownloading}
                         title={'Download PDF'}
@@ -167,7 +167,7 @@ export default function CvCardActions({
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-blue-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-blue-500 transition hover:bg-blue-500/10 hover:border-blue-500/50 sm:text-xs"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-orange-500/30 bg-zinc-950 px-2 text-[11px] font-medium text-orange-500 transition hover:bg-orange-500/10 hover:border-orange-500/50 sm:text-xs"
                         onClick={openPreview}
                         disabled={isPreviewLoading}
                         title={'Preview'}
@@ -183,7 +183,7 @@ export default function CvCardActions({
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full min-w-0 justify-center rounded-lg border-rose-500/30 bg-[#05070b] px-2 text-[11px] font-medium text-rose-500 transition hover:bg-rose-500/10 hover:border-rose-500/50 sm:text-xs"
+                        className="h-9 w-full min-w-0 justify-center rounded-lg border-rose-500/30 bg-zinc-950 px-2 text-[11px] font-medium text-rose-500 transition hover:bg-rose-500/10 hover:border-rose-500/50 sm:text-xs"
                         onClick={openDeleteDialog}
                         disabled={isDeleting}
                         title={'Delete CV'}

@@ -281,7 +281,7 @@ export default function AiReviewDashboard({
           <div className="shrink-0">
             <Button
               onClick={openFilePicker}
-              className="h-11 rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl"
+              className="h-11 rounded-xl bg-orange-600 px-6 font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-xl"
             >
               <Plus className="mr-2 h-4 w-4" /> {'New Review'}
             </Button>
@@ -322,7 +322,7 @@ export default function AiReviewDashboard({
       <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400">
               <FileText className="h-5 w-5" />
             </div>
             <h2 className="text-lg font-bold text-white">{'Review History'}</h2>
@@ -338,7 +338,7 @@ export default function AiReviewDashboard({
                 onClick={() => setActiveReview(review)}
                 className={`rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${
                   activeReview?.id === review.id
-                    ? 'border-blue-500/40 bg-blue-500/10'
+                    ? 'border-orange-500/40 bg-orange-500/10'
                     : 'border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
@@ -403,7 +403,7 @@ function MetricCard({
   const toneClasses = {
     emerald: 'bg-emerald-500/10 text-emerald-500',
     slate: 'bg-slate-900/10 text-slate-800 dark:bg-slate-100/10 dark:text-slate-200',
-    blue: 'bg-blue-500/10 text-blue-500',
+    blue: 'bg-orange-500/10 text-orange-500',
     amber: 'bg-amber-500/10 text-amber-500',
   };
 
@@ -439,7 +439,7 @@ function ReviewWizard(props: {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-[#05070b] p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-2xl">
+      <DialogContent className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-zinc-950 p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-2xl">
         <DialogHeader className="shrink-0 border-b border-white/10 p-4 sm:p-8">
           <DialogTitle className="text-2xl sm:text-3xl font-black">{'AI Resume Review'}</DialogTitle>
           <DialogDescription className="text-sm sm:text-base">{wizardSubtitle(props.step, props.locale)}</DialogDescription>
@@ -527,7 +527,7 @@ function ReviewWizard(props: {
 
               <label className="mt-6 sm:mt-9 block">
                 <span className="mb-2 sm:mb-3 flex items-center gap-2 text-base sm:text-lg font-bold">
-                  <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-300" />
+                  <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-blue-300" />
                   {'Add job description (optional)'}
                 </span>
                 <textarea
@@ -542,7 +542,7 @@ function ReviewWizard(props: {
           ) : null}
         </div>
 
-        <div className="shrink-0 border-t border-white/10 bg-[#05070b] p-4 shadow-[0_-12px_30px_rgba(0,0,0,0.5)] sm:p-7">
+        <div className="shrink-0 border-t border-white/10 bg-zinc-950 p-4 shadow-[0_-12px_30px_rgba(0,0,0,0.5)] sm:p-7">
           <div className="flex items-center justify-between gap-3">
             <Button
               variant="outline"
@@ -558,7 +558,7 @@ function ReviewWizard(props: {
               <Button
                 onClick={() => props.setStep(Math.min(2, props.step + 1))}
                 disabled={!canGoNext}
-                className="h-10 sm:h-12 rounded-xl bg-blue-600 px-6 sm:px-7 text-sm sm:text-base font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+                className="h-10 sm:h-12 rounded-xl bg-orange-600 px-6 sm:px-7 text-sm sm:text-base font-bold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-700"
               >
                 {'Next'}
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -566,7 +566,7 @@ function ReviewWizard(props: {
             ) : (
               <Button
                 onClick={props.onStart}
-                className="h-10 sm:h-12 rounded-xl bg-blue-600 px-6 sm:px-8 text-sm sm:text-base font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+                className="h-10 sm:h-12 rounded-xl bg-orange-600 px-6 sm:px-8 text-sm sm:text-base font-bold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-700"
               >
                 {'Start Review'}
               </Button>
@@ -638,12 +638,12 @@ function AnalyzingOverlay({
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
       <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-200 dark:bg-slate-800">
-        <div className="h-full bg-gradient-to-r from-slate-900 via-blue-600 to-emerald-500 transition-all duration-500 dark:from-slate-100 dark:via-blue-400 dark:to-emerald-400" style={{ width: `${progress}%` }} />
+        <div className="h-full bg-gradient-to-r from-slate-900 via-orange-600 to-emerald-500 transition-all duration-500 dark:from-slate-100 dark:via-orange-400 dark:to-emerald-400" style={{ width: `${progress}%` }} />
       </div>
       <div className="flex flex-col items-center gap-6 text-center">
-        <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-300">
+        <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-600 dark:text-blue-300">
           <Brain className="h-12 w-12 animate-pulse" />
-          <div className="absolute inset-0 animate-ping rounded-2xl border border-blue-500/30" />
+          <div className="absolute inset-0 animate-ping rounded-2xl border border-orange-500/30" />
         </div>
         <TextShimmer
           key={lines[index]}
@@ -672,7 +672,7 @@ function FixingOverlay({}: {}) {
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
       <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-200 dark:bg-slate-800">
-        <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-500 via-blue-600 to-indigo-500 transition-all duration-500 dark:from-emerald-400 dark:via-blue-400 dark:to-indigo-400" />
+        <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-500 via-orange-600 to-indigo-500 transition-all duration-500 dark:from-emerald-400 dark:via-orange-400 dark:to-indigo-400" />
       </div>
       <div className="flex flex-col items-center gap-6 text-center">
         <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
@@ -700,7 +700,7 @@ function EmptyBenchmark({
   return (
     <div className="flex min-h-[390px] flex-col">
       <div className="mb-5 flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500">
           <TrendingUp className="h-5 w-5" />
         </div>
         <h2 className="text-lg font-bold text-slate-950 dark:text-slate-100">{'Industry Benchmark'}</h2>
@@ -731,7 +731,7 @@ function ReviewSummary({
 
   return (
     <div className="flex min-h-[390px] flex-col">
-      <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
+      <div className="rounded-2xl border border-orange-500/30 bg-orange-500/10 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-bold text-white">{"We'll help rebuild fast - unlock your job-ready plan"}</p>
           <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-white text-slate-950 hover:bg-white/90">
@@ -764,7 +764,7 @@ function ResultPanel({
 }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-sm">
-      <div className="mb-7 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
+      <div className="mb-7 rounded-2xl border border-orange-500/30 bg-orange-500/10 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-black text-white">{'Unlock Full Review'}</p>
@@ -809,7 +809,7 @@ function ResultPanel({
             <div key={finding.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="mb-1 flex items-center justify-between gap-3">
                 <p className="font-bold text-white">{finding.title}</p>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${finding.severity === 'critical' ? 'bg-rose-500/10 text-rose-500' : finding.severity === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${finding.severity === 'critical' ? 'bg-rose-500/10 text-rose-500' : finding.severity === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-orange-500/10 text-orange-500'}`}>
                   {finding.severity}
                 </span>
               </div>
@@ -826,9 +826,9 @@ function ScoreDonut({ score }: { score: number }) {
   return (
     <div
       className="relative flex h-40 w-40 items-center justify-center rounded-full"
-      style={{ background: `conic-gradient(#0f172a ${score * 3.6}deg, #dbe4ef 0deg)` }}
+      style={{ background: `conic-gradient(#f97316 ${score * 3.6}deg, rgba(255,255,255,0.1) 0deg)` }}
     >
-      <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-[#05070b]">
+      <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-zinc-950">
         <span className="text-5xl font-black text-white">{score}</span>
         <span className="text-sm font-semibold text-white/50">/ 100</span>
       </div>
@@ -844,15 +844,15 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
     return (
       <>
         {/* Desktop View */}
-        <div className="hidden h-[620px] overflow-hidden rounded-2xl border border-white/10 bg-[#05070b] md:block">
+        <div className="hidden h-[620px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 md:block">
           <iframe src={`/api/ai-review/${review.id}/file`} className="h-full w-full border-0" title={review.fileName} />
         </div>
         
         {/* Mobile View Fallback */}
         <div className="flex flex-col gap-4 md:hidden">
-          <div className="flex items-center justify-between rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4">
+          <div className="flex items-center justify-between rounded-2xl border border-orange-500/30 bg-orange-500/10 p-4">
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-orange-400">
                 <FileText className="h-5 w-5" />
               </div>
               <div className="min-w-0">
@@ -864,7 +864,7 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
               href={`/api/ai-review/${review.id}/file`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-700"
+              className="shrink-0 rounded-xl bg-orange-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-orange-700"
             >
               PDF'i Aç
             </a>
@@ -907,7 +907,7 @@ function BillingModal({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-[#05070b] p-0 text-white shadow-2xl">
+      <DialogContent className="max-h-[92vh] w-[94vw] max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950 p-0 text-white shadow-2xl">
         <DialogHeader className="border-b border-white/10 p-7">
           <DialogTitle className="text-3xl font-black">{'Unlock Full Review'}</DialogTitle>
           <DialogDescription className="text-white/60">
