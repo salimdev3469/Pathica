@@ -22,6 +22,7 @@ import {
   Wrench,
   Zap,
 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 import CheckoutButton from '@/components/billing/CheckoutButton';
 import { CVTemplate } from '@/components/pdf/CVTemplate';
@@ -115,7 +116,8 @@ export default function AiReviewDashboard({
   const [wizardOpen, setWizardOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [category, setCategory] = useState<ReviewCategoryId>('software_engineering');
-  const [field, setField] = useState<ReviewFieldId>('general_software');
+  const [field, setField] = useState<ReviewFieldId | 'custom'>('general_software');
+  const [customField, setCustomField] = useState('');
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevelId>('mid');
   const [jobDescription, setJobDescription] = useState('');
   const [activeReview, setActiveReview] = useState<AiReviewClientReview | null>(null);
@@ -147,7 +149,7 @@ export default function AiReviewDashboard({
   }, [initialStats]);
 
   useEffect(() => {
-    if (fieldsForCategory.length > 0 && !fieldsForCategory.some((candidate) => candidate.id === field)) {
+    if (fieldsForCategory.length > 0 && field !== 'custom' && !fieldsForCategory.some((candidate) => candidate.id === field)) {
       setField(fieldsForCategory[0].id);
     }
   }, [field, fieldsForCategory]);
@@ -198,16 +200,33 @@ export default function AiReviewDashboard({
       return;
     }
 
+    if (field === 'custom' && !customField.trim()) {
+      return toast.error('Lütfen alanınızı belirtin.');
+    }
+
     setWizardOpen(false);
     setIsAnalyzing(true);
+
+    const genericFields: Record<string, string> = {
+      software_engineering: 'general_software',
+      engineering_stem: 'mechanical',
+      business_finance: 'operations',
+      design_creative: 'ux_ui',
+      marketing_sales: 'growth',
+      operations_support: 'operations',
+    };
+    const actualFieldId = field === 'custom' ? genericFields[category] : field;
+    const actualJobDescription = field === 'custom' && customField.trim() 
+      ? `Target Role: ${customField}\n\n${jobDescription}` 
+      : jobDescription;
 
     try {
       const formData = new FormData();
       formData.set('file', selectedFile);
       formData.set('category', category);
-      formData.set('field', field);
+      formData.set('field', actualFieldId);
       formData.set('experienceLevel', experienceLevel);
-      formData.set('jobDescription', jobDescription);
+      formData.set('jobDescription', actualJobDescription);
 
       const response = await fetch('/api/ai-review/analyze', {
         method: 'POST',
@@ -358,12 +377,14 @@ export default function AiReviewDashboard({
         setStep={setStep}
         category={category}
         field={field}
+        customField={customField}
         experienceLevel={experienceLevel}
         jobDescription={jobDescription}
         selectedFile={selectedFile}
         fieldsForCategory={fieldsForCategory}
         onCategorySelect={handleCategorySelect}
         onFieldSelect={setField}
+        onCustomFieldChange={setCustomField}
         onExperienceSelect={setExperienceLevel}
         onJobDescriptionChange={setJobDescription}
         onStart={startReview} />
@@ -419,18 +440,20 @@ function ReviewWizard(props: {
   step: number;
   setStep: (step: number) => void;
   category: ReviewCategoryId;
-  field: ReviewFieldId;
+  field: ReviewFieldId | 'custom';
+  customField: string;
   experienceLevel: ExperienceLevelId;
   jobDescription: string;
   selectedFile: File | null;
   fieldsForCategory: typeof AI_REVIEW_ONTOLOGY.fields;
   onCategorySelect: (category: ReviewCategoryId) => void;
-  onFieldSelect: (field: ReviewFieldId) => void;
+  onFieldSelect: (field: ReviewFieldId | 'custom') => void;
+  onCustomFieldChange: (value: string) => void;
   onExperienceSelect: (level: ExperienceLevelId) => void;
   onJobDescriptionChange: (value: string) => void;
   onStart: () => void;
 }) {
-  const canGoNext = props.step === 0 ? Boolean(props.category) : props.step === 1 ? Boolean(props.field) : true;
+  const canGoNext = props.step === 0 ? Boolean(props.category) : props.step === 1 ? (props.field === 'custom' ? Boolean(props.customField.trim()) : Boolean(props.field)) : true;
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -496,7 +519,30 @@ function ReviewWizard(props: {
                     {item.label}
                   </button>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => props.onFieldSelect('custom')}
+                  className={`rounded-full border px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition ${
+                    props.field === 'custom'
+                      ? 'border-blue-200 bg-blue-50 text-[#111827] shadow-lg'
+                      : 'border-gray-200 bg-transparent text-gray-600 hover:border-blue-200 hover:text-[#111827]'
+                  }`}
+                >
+                  {'Other / Custom'}
+                </button>
               </div>
+              {props.field === 'custom' && (
+                <div className="mt-6 flex justify-center animate-in fade-in slide-in-from-top-2">
+                  <input
+                    type="text"
+                    value={props.customField}
+                    onChange={(e) => props.onCustomFieldChange(e.target.value)}
+                    placeholder="Enter your specific field (e.g. Graphic Designer)"
+                    className="w-full max-w-sm rounded-xl border border-gray-300 px-4 py-3 text-sm sm:text-base shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    autoFocus
+                  />
+                </div>
+              )}
             </div>
           ) : null}
 
@@ -630,8 +676,8 @@ function AnalyzingOverlay({
     return () => window.clearInterval(interval);
   }, [lines.length]);
 
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
+  const overlay = (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
       <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-200 dark:bg-slate-800">
         <div className="h-full bg-gradient-to-r from-slate-900 via-blue-600 to-emerald-500 transition-all duration-500 dark:from-slate-100  dark:to-emerald-400" style={{ width: `${progress}%` }} />
       </div>
@@ -651,6 +697,11 @@ function AnalyzingOverlay({
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(overlay, document.body);
+  }
+  return overlay;
 }
 
 function FixingOverlay({}: {}) {

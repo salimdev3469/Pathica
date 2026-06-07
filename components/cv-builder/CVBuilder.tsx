@@ -469,7 +469,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
             <input
               value={state.title}
               onChange={(e) => dispatch({ type: 'UPDATE_TITLE', payload: e.target.value })}
-              className="w-full min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-b-2 border-transparent bg-transparent pb-1 text-2xl font-bold leading-tight outline-none transition-colors hover:border-slate-200 focus:border-primary sm:text-3xl md:text-4xl xl:text-5xl"
+              className="w-full min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-b-2 border-transparent bg-transparent pb-1 text-xl font-bold leading-tight outline-none transition-colors hover:border-slate-200 focus:border-primary sm:text-2xl md:text-3xl"
               placeholder={'CV Title'}
             />
             <p className="mt-2 text-lg leading-relaxed text-slate-500">{'Build your ATS-friendly CV by filling the info and adding sub-sections below. Drag-and-drop to reorder in the preview!'}</p>
