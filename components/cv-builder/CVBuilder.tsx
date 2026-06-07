@@ -339,7 +339,6 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
     shouldRestoreGuestDraft,
     state,
     templateSlug,
-    t,
   ]);
 
   const handleBack = () => {
