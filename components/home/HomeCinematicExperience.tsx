@@ -1190,22 +1190,30 @@ function QuoteSlide({
   density: ViewportDensity;
   activeQuoteIndex: number;
 }) {
-  const [localIndex, setLocalIndex] = useState(activeQuoteIndex);
+  const [localIndex, setLocalIndex] = useState(activeQuoteIndex || 0);
+  const [isMobile, setIsMobile] = useState(false);
   
   useEffect(() => {
-    setLocalIndex(activeQuoteIndex);
+    setLocalIndex(activeQuoteIndex || 0);
   }, [activeQuoteIndex]);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || window.innerWidth >= 1024) return;
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
     const interval = setInterval(() => {
-      setLocalIndex((prev) => (prev + 1) % quote.entries.length);
+      setLocalIndex((prev) => (prev + 1) % (quote?.entries?.length || 1));
     }, 4000);
     return () => clearInterval(interval);
-  }, [quote.entries.length]);
+  }, [isMobile, quote?.entries?.length]);
 
-  const displayIndex = typeof window !== 'undefined' && window.innerWidth >= 1024 ? activeQuoteIndex : localIndex;
-  const activeEntry = quote.entries[displayIndex] ?? quote.entries[0];
+  const displayIndex = isMobile ? localIndex : (activeQuoteIndex || 0);
+  const activeEntry = quote?.entries?.[displayIndex] ?? quote?.entries?.[0];
 
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden">
