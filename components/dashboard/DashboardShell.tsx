@@ -33,8 +33,8 @@ export default function DashboardShell({
   children
 }: DashboardShellProps) {
   return (
-    <div className="min-h-screen bg-[#FFF8F1] text-[#171717] selection:bg-[#FFD6BA]">
-      <header className="border-b border-[#EAE2DA] bg-white/60 backdrop-blur-md sticky top-0 z-40">
+    <div className="min-h-screen bg-[#FAFAFA] text-[#111827] selection:bg-blue-100">
+      <header className="border-b border-[#E5E7EB] bg-white/60 backdrop-blur-md sticky top-0 z-40">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-4 sm:px-6">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
             <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
@@ -53,21 +53,21 @@ export default function DashboardShell({
               {userName || userEmail ? (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="flex items-center gap-2 rounded-full border border-[#EAE2DA] bg-white pl-3 pr-2 py-1.5 shadow-sm transition hover:border-[#FFD6BA] hover:bg-[#FFF0E5]">
-                      <span className="max-w-[120px] truncate text-sm font-semibold text-[#171717]">
+                    <button className="flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white pl-3 pr-2 py-1.5 shadow-sm transition hover:border-blue-200 hover:bg-blue-50">
+                      <span className="max-w-[120px] truncate text-sm font-semibold text-[#111827]">
                         {userName || userEmail}
                       </span>
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FFF0E5] text-[#FF6B1A]">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-blue-600">
                         <User className="h-3 w-3" />
                       </div>
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent align="end" className="w-48 rounded-xl border border-[#EAE2DA] bg-white p-2 shadow-lg">
+                  <PopoverContent align="end" className="w-48 rounded-xl border border-[#E5E7EB] bg-white p-2 shadow-lg">
                     <div className="mb-2 px-2 py-1.5">
-                      <p className="text-xs font-medium text-[#6B7280]">Signed in as</p>
-                      <p className="truncate text-sm font-bold text-[#171717]">{userEmail}</p>
+                      <p className="text-xs font-medium text-[#4B5563]">Signed in as</p>
+                      <p className="truncate text-sm font-bold text-[#111827]">{userEmail}</p>
                     </div>
-                    <div className="h-px w-full bg-[#EAE2DA] my-1" />
+                    <div className="h-px w-full bg-[#E5E7EB] my-1" />
                     <LogoutButton
                       className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50" 
                     >
@@ -78,14 +78,14 @@ export default function DashboardShell({
                 </Popover>
               ) : (
                 <LogoutButton
-                  className="rounded-full border border-[#EAE2DA] bg-white px-4 py-2 text-sm font-semibold text-[#171717] transition hover:bg-[#FFF0E5] hover:text-[#FF6B1A]" 
+                  className="rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-semibold text-[#111827] transition hover:bg-blue-50 hover:text-blue-600" 
                 />
               )}
             </div>
           </div>
 
           <nav className="flex items-center justify-center gap-2 sm:justify-start">
-            <div className="flex items-center rounded-full bg-white p-1 shadow-sm border border-[#EAE2DA]">
+            <div className="flex items-center rounded-full bg-white p-1 shadow-sm border border-[#E5E7EB]">
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.id === active;
@@ -95,8 +95,8 @@ export default function DashboardShell({
                     href={item.href}
                     className={`flex h-9 items-center gap-2 rounded-full px-4 text-sm font-bold transition-all ${
                       isActive
-                        ? 'bg-[#FFF0E5] text-[#FF6B1A] shadow-sm'
-                        : 'text-[#6B7280] hover:bg-slate-50 hover:text-[#171717]'
+                        ? 'bg-blue-50 text-blue-600 shadow-sm'
+                        : 'text-[#4B5563] hover:bg-slate-50 hover:text-[#111827]'
                     }`}
                   >
                     <Icon className="h-4 w-4" />

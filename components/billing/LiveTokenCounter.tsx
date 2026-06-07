@@ -73,8 +73,8 @@ export default function LiveTokenCounter({
 
   if (compact) {
     return (
-      <div className="inline-flex h-9 items-center gap-2 rounded-full border border-[#EAE2DA] bg-white px-3 text-[#171717] shadow-sm transition hover:bg-slate-50" title={'Available credits'}>
-        <Coins className="h-4 w-4 text-[#FF6B1A]" />
+      <div className="inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 bg-white px-3 text-[#111827] shadow-sm transition hover:bg-slate-50" title={'Available credits'}>
+        <Coins className="h-4 w-4 text-blue-600" />
         <span className="text-sm font-bold tabular-nums">
           {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : formatter.format(credits)}
         </span>
@@ -84,21 +84,21 @@ export default function LiveTokenCounter({
 
   return (
     <div className="flex min-w-0 flex-wrap items-center gap-2">
-      <div className="inline-flex h-9 items-center gap-2 rounded-full border border-[#EAE2DA] bg-white px-3 text-[#171717] shadow-sm">
-        <Coins className="h-4 w-4 text-[#6B7280]" />
-        <span className="text-xs font-semibold text-[#6B7280]">{'Credits'}</span>
-        <span className="text-sm font-bold tabular-nums text-[#171717]">
+      <div className="inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 bg-white px-3 text-[#111827] shadow-sm">
+        <Coins className="h-4 w-4 text-blue-600" />
+        <span className="text-xs font-semibold text-gray-600">{'Credits'}</span>
+        <span className="text-sm font-bold tabular-nums text-[#111827]">
           {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : formatter.format(credits)}
         </span>
       </div>
-      <div className="inline-flex h-9 items-center gap-2 rounded-full border border-[#EAE2DA] bg-white px-3 text-[#171717] shadow-sm">
-        <Download className="h-4 w-4 text-[#6B7280]" />
-        <span className="text-xs font-semibold text-[#6B7280]">{'Exports'}</span>
-        <span className="text-sm font-bold tabular-nums text-[#171717]">
+      <div className="inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 bg-white px-3 text-[#111827] shadow-sm">
+        <Download className="h-4 w-4 text-blue-600" />
+        <span className="text-xs font-semibold text-gray-600">{'Exports'}</span>
+        <span className="text-sm font-bold tabular-nums text-[#111827]">
           {isLoading ? '-' : formatter.format(freeExports)}
         </span>
       </div>
-      <div className="inline-flex h-9 cursor-pointer items-center justify-center rounded-full border border-[#FFD6BA] bg-[#FFF0E5] px-4 text-xs font-bold text-[#FF6B1A] transition hover:bg-[#FFD6BA]">
+      <div className="inline-flex h-9 cursor-pointer items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-4 text-xs font-bold text-blue-600 transition hover:bg-blue-100">
         <Plus className="mr-1.5 h-3.5 w-3.5" />
         {'Upgrade'}
       </div>

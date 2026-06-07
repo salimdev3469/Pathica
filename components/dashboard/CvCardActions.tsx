@@ -140,11 +140,11 @@ export default function CvCardActions({
             <div className="flex flex-col gap-2 mt-4">
                 <Button
                     variant="outline"
-                    className="h-10 w-full rounded-xl border border-[#EAE2DA] bg-white text-[#171717] shadow-sm transition hover:bg-slate-50 hover:border-[#FFD6BA] text-sm font-bold"
+                    className="h-10 w-full rounded-xl border border-gray-200 bg-white text-[#111827] shadow-sm transition hover:bg-slate-50 hover:border-blue-200 text-sm font-bold"
                     asChild
                 >
                     <Link href={`/cv/${cvId}`}>
-                        <Edit2 className="mr-2 h-4 w-4 text-[#FF6B1A]" /> {'Open Editor'}
+                        <Edit2 className="mr-2 h-4 w-4 text-blue-600" /> {'Open Editor'}
                     </Link>
                 </Button>
 
@@ -152,7 +152,7 @@ export default function CvCardActions({
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 flex-1 min-w-0 justify-center rounded-lg border-[#EAE2DA] bg-white px-2 text-[11px] font-semibold text-[#6B7280] shadow-sm transition hover:bg-slate-50 hover:text-[#171717] sm:text-xs"
+                        className="h-9 flex-1 min-w-0 justify-center rounded-lg border-gray-200 bg-white px-2 text-[11px] font-semibold text-gray-600 shadow-sm transition hover:bg-slate-50 hover:text-[#111827] sm:text-xs"
                         onClick={handleDownload}
                         disabled={isDownloading}
                         title={'Download PDF'}
@@ -168,7 +168,7 @@ export default function CvCardActions({
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 flex-1 min-w-0 justify-center rounded-lg border-[#EAE2DA] bg-white px-2 text-[11px] font-semibold text-[#6B7280] shadow-sm transition hover:bg-slate-50 hover:text-[#171717] sm:text-xs"
+                        className="h-9 flex-1 min-w-0 justify-center rounded-lg border-gray-200 bg-white px-2 text-[11px] font-semibold text-gray-600 shadow-sm transition hover:bg-slate-50 hover:text-[#111827] sm:text-xs"
                         onClick={openPreview}
                         disabled={isPreviewLoading}
                         title={'Preview'}
@@ -186,13 +186,13 @@ export default function CvCardActions({
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-9 shrink-0 p-0 justify-center rounded-lg border-[#EAE2DA] bg-white text-[#6B7280] shadow-sm transition hover:bg-slate-50 hover:text-[#171717]"
+                                className="h-9 w-9 shrink-0 p-0 justify-center rounded-lg border-gray-200 bg-white text-gray-600 shadow-sm transition hover:bg-slate-50 hover:text-[#111827]"
                                 title="More actions"
                             >
                                 <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent align="end" className="w-40 rounded-xl border border-[#EAE2DA] bg-white p-1.5 shadow-lg">
+                        <PopoverContent align="end" className="w-40 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg">
                             <Button
                                 type="button"
                                 variant="ghost"

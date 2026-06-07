@@ -115,18 +115,18 @@ export default async function DashboardPage() {
       wallet={wallet}
       billingSchemaMissing={billingSchemaMissing}>
       
-      <section className="mb-7 rounded-2xl border border-[#EAE2DA] bg-white p-6 sm:p-8 shadow-sm">
+      <section className="mb-7 rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#171717]">{'Your career workspace'}</h1>
-            <p className="mt-2 text-base text-[#6B7280]">
+            <h1 className="text-3xl font-black tracking-tight text-[#111827]">{'Your career workspace'}</h1>
+            <p className="mt-2 text-base text-gray-600">
               {'Create, improve and export job-ready resumes in minutes.'}
             </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <GenerateCvFromJobButton triggerClassName="h-12 w-full sm:w-auto rounded-xl bg-[#FF6B1A] px-6 text-base text-white font-bold hover:bg-[#E85D0F] shadow-lg shadow-[#FF6B1A]/20 transition" />
-            <Button asChild className="h-12 gap-2 rounded-xl border border-[#EAE2DA] bg-white px-6 text-base text-[#171717] font-semibold hover:bg-slate-50 transition">
+            <GenerateCvFromJobButton triggerClassName="h-12 w-full sm:w-auto rounded-xl bg-blue-600 px-6 text-base text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition" />
+            <Button asChild className="h-12 gap-2 rounded-xl border border-gray-200 bg-white px-6 text-base text-[#111827] font-semibold hover:bg-slate-50 transition">
               <Link href="/cv/new">
                 <Plus className="h-4 w-4" /> {'New CV'}
               </Link>
@@ -136,16 +136,16 @@ export default async function DashboardPage() {
       </section>
 
       {firstCv && (
-        <section className="mb-7 rounded-2xl border border-[#EAE2DA] bg-white p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <section className="mb-7 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <p className="text-sm font-bold text-[#FF6B1A] mb-1">Recommended next step</p>
-            <p className="text-base font-medium text-[#171717]">
+            <p className="text-sm font-bold text-blue-600 mb-1">Recommended next step</p>
+            <p className="text-base font-medium text-[#111827]">
               {firstCvAts?.score !== null
                 ? `Your latest CV has an ATS score of ${firstCvAts.score}. Improve it to 80+ before applying.`
                 : 'Review your latest CV to discover what can be improved.'}
             </p>
           </div>
-          <Button asChild className="h-10 shrink-0 rounded-xl bg-[#FFF0E5] text-[#FF6B1A] hover:bg-[#FFD6BA] font-bold">
+          <Button asChild className="h-10 shrink-0 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold">
             <Link href={`/dashboard/ai-review`}>
               {firstCvAts?.score !== null ? 'Improve with AI' : 'Get ATS Score'}
             </Link>
@@ -153,20 +153,20 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      <section className="mb-7 overflow-hidden rounded-2xl bg-[#FFF0E5] border border-[#FFD6BA]">
+      <section className="mb-7 overflow-hidden rounded-2xl bg-gray-900 border border-gray-800">
         <div className="flex flex-col sm:flex-row items-center justify-between p-5 sm:p-6">
           <div className="flex items-start sm:items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-[#FF6B1A] shadow-sm">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 text-white shadow-sm">
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-base font-bold text-[#171717]">
+              <p className="text-base font-bold text-white">
                 {'Store unlimited resumes and share them with one Pathica link.'}
               </p>
             </div>
           </div>
           <div className="mt-4 sm:mt-0 shrink-0">
-            <div className="inline-flex items-center rounded-full border border-[#FFD6BA] bg-white px-3 py-1 text-xs font-bold tracking-wide text-[#FF6B1A]">
+            <div className="inline-flex items-center rounded-full border border-gray-700 bg-white/5 px-3 py-1 text-xs font-bold tracking-wide text-gray-300">
               {'Always Free'}
             </div>
           </div>
@@ -182,16 +182,16 @@ export default async function DashboardPage() {
             return (
               <Card
                 key={cv.id}
-                className="group flex flex-col rounded-2xl border-[#EAE2DA] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#FFD6BA]"
+                className="group flex flex-col rounded-2xl border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-blue-200"
               >
                 <CardHeader className="flex-1">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <CardTitle className="min-w-0 flex-1 text-xl leading-tight text-[#171717]">
+                    <CardTitle className="min-w-0 flex-1 text-xl leading-tight text-[#111827]">
                       <span className="block break-words pr-1 [overflow-wrap:anywhere]">{cv.title}</span>
                     </CardTitle>
                     <CvShareActions cvId={cv.id} cvTitle={cv.title} atsScore={ats.score} />
                   </div>
-                  <CardDescription className="flex items-center gap-1 text-[#6B7280]">
+                  <CardDescription className="flex items-center gap-1 text-gray-600">
                     <Calendar className="h-3 w-3" />
                     {'Updated'} {formatDistanceToNow(new Date(cv.updated_at))} {'ago'}
                   </CardDescription>
@@ -208,12 +208,12 @@ export default async function DashboardPage() {
                         </div>
                       </div>
                     ) : (
-                      <span className="inline-flex items-center rounded-full border border-[#EAE2DA] bg-slate-50 px-2.5 py-1 text-xs font-semibold text-[#6B7280]">
+                      <span className="inline-flex items-center rounded-full border border-gray-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-gray-600">
                         Not reviewed yet
                       </span>
                     )}
                     {localizedReason ? (
-                      <div className="mt-3 text-sm text-[#6B7280]">
+                      <div className="mt-3 text-sm text-gray-600">
                         <AtsReason reason={localizedReason} />
                       </div>
                     ) : null}
@@ -227,18 +227,18 @@ export default async function DashboardPage() {
           })}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#EAE2DA] bg-white py-20 shadow-sm">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#FFF0E5] text-[#FF6B1A]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-20 shadow-sm">
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-blue-600">
             <FileText className="h-10 w-10" />
           </div>
-          <h3 className="mb-2 text-xl font-bold text-[#171717]">{'Your next application starts here'}</h3>
-          <p className="mb-6 max-w-sm text-center text-[#6B7280]">
+          <h3 className="mb-2 text-xl font-bold text-[#111827]">{'Your next application starts here'}</h3>
+          <p className="mb-6 max-w-sm text-center text-gray-600">
             {'Create a job-ready CV in minutes.'}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <GenerateCvFromJobButton
-              triggerClassName="h-12 w-full sm:w-auto rounded-xl bg-[#FF6B1A] px-6 text-white font-bold hover:bg-[#E85D0F] shadow-lg shadow-[#FF6B1A]/20 transition" />
-            <Button asChild className="h-12 rounded-xl border border-[#EAE2DA] bg-white px-6 text-[#171717] font-bold hover:bg-slate-50 transition">
+              triggerClassName="h-12 w-full sm:w-auto rounded-xl bg-blue-600 px-6 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition" />
+            <Button asChild className="h-12 rounded-xl border border-gray-200 bg-white px-6 text-[#111827] font-bold hover:bg-slate-50 transition">
               <Link href="/cv/new">
                 <Plus className="mr-2 h-5 w-5" /> {'Create Your First CV'}
               </Link>

@@ -262,19 +262,19 @@ export default function AiReviewDashboard({
 
   return (
     <div className="space-y-7">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-sm sm:p-8">
+      <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
 
-            <h1 className="text-4xl font-bold tracking-tight text-white">{'AI Resume Review'}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
+            <h1 className="text-4xl font-bold tracking-tight text-[#111827]">{'AI Resume Review'}</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
               {'Free analysis uses file extraction, schema normalization, ontology mapping, and weighted mathematical scoring. LLM is only used for paid CV fixes.'}
             </p>
           </div>
           <div className="shrink-0">
             <Button
               onClick={openFilePicker}
-              className="h-11 rounded-xl bg-orange-600 px-6 font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-xl"
+              className="h-11 rounded-xl bg-blue-600 px-6 font-semibold text-[#111827] shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl"
             >
               <Plus className="mr-2 h-4 w-4" /> {'New Review'}
             </Button>
@@ -289,15 +289,15 @@ export default function AiReviewDashboard({
       </section>
       {activeReview ? (
         <section className="flex flex-col gap-5 xl:flex-row">
-          <div className="w-full xl:w-[45%] shrink-0 rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
+          <div className="w-full xl:w-[45%] shrink-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div className="flex min-w-0 flex-1 items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-white/50">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gray-50 text-gray-500">
                   <FileText className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-bold text-white">{activeReview.fileName}</h3>
-                  <p className="text-xs text-white/50">{new Date(activeReview.createdAt).toLocaleDateString(false ? 'tr-TR' : 'en-US')}</p>
+                  <h3 className="truncate font-bold text-[#111827]">{activeReview.fileName}</h3>
+                  <p className="text-xs text-gray-500">{new Date(activeReview.createdAt).toLocaleDateString(false ? 'tr-TR' : 'en-US')}</p>
                 </div>
               </div>
               <span className="shrink-0 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">Ready</span>
@@ -312,13 +312,13 @@ export default function AiReviewDashboard({
             fixCreditCost={fixCreditCost} />
         </section>
       ) : null}
-      <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 shadow-sm">
+      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
               <FileText className="h-5 w-5" />
             </div>
-            <h2 className="text-lg font-bold text-white">{'Review History'}</h2>
+            <h2 className="text-lg font-bold text-[#111827]">{'Review History'}</h2>
           </div>
         </div>
 
@@ -331,22 +331,22 @@ export default function AiReviewDashboard({
                 onClick={() => setActiveReview(review)}
                 className={`rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${
                   activeReview?.id === review.id
-                    ? 'border-orange-500/40 bg-orange-500/10'
-                    : 'border-white/10 bg-white/5 hover:bg-white/10'
+                    ? 'border-blue-200 bg-blue-50'
+                    : 'border-gray-200 bg-gray-50 hover:bg-blue-50'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-bold text-white">{review.fileName}</p>
-                    <p className="mt-1 text-xs text-white/50">{review.headline}</p>
+                    <p className="font-bold text-[#111827]">{review.fileName}</p>
+                    <p className="mt-1 text-xs text-gray-500">{review.headline}</p>
                   </div>
-                  <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-bold text-white">{review.score}/100</span>
+                  <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-[#111827]">{review.score}/100</span>
                 </div>
               </button>
             ))}
           </div>
         ) : (
-          <p className="rounded-2xl border border-dashed border-white/20 p-8 text-center text-sm text-white/50">
+          <p className="rounded-2xl border border-dashed border-gray-200 p-8 text-center text-sm text-gray-500">
             {'Upload your first resume to create a deterministic review.'}
           </p>
         )}
@@ -399,15 +399,15 @@ function MetricCard({
   const toneClasses = {
     emerald: 'bg-emerald-500/10 text-emerald-500',
     slate: 'bg-slate-900/10 text-slate-800 dark:bg-slate-100/10 dark:text-slate-200',
-    blue: 'bg-orange-500/10 text-orange-500',
+    blue: 'bg-blue-50 text-blue-600',
     amber: 'bg-amber-500/10 text-amber-500',
   };
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] p-8 shadow-sm text-center">
-      <p className="mb-2 text-sm font-semibold text-white/60">{label}</p>
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+      <p className="mb-2 text-sm font-semibold text-gray-500">{label}</p>
       <div className="flex items-end justify-center gap-2">
-        <span className="text-5xl font-black tracking-tight text-white">{value}</span>
+        <span className="text-5xl font-black tracking-tight text-[#111827]">{value}</span>
         <span className="pb-1 text-sm font-semibold text-emerald-400">{hint}</span>
       </div>
     </div>
@@ -435,8 +435,8 @@ function ReviewWizard(props: {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-zinc-950 p-0 text-white sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-2xl">
-        <DialogHeader className="shrink-0 border-b border-white/10 p-4 sm:p-8">
+      <DialogContent className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white p-0 text-[#111827] sm:h-[92vh] sm:max-h-[92vh] sm:w-[94vw] sm:max-w-6xl sm:rounded-2xl sm:border sm:border-gray-200 sm:shadow-2xl">
+        <DialogHeader className="shrink-0 border-b border-gray-200 p-4 sm:p-8">
           <DialogTitle className="text-2xl sm:text-3xl font-black">{'AI Resume Review'}</DialogTitle>
           <DialogDescription className="text-sm sm:text-base">{wizardSubtitle(props.step, props.locale)}</DialogDescription>
         </DialogHeader>
@@ -445,7 +445,7 @@ function ReviewWizard(props: {
           <StepIndicator step={props.step} />
 
           {props.selectedFile ? (
-            <div className="mx-auto mb-6 sm:mb-8 max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs sm:text-sm text-white/70">
+            <div className="mx-auto mb-6 sm:mb-8 max-w-2xl rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs sm:text-sm text-gray-600">
               <FileText className="mr-2 inline h-4 w-4" />
               {props.selectedFile.name} · {(props.selectedFile.size / 1024 / 1024).toFixed(2)} MB
             </div>
@@ -463,15 +463,15 @@ function ReviewWizard(props: {
                     onClick={() => props.onCategorySelect(item.id)}
                     className={`rounded-2xl border p-4 sm:p-7 text-center transition hover:-translate-y-0.5 hover:shadow-lg ${
                       isSelected
-                        ? 'border-white/30 bg-white/10 text-white shadow-xl'
-                        : 'border-white/10 bg-white/[0.02] hover:bg-white/5'
+                        ? 'border-blue-200 bg-blue-50 text-[#111827] shadow-xl'
+                        : 'border-gray-200 bg-white hover:bg-gray-50'
                     }`}
                   >
-                    <div className="mx-auto mb-3 sm:mb-5 flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl bg-white/5 text-white/50 shadow-sm">
+                    <div className="mx-auto mb-3 sm:mb-5 flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl bg-gray-50 text-gray-500 shadow-sm">
                       <Icon className="h-7 w-7 sm:h-9 sm:w-9" />
                     </div>
-                    <h3 className="text-lg sm:text-xl font-black text-white">{item.label}</h3>
-                    <p className={`mt-1 sm:mt-2 text-xs sm:text-sm ${isSelected ? 'text-white/80' : 'text-white/50'}`}>{item.description}</p>
+                    <h3 className="text-lg sm:text-xl font-black text-[#111827]">{item.label}</h3>
+                    <p className={`mt-1 sm:mt-2 text-xs sm:text-sm ${isSelected ? 'text-gray-700' : 'text-gray-500'}`}>{item.description}</p>
                   </button>
                 );
               })}
@@ -490,8 +490,8 @@ function ReviewWizard(props: {
                     onClick={() => props.onFieldSelect(item.id)}
                     className={`rounded-full border px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold transition ${
                       props.field === item.id
-                        ? 'border-white/30 bg-white/10 text-white shadow-lg'
-                        : 'border-white/10 bg-transparent text-white/70 hover:border-white/30 hover:text-white'
+                        ? 'border-blue-200 bg-blue-50 text-[#111827] shadow-lg'
+                        : 'border-gray-200 bg-transparent text-gray-600 hover:border-blue-200 hover:text-[#111827]'
                     }`}
                   >
                     {item.label}
@@ -503,34 +503,34 @@ function ReviewWizard(props: {
 
           {props.step === 2 ? (
             <div className="mx-auto max-w-5xl">
-              <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3">
                 {AI_REVIEW_ONTOLOGY.experienceLevels.map((level) => (
                   <button
                     key={level.id}
                     type="button"
                     onClick={() => props.onExperienceSelect(level.id)}
-                    className={`min-w-28 sm:min-w-32 rounded-2xl border px-4 sm:px-6 py-3 sm:py-4 text-center transition ${
+                    className={`w-full sm:w-auto sm:min-w-32 rounded-2xl border px-4 sm:px-6 py-4 text-center transition flex flex-col items-center justify-center ${
                       props.experienceLevel === level.id
-                        ? 'border-white/30 bg-white/10 text-white shadow-lg'
-                        : 'border-white/10 bg-transparent text-white/70 hover:border-white/30 hover:text-white'
+                        ? 'border-blue-200 bg-blue-50 text-blue-600 shadow-sm'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50'
                     }`}
                   >
                     <span className="block text-base sm:text-lg font-black">{level.label}</span>
-                    <span className="text-xs sm:text-sm opacity-70">{level.range}</span>
+                    <span className="text-xs sm:text-sm font-medium">{level.range}</span>
                   </button>
                 ))}
               </div>
 
               <label className="mt-6 sm:mt-9 block">
                 <span className="mb-2 sm:mb-3 flex items-center gap-2 text-base sm:text-lg font-bold">
-                  <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-blue-300" />
+                  <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-300" />
                   {'Add job description (optional)'}
                 </span>
                 <textarea
                   value={props.jobDescription}
                   onChange={(event) => props.onJobDescriptionChange(event.target.value)}
                   rows={5}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 text-sm text-white outline-none transition focus:border-white/30 focus:ring-4 focus:ring-white/10 placeholder:text-white/30"
+                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 p-3 sm:p-4 text-sm text-[#111827] outline-none transition focus:border-blue-200 focus:ring-4 focus:ring-white/10 placeholder:text-[#111827]/30"
                   placeholder={'Paste the job description to score keyword coverage mathematically.'}
                 />
               </label>
@@ -538,13 +538,13 @@ function ReviewWizard(props: {
           ) : null}
         </div>
 
-        <div className="shrink-0 border-t border-white/10 bg-zinc-950 p-4 shadow-[0_-12px_30px_rgba(0,0,0,0.5)] sm:p-7">
+        <div className="shrink-0 border-t border-gray-200 bg-white p-4 shadow-[0_-12px_30px_rgba(0,0,0,0.5)] sm:p-7">
           <div className="flex items-center justify-between gap-3">
             <Button
               variant="outline"
               onClick={() => props.setStep(Math.max(0, props.step - 1))}
               disabled={props.step === 0}
-              className="h-10 sm:h-12 rounded-xl px-4 sm:px-5 border-white/10 bg-transparent text-sm sm:text-base text-white hover:bg-white/10"
+              className="h-10 sm:h-12 rounded-xl px-4 sm:px-5 border-gray-200 bg-transparent text-sm sm:text-base text-[#111827] hover:bg-blue-50"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               {'Back'}
@@ -554,15 +554,15 @@ function ReviewWizard(props: {
               <Button
                 onClick={() => props.setStep(Math.min(2, props.step + 1))}
                 disabled={!canGoNext}
-                className="h-10 sm:h-12 rounded-xl bg-orange-600 px-6 sm:px-7 text-sm sm:text-base font-bold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-700"
+                className="h-10 sm:h-12 rounded-xl bg-blue-600 px-6 sm:px-7 text-sm sm:text-base font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700"
               >
                 {'Next'}
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-2 h-4 w-4 text-white" />
               </Button>
             ) : (
               <Button
                 onClick={props.onStart}
-                className="h-10 sm:h-12 rounded-xl bg-orange-600 px-6 sm:px-8 text-sm sm:text-base font-bold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-700"
+                className="h-10 sm:h-12 rounded-xl bg-blue-600 px-6 sm:px-8 text-sm sm:text-base font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700"
               >
                 {'Start Review'}
               </Button>
@@ -592,16 +592,16 @@ function StepIndicator({
               <div
                 className={`mx-auto flex h-10 w-10 sm:h-16 sm:w-16 items-center justify-center rounded-full text-lg sm:text-2xl font-black ${
                   isComplete || isActive
-                    ? 'bg-white text-slate-950 shadow-sm'
-                    : 'bg-white/5 text-white/30'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-400'
                 }`}
               >
-                {isComplete ? <Check className="h-5 w-5 sm:h-7 sm:w-7" /> : index + 1}
+                {isComplete ? <Check className="h-5 w-5 sm:h-7 sm:w-7 text-white" /> : index + 1}
               </div>
-              <p className={`mt-2 sm:mt-3 text-xs sm:text-sm font-bold ${isComplete || isActive ? 'text-white' : 'text-white/30'}`}>{label}</p>
+              <p className={`mt-2 sm:mt-3 text-xs sm:text-sm font-bold ${isComplete || isActive ? 'text-[#111827]' : 'text-[#111827]/30'}`}>{label}</p>
             </div>
             {index < labels.length - 1 ? (
-              <div className={`mx-2 sm:mx-5 h-1 w-8 sm:w-24 lg:w-36 rounded-full ${index < step ? 'bg-white' : 'bg-white/10'}`} />
+              <div className={`mx-2 sm:mx-5 h-1 w-8 sm:w-24 lg:w-36 rounded-full ${index < step ? 'bg-white' : 'bg-blue-50'}`} />
             ) : null}
           </div>
         );
@@ -637,7 +637,7 @@ function AnalyzingOverlay({
         <div className="h-full bg-gradient-to-r from-slate-900 via-orange-600 to-emerald-500 transition-all duration-500 dark:from-slate-100 dark:via-orange-400 dark:to-emerald-400" style={{ width: `${progress}%` }} />
       </div>
       <div className="flex flex-col items-center gap-6 text-center">
-        <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-600 dark:text-blue-300">
+        <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:text-blue-300">
           <Brain className="h-12 w-12 animate-pulse" />
           <div className="absolute inset-0 animate-ping rounded-2xl border border-orange-500/30" />
         </div>
@@ -696,17 +696,17 @@ function EmptyBenchmark({
   return (
     <div className="flex min-h-[390px] flex-col">
       <div className="mb-5 flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
           <TrendingUp className="h-5 w-5" />
         </div>
         <h2 className="text-lg font-bold text-slate-950 dark:text-slate-100">{'Industry Benchmark'}</h2>
       </div>
       <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-white/5 text-white/30">
+        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-gray-50 text-[#111827]/30">
           <TrendingUp className="h-8 w-8" />
         </div>
-        <p className="text-white/50">{'Complete an AI review to see how you compare'}</p>
-        <button type="button" onClick={onUpload} className="mt-6 font-bold text-white hover:text-white/80">
+        <p className="text-gray-500">{'Complete an AI review to see how you compare'}</p>
+        <button type="button" onClick={onUpload} className="mt-6 font-bold text-[#111827] hover:text-gray-700">
           {'Get your first review'} →
         </button>
       </div>
@@ -727,9 +727,9 @@ function ReviewSummary({
 
   return (
     <div className="flex min-h-[390px] flex-col">
-      <div className="rounded-2xl border border-orange-500/30 bg-orange-500/10 p-4">
+      <div className="rounded-2xl border border-orange-500/30 bg-blue-50 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-bold text-white">{"We'll help rebuild fast - unlock your job-ready plan"}</p>
+          <p className="font-bold text-[#111827]">{"We'll help rebuild fast - unlock your job-ready plan"}</p>
           <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-white text-slate-950 hover:bg-white/90">
             {isFixing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LockKeyhole className="mr-2 h-4 w-4" />}
             {'Fix CV'}
@@ -739,7 +739,7 @@ function ReviewSummary({
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <ScoreDonut score={review.score} />
         <h3 className={`mt-6 text-2xl font-black ${scoreTone}`}>{review.analysis.rating} - {review.headline}</h3>
-        <p className="mt-3 max-w-md text-sm text-white/50">
+        <p className="mt-3 max-w-md text-sm text-gray-500">
           {'Unlock deterministic findings into rewritten bullets, structure fixes, and a clean editable CV.'}
         </p>
       </div>
@@ -759,12 +759,12 @@ function ResultPanel({
   fixCreditCost: number;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 shadow-sm">
-      <div className="mb-7 rounded-2xl border border-orange-500/30 bg-orange-500/10 p-4">
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mb-7 rounded-2xl border border-orange-500/30 bg-blue-50 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-black text-white">{'Unlock Full Review'}</p>
-            <p className="text-sm text-white/50">{fixCreditCost} {'credits for a new fixed CV'}</p>
+            <p className="font-black text-[#111827]">{'Unlock Full Review'}</p>
+            <p className="text-sm text-gray-500">{fixCreditCost} {'credits for a new fixed CV'}</p>
           </div>
           <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-white px-5 text-slate-950 hover:bg-white/90">
             {isFixing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
@@ -774,11 +774,11 @@ function ResultPanel({
       </div>
       <div className="flex flex-col items-center">
         <ScoreDonut score={review.score} />
-        <h2 className="mt-6 text-center text-2xl font-black text-white">{review.analysis.rating}</h2>
-        <p className="mt-2 text-center text-sm text-white/50">{review.headline}</p>
+        <h2 className="mt-6 text-center text-2xl font-black text-[#111827]">{review.analysis.rating}</h2>
+        <p className="mt-2 text-center text-sm text-gray-500">{review.headline}</p>
       </div>
       <div className="mt-8">
-        <div className="mb-4 flex items-center gap-2 font-black text-white">
+        <div className="mb-4 flex items-center gap-2 font-black text-[#111827]">
           <BarChart3 className="h-5 w-5" />
           {'Category Breakdown'}
         </div>
@@ -788,28 +788,28 @@ function ResultPanel({
             const max = review.analysis.maxBreakdown[typedKey];
             return (
               <div key={key} className="grid grid-cols-[92px_1fr_56px] items-center gap-3 text-sm">
-                <span className="text-white/50">{BREAKDOWN_LABELS[typedKey]}</span>
-                <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
+                <span className="text-gray-500">{BREAKDOWN_LABELS[typedKey]}</span>
+                <div className="h-2.5 overflow-hidden rounded-full bg-blue-50">
                   <div className="h-full rounded-full bg-white" style={{ width: `${Math.round((value / max) * 100)}%` }} />
                 </div>
-                <span className="text-right font-bold text-white/80">{value}/{max}</span>
+                <span className="text-right font-bold text-gray-700">{value}/{max}</span>
               </div>
             );
           })}
         </div>
       </div>
       <div className="mt-8">
-        <h3 className="mb-3 font-black text-white">{'Deterministic Findings'}</h3>
+        <h3 className="mb-3 font-black text-[#111827]">{'Deterministic Findings'}</h3>
         <div className="space-y-3">
           {review.analysis.findings.slice(0, 6).map((finding) => (
-            <div key={finding.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div key={finding.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
               <div className="mb-1 flex items-center justify-between gap-3">
-                <p className="font-bold text-white">{finding.title}</p>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${finding.severity === 'critical' ? 'bg-rose-500/10 text-rose-500' : finding.severity === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                <p className="font-bold text-[#111827]">{finding.title}</p>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${finding.severity === 'critical' ? 'bg-rose-500/10 text-rose-500' : finding.severity === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-blue-50 text-blue-600'}`}>
                   {finding.severity}
                 </span>
               </div>
-              <p className="text-sm text-white/50">{finding.detail}</p>
+              <p className="text-sm text-gray-500">{finding.detail}</p>
             </div>
           ))}
         </div>
@@ -824,9 +824,9 @@ function ScoreDonut({ score }: { score: number }) {
       className="relative flex h-40 w-40 items-center justify-center rounded-full"
       style={{ background: `conic-gradient(#f97316 ${score * 3.6}deg, rgba(255,255,255,0.1) 0deg)` }}
     >
-      <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-zinc-950">
-        <span className="text-5xl font-black text-white">{score}</span>
-        <span className="text-sm font-semibold text-white/50">/ 100</span>
+      <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-white">
+        <span className="text-5xl font-black text-[#111827]">{score}</span>
+        <span className="text-sm font-semibold text-gray-500">/ 100</span>
       </div>
     </div>
   );
@@ -840,27 +840,27 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
     return (
       <>
         {/* Desktop View */}
-        <div className="hidden h-[620px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 md:block">
+        <div className="hidden h-[620px] overflow-hidden rounded-2xl border border-gray-200 bg-white md:block">
           <iframe src={`/api/ai-review/${review.id}/file`} className="h-full w-full border-0" title={review.fileName} />
         </div>
         
         {/* Mobile View Fallback */}
         <div className="flex flex-col gap-4 md:hidden">
-          <div className="flex items-center justify-between rounded-2xl border border-orange-500/30 bg-orange-500/10 p-4">
+          <div className="flex items-center justify-between rounded-2xl border border-orange-500/30 bg-blue-50 p-4">
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-orange-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-blue-600">
                 <FileText className="h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-bold text-white">Orijinal PDF</p>
-                <p className="truncate text-xs text-white/50">{review.fileName}</p>
+                <p className="truncate text-sm font-bold text-[#111827]">Orijinal PDF</p>
+                <p className="truncate text-xs text-gray-500">{review.fileName}</p>
               </div>
             </div>
             <a 
               href={`/api/ai-review/${review.id}/file`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="shrink-0 rounded-xl bg-orange-600 px-4 py-2 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-orange-700"
+              className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-[#111827] shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-700"
             >
               PDF'i Aç
             </a>
