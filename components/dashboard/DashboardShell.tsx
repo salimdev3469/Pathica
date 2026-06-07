@@ -44,15 +44,15 @@ export default function DashboardShell({
         </span>
       </div>
       <header className="border-b border-[#E5E7EB] bg-white/60 backdrop-blur-md sticky top-0 z-40">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-4 sm:px-6">
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 sm:gap-5 px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-row items-center justify-between gap-2 overflow-hidden">
             <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
-              <Image src="/logo_pathica.png" alt={'Pathica logo'} width={200} height={200} className="h-14 w-auto object-contain sm:h-16" />
+              <Image src="/logo_pathica.png" alt={'Pathica logo'} width={200} height={200} className="h-8 sm:h-14 lg:h-16 w-auto object-contain" />
             </Link>
 
-            <div className="flex w-full flex-wrap items-center justify-center gap-2 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
+            <div className="flex w-auto items-center justify-end gap-1.5 sm:gap-4 shrink-0 overflow-x-auto no-scrollbar pb-1 -mb-1">
               {wallet && (
-                <Link href="/billing" className="hover:opacity-90 transition-opacity">
+                <Link href="/billing" className="hover:opacity-90 transition-opacity shrink-0">
                   <LiveTokenCounter
                     initialCredits={wallet.creditBalance}
                     initialFreeExports={wallet.freeExportsRemaining}
@@ -62,12 +62,12 @@ export default function DashboardShell({
               {userName || userEmail ? (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white pl-3 pr-2 py-1.5 shadow-sm transition hover:border-blue-200 hover:bg-blue-50">
-                      <span className="max-w-[120px] truncate text-sm font-semibold text-[#111827]">
+                    <button className="flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-full border border-[#E5E7EB] bg-white pl-2 sm:pl-3 pr-1.5 sm:pr-2 py-1 sm:py-1.5 shadow-sm transition hover:border-blue-200 hover:bg-blue-50">
+                      <span className="max-w-[70px] sm:max-w-[120px] truncate text-[11px] sm:text-sm font-semibold text-[#111827]">
                         {userName || userEmail}
                       </span>
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-                        <User className="h-3 w-3" />
+                      <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                        <User className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </div>
                     </button>
                   </PopoverTrigger>
@@ -87,14 +87,14 @@ export default function DashboardShell({
                 </Popover>
               ) : (
                 <LogoutButton
-                  className="rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-semibold text-[#111827] transition hover:bg-blue-50 hover:text-blue-600" 
+                  className="rounded-full shrink-0 border border-[#E5E7EB] bg-white px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-sm font-semibold text-[#111827] transition hover:bg-blue-50 hover:text-blue-600" 
                 />
               )}
             </div>
           </div>
 
-          <nav className="flex items-center justify-center gap-2 sm:justify-start">
-            <div className="flex items-center rounded-full bg-white p-1 shadow-sm border border-[#E5E7EB]">
+          <nav className="flex items-center justify-center sm:justify-start overflow-x-auto no-scrollbar pb-1 -mb-1 w-full">
+            <div className="flex items-center rounded-full bg-white p-1 shadow-sm border border-[#E5E7EB] shrink-0">
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.id === active;
@@ -102,7 +102,7 @@ export default function DashboardShell({
                   <Link
                     key={item.id}
                     href={item.href}
-                    className={`flex h-9 items-center gap-1.5 sm:gap-2 rounded-full px-3 sm:px-4 text-xs sm:text-sm font-bold transition-all ${
+                    className={`flex h-9 items-center gap-1.5 sm:gap-2 rounded-full px-3 sm:px-4 text-[11px] sm:text-sm font-bold transition-all ${
                       isActive
                         ? 'bg-blue-50 text-blue-600 shadow-sm'
                         : 'text-[#4B5563] hover:bg-slate-50 hover:text-[#111827]'
