@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { useCV, Section, type CVState } from '@/context/CVContext';
 import { SectionCard } from './SectionCard';
 import { PersonalInfoForm } from './PersonalInfoForm';
-import { CvImportDialog } from './CvImportDialog';
+import { CvTailorDialog } from './CvTailorDialog';
 import { BuilderOnboardingModal } from './BuilderOnboardingModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -584,7 +584,7 @@ export function CVBuilder({ locale = 'en', onOpenPreview }: CVBuilderProps) {
               </Button>
             )}
             {isAuthenticated && (
-              <CvImportDialog />
+              <CvTailorDialog />
             )}
             {isAuthenticated && (
               <Button onClick={handleSave} disabled={isSaving} className="gap-2">

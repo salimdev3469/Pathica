@@ -10,6 +10,7 @@ import CvShareActions from '@/components/dashboard/CvShareActions';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import GenerateCvFromJobButton from '@/components/dashboard/GenerateCvFromJobButton';
 import DashboardWelcomeModal from '@/components/dashboard/DashboardWelcomeModal';
+import DashboardImportCvButton from '@/components/dashboard/DashboardImportCvButton';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { calculateKnowledgeBasedAts } from '@/lib/ats-knowledge-score';
@@ -126,6 +127,7 @@ export default async function DashboardPage() {
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <GenerateCvFromJobButton triggerClassName="h-12 w-full sm:w-auto rounded-xl bg-blue-600 px-6 text-base text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition" />
+            <DashboardImportCvButton className="w-full sm:w-auto" />
             <Button asChild className="h-12 gap-2 rounded-xl border border-gray-200 bg-white px-6 text-base text-[#111827] font-semibold hover:bg-slate-50 transition">
               <Link href="/cv/new">
                 <Plus className="h-4 w-4" /> {'New CV'}
@@ -141,13 +143,15 @@ export default async function DashboardPage() {
             <p className="text-sm font-bold text-blue-600 mb-1">Recommended next step</p>
             <p className="text-base font-medium text-[#111827]">
               {firstCvAts?.score !== null
-                ? `Your latest CV has an ATS score of ${firstCvAts.score}. Improve it to 80+ before applying.`
+                ? firstCvAts.score >= 80
+                  ? `Your latest CV has a Resume Strength score of ${firstCvAts.score}. You are ready to apply!`
+                  : `Your latest CV has a Resume Strength score of ${firstCvAts.score}. Improve it to 80+ before applying.`
                 : 'Review your latest CV to discover what can be improved.'}
             </p>
           </div>
           <Button asChild className="h-10 shrink-0 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold">
             <Link href={`/dashboard/ai-review`}>
-              {firstCvAts?.score !== null ? 'Improve with AI' : 'Get ATS Score'}
+              {firstCvAts?.score !== null ? 'Improve with AI' : 'Check Resume Strength'}
             </Link>
           </Button>
         </section>
@@ -182,7 +186,7 @@ export default async function DashboardPage() {
                       <div className="flex flex-col gap-2.5">
                         <div className="flex items-center">
                           <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ${getAtsScoreStyles(ats.score)}`}>
-                            ATS Score: {ats.score}/100
+                            Resume Strength: {ats.score}/100
                           </span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -220,6 +224,7 @@ export default async function DashboardPage() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <GenerateCvFromJobButton
               triggerClassName="h-12 w-full sm:w-auto rounded-xl bg-blue-600 px-6 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition" />
+            <DashboardImportCvButton className="w-full sm:w-auto" />
             <Button asChild className="h-12 rounded-xl border border-gray-200 bg-white px-6 text-[#111827] font-bold hover:bg-slate-50 transition">
               <Link href="/cv/new">
                 <Plus className="mr-2 h-5 w-5" /> {'Create Your First CV'}

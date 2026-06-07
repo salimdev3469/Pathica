@@ -110,7 +110,7 @@ export default async function SharedCvPage({ params, searchParams }: SharePagePr
               <h1 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{title}</h1>
               {score !== 'Pending' && (
                   <p className="mt-2 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                  ATS Score: {score}
+                  Resume Strength: {score}
                   </p>
               )}
           </div>

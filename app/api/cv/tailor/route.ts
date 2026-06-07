@@ -52,6 +52,7 @@ export async function POST(req: Request) {
     - Retain the exact same overall JSON structure.
     - Emphasize skills and experiences that align with the job description.
     - Rewrite achievements to use keywords from the job description naturally.
+    - Ensure all tailored and generated content is strictly in English.
     - Only return the valid JSON, with absolutely NO markdown formatting blocks like \`\`\`json. NO explanation.
 
     Job Description:

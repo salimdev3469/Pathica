@@ -292,7 +292,7 @@ export default function AiReviewDashboard({
           <div className="shrink-0">
             <Button
               onClick={openFilePicker}
-              className="h-11 rounded-xl bg-blue-600 px-6 font-semibold text-[#111827] shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl"
+              className="h-11 rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl"
             >
               <Plus className="mr-2 h-4 w-4" /> {'New Review'}
             </Button>
@@ -706,8 +706,8 @@ function AnalyzingOverlay({
 
 function FixingOverlay({}: {}) {
   const lines = false
-    ? ['CV yeniden yazılıyor...', 'Zayıf eylem fiilleri düzeltiliyor...', 'Anahtar kelimeler yerleştiriliyor...', 'ATS skoru maksimize ediliyor...']
-    : ['Rewriting your CV...', 'Fixing weak action verbs...', 'Injecting target keywords...', 'Maximizing ATS score...'];
+    ? ['CV yeniden yazılıyor...', 'Zayıf eylem fiilleri düzeltiliyor...', 'Anahtar kelimeler yerleştiriliyor...', 'ATS uyumu maksimize ediliyor...']
+    : ['Rewriting your CV...', 'Fixing weak action verbs...', 'Injecting target keywords...', 'Maximizing ATS match score...'];
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
