@@ -85,6 +85,9 @@ export default function CoverLetterBuilder({
         const text = generatedText.trim();
         if (!text) return;
 
+        const formattedText = text.replace(/\n/g, '<br>');
+        const safeName = userName?.replace(/\s+/g, '_') || 'Document';
+
         // Create a simple HTML document formatted for A4 printing/editing in Word
         const htmlContent = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
@@ -118,19 +121,19 @@ export default function CoverLetterBuilder({
                 <div class="header">
                     <div class="name">${userName || 'Your Name'}</div>
                 </div>
-                <div class="content">${text.replace(/\\n/g, '<br>')}</div>
+                <div class="content">${formattedText}</div>
             </body>
             </html>
         `;
 
-        const blob = new Blob(['\\ufeff', htmlContent], {
+        const blob = new Blob(['\ufeff', htmlContent], {
             type: 'application/msword'
         });
 
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = \`Cover_Letter_\${userName?.replace(/\\s+/g, '_') || 'Document'}.doc\`;
+        link.download = `Cover_Letter_${safeName}.doc`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
