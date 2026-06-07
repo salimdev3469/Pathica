@@ -65,17 +65,17 @@ export default async function CoverLettersDashboardPage() {
       userName={user.user_metadata?.full_name}
       wallet={wallet}
       billingSchemaMissing={billingSchemaMissing}>
-      <section className="mb-7 rounded-xl border border-white/10 bg-white/[0.02] p-5 shadow-sm sm:p-6">
+      <section className="mb-7 rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">{'My Cover Letters'}</h1>
-            <p className="mt-2 text-sm text-white/60">
+            <h1 className="text-3xl font-bold tracking-tight text-[#111827]">{'My Cover Letters'}</h1>
+            <p className="mt-2 text-sm text-gray-500">
               {'Create and manage personalized cover letters for your job applications.'}
             </p>
           </div>
           <Button
             asChild
-            className="h-11 gap-2 rounded-xl bg-orange-600 px-5 text-white shadow-lg shadow-orange-500/20 transition hover:-translate-y-0.5 hover:bg-orange-700"
+            className="h-11 gap-2 rounded-xl bg-blue-600 px-5 text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
           >
             <Link href="/cover-letter/new">
               <Plus className="h-4 w-4" /> {'New Cover Letter'}
@@ -88,13 +88,13 @@ export default async function CoverLettersDashboardPage() {
           {coverLetterList.map((coverLetter) => (
             <Card
               key={coverLetter.id}
-              className="group rounded-xl border-white/10 bg-white/[0.02] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group rounded-xl border-gray-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-blue-200"
             >
               <CardHeader>
-                <CardTitle className="text-xl text-white">
+                <CardTitle className="text-xl text-[#111827]">
                   <span className="truncate pr-2">{coverLetter.job_title || 'Untitled'}</span>
                 </CardTitle>
-                <CardDescription className="flex flex-col gap-1 text-white/60">
+                <CardDescription className="flex flex-col gap-1 text-gray-500">
                   {coverLetter.company_name ? <span>{coverLetter.company_name}</span> : null}
                   <div className="flex items-center gap-1 text-xs">
                     <Calendar className="h-3 w-3" />
@@ -103,7 +103,7 @@ export default async function CoverLettersDashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild variant="outline" className="h-10 w-full rounded-xl border-orange-500/30 bg-zinc-950 text-orange-500 transition hover:bg-orange-500/10 hover:border-orange-500/50 text-sm font-medium">
+                <Button asChild variant="outline" className="h-10 w-full rounded-xl border-blue-200 bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:border-blue-300 text-sm font-medium">
                   <Link href={`/cover-letter/${coverLetter.id}`}>{'Edit / View'}</Link>
                 </Button>
               </CardContent>
@@ -111,11 +111,11 @@ export default async function CoverLettersDashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/[0.02] py-16">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-white/50">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white py-16">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-blue-600">
             <FileText className="h-6 w-6" />
           </div>
-          <p className="text-sm text-white/50">
+          <p className="text-sm text-gray-500">
             {'No cover letters generated yet.'}
           </p>
         </div>

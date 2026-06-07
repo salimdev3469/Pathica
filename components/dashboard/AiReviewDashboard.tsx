@@ -634,12 +634,12 @@ function AnalyzingOverlay({
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
       <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-200 dark:bg-slate-800">
-        <div className="h-full bg-gradient-to-r from-slate-900 via-orange-600 to-emerald-500 transition-all duration-500 dark:from-slate-100 dark:via-orange-400 dark:to-emerald-400" style={{ width: `${progress}%` }} />
+        <div className="h-full bg-gradient-to-r from-slate-900 via-blue-600 to-emerald-500 transition-all duration-500 dark:from-slate-100  dark:to-emerald-400" style={{ width: `${progress}%` }} />
       </div>
       <div className="flex flex-col items-center gap-6 text-center">
         <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:text-blue-300">
           <Brain className="h-12 w-12 animate-pulse" />
-          <div className="absolute inset-0 animate-ping rounded-2xl border border-orange-500/30" />
+          <div className="absolute inset-0 animate-ping rounded-2xl border border-blue-200" />
         </div>
         <TextShimmer
           key={lines[index]}
@@ -668,7 +668,7 @@ function FixingOverlay({}: {}) {
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-white px-6 dark:bg-slate-950">
       <div className="absolute inset-x-0 bottom-0 h-2 bg-slate-200 dark:bg-slate-800">
-        <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-500 via-orange-600 to-indigo-500 transition-all duration-500 dark:from-emerald-400 dark:via-orange-400 dark:to-indigo-400" />
+        <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-500 via-blue-600 to-indigo-500 transition-all duration-500 dark:from-emerald-400  dark:to-indigo-400" />
       </div>
       <div className="flex flex-col items-center gap-6 text-center">
         <div className="relative flex h-28 w-28 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
@@ -727,7 +727,7 @@ function ReviewSummary({
 
   return (
     <div className="flex min-h-[390px] flex-col">
-      <div className="rounded-2xl border border-orange-500/30 bg-blue-50 p-4">
+      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-bold text-[#111827]">{"We'll help rebuild fast - unlock your job-ready plan"}</p>
           <Button onClick={onFix} disabled={isFixing} className="rounded-xl bg-white text-slate-950 hover:bg-white/90">
@@ -760,7 +760,7 @@ function ResultPanel({
 }) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="mb-7 rounded-2xl border border-orange-500/30 bg-blue-50 p-4">
+      <div className="mb-7 rounded-2xl border border-blue-200 bg-blue-50 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-black text-[#111827]">{'Unlock Full Review'}</p>
@@ -822,7 +822,7 @@ function ScoreDonut({ score }: { score: number }) {
   return (
     <div
       className="relative flex h-40 w-40 items-center justify-center rounded-full"
-      style={{ background: `conic-gradient(#f97316 ${score * 3.6}deg, rgba(255,255,255,0.1) 0deg)` }}
+      style={{ background: `conic-gradient(#2563eb ${score * 3.6}deg, rgba(0,0,0,0.05) 0deg)` }}
     >
       <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-white">
         <span className="text-5xl font-black text-[#111827]">{score}</span>
@@ -846,9 +846,9 @@ function ResumePreview({ review }: { review: AiReviewClientReview }) {
         
         {/* Mobile View Fallback */}
         <div className="flex flex-col gap-4 md:hidden">
-          <div className="flex items-center justify-between rounded-2xl border border-orange-500/30 bg-blue-50 p-4">
+          <div className="flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-50 p-4">
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-blue-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                 <FileText className="h-5 w-5" />
               </div>
               <div className="min-w-0">

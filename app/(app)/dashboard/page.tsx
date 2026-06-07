@@ -153,25 +153,7 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      <section className="mb-7 overflow-hidden rounded-2xl bg-gray-900 border border-gray-800">
-        <div className="flex flex-col sm:flex-row items-center justify-between p-5 sm:p-6">
-          <div className="flex items-start sm:items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 text-white shadow-sm">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-base font-bold text-white">
-                {'Store unlimited resumes and share them with one Pathica link.'}
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 sm:mt-0 shrink-0">
-            <div className="inline-flex items-center rounded-full border border-gray-700 bg-white/5 px-3 py-1 text-xs font-bold tracking-wide text-gray-300">
-              {'Always Free'}
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {cvList.length > 0 ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">

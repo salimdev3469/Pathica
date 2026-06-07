@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Brain, FileText, Mail, User, LogOut } from 'lucide-react';
+import { Brain, FileText, Mail, User, LogOut, Sparkles } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 import LiveTokenCounter from '@/components/billing/LiveTokenCounter';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -34,6 +34,15 @@ export default function DashboardShell({
 }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#111827] selection:bg-blue-100">
+      <div className="bg-gray-900 px-4 py-2 sm:px-6 lg:px-8 text-center flex flex-col sm:flex-row items-center justify-center gap-2">
+        <p className="text-sm font-medium text-white flex items-center justify-center gap-2">
+          <Sparkles className="h-4 w-4 text-white shrink-0" />
+          Store unlimited resumes and share them with one Pathica link.
+        </p>
+        <span className="inline-flex items-center rounded-full border border-gray-700 bg-white/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-300 shrink-0">
+          Always Free
+        </span>
+      </div>
       <header className="border-b border-[#E5E7EB] bg-white/60 backdrop-blur-md sticky top-0 z-40">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-4 sm:px-6">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
@@ -93,14 +102,14 @@ export default function DashboardShell({
                   <Link
                     key={item.id}
                     href={item.href}
-                    className={`flex h-9 items-center gap-2 rounded-full px-4 text-sm font-bold transition-all ${
+                    className={`flex h-9 items-center gap-1.5 sm:gap-2 rounded-full px-3 sm:px-4 text-xs sm:text-sm font-bold transition-all ${
                       isActive
                         ? 'bg-blue-50 text-blue-600 shadow-sm'
                         : 'text-[#4B5563] hover:bg-slate-50 hover:text-[#111827]'
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{item.labelEn}</span>
+                    <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span>{item.labelEn}</span>
                   </Link>
                 );
               })}
