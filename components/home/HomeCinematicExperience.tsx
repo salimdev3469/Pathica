@@ -1112,7 +1112,7 @@ function ProofAIWriterCard({}: {}) {
 
 function WorkflowSlide({ workflow, density }: { workflow: HomeCinematicExperienceProps['workflow']; density: ViewportDensity }) {
   return (
-    <div className="flex h-full w-full items-center overflow-hidden">
+    <div className="flex w-full items-center overflow-hidden">
       <div className={cn('grid w-full xl:grid-cols-[0.78fr_1.22fr]', density === 'tight' ? 'gap-6' : 'gap-8')}>
         <div className="max-w-xl">
           <InlineLabel>{workflow.label}</InlineLabel>
@@ -1216,7 +1216,7 @@ function QuoteSlide({
   const activeEntry = quote?.entries?.[displayIndex] ?? quote?.entries?.[0];
 
   return (
-    <div className="flex h-full w-full items-center justify-center overflow-hidden">
+    <div className="flex w-full items-center justify-center overflow-hidden">
       <div className={cn('mx-auto text-center', density === 'tight' ? 'max-w-3xl' : 'max-w-4xl')}>
         <InlineLabel>{quote.label}</InlineLabel>
         <p
@@ -1275,7 +1275,7 @@ function QuoteSlide({
 
 function StatsSlide({ stats, density }: { stats: HomeCinematicExperienceProps['stats']; density: ViewportDensity }) {
   return (
-    <div className="flex h-full w-full items-center overflow-hidden">
+    <div className="flex w-full items-center overflow-hidden">
       <div className="w-full">
         <InlineLabel>{stats.label}</InlineLabel>
 
