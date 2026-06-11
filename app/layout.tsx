@@ -25,22 +25,22 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseUrl()),
   title: {
-    default: 'Pathica | AI Resume Builder, CV Oluşturucu & Cover Letter Generator',
+    default: 'Pathica | AI Resume Builder, CV Maker & Cover Letter Generator',
     template: '%s | Pathica',
   },
   description:
-    'Pathica ile AI resume builder, cv oluşturucu ve cover letter generator araçlarını kullanarak ATS uyumlu başvuru dosyaları hazırla.',
+    "Build ATS-friendly resumes and cover letters with Pathica's AI resume builder, CV maker, and keyword optimization tools.",
   keywords: [
     'ai resume builder',
     'resume builder',
     'cv builder',
-    'cv oluşturucu',
-    'online cv oluştur',
-    'ai cv oluşturucu',
+    'cv maker',
+    'online resume maker',
     'cover letter generator',
-    'ön yazı oluşturucu',
-    'ön yazı nasıl yazılır',
-    'ats resume builder',
+    'ats resume checker',
+    'resume keyword optimizer',
+    'ats friendly resume format',
+    'ai cv maker',
   ],
   alternates: {
     canonical: '/',
@@ -51,14 +51,14 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Pathica | AI Resume Builder, CV Oluşturucu & Cover Letter Generator',
-    description: 'ATS uyumlu CV, resume ve ön yazı üretmek için AI destekli builder ve optimizasyon araçları.',
+    title: 'Pathica | AI Resume Builder, CV Maker & Cover Letter Generator',
+    description: "Build ATS-friendly resumes and cover letters with Pathica's AI resume builder, CV maker, and keyword optimization tools.",
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pathica | AI Resume Builder ve CV Oluşturucu',
-    description: 'CV oluşturucu, resume builder ve cover letter generator araçlarıyla başvurularını güçlendir.',
+    title: 'Pathica | AI Resume Builder & CV Maker',
+    description: "Build ATS-friendly resumes and cover letters with Pathica's AI resume builder, CV maker, and keyword optimization tools.",
   },
   icons: {
     icon: '/tab_icon.png',

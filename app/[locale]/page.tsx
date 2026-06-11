@@ -35,6 +35,8 @@ export function generateMetadata({ params }: LocaleHubPageProps): Metadata {
       : [
           'ai resume builder',
           'resume builder',
+          'cv maker',
+          'online resume maker',
           'cover letter generator',
           'how to write a cover letter',
           'ats resume builder',

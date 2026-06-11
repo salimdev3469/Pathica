@@ -17,9 +17,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export const metadata: Metadata = {
-  title: 'AI Resume Builder, CV Oluşturucu ve Cover Letter Generator',
+  title: 'AI Resume Builder, CV Maker and Cover Letter Generator',
   description:
-    'Pathica ile AI resume builder, CV oluşturucu ve cover letter generator araçlarıyla ATS uyumlu başvuru dosyaları hazırla.',
+    'Create ATS-friendly resumes with Pathica. Use our AI resume builder, CV maker, and cover letter generator for job-winning applications.',
   alternates: {
     canonical: '/',
     languages: {
@@ -29,29 +29,27 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Pathica | AI Resume Builder, CV Oluşturucu ve Cover Letter Generator',
+    title: 'Pathica | AI Resume Builder, CV Maker and Cover Letter Generator',
     description:
-      'ATS uyumlu resume, CV ve ön yazı hazırlamak için AI destekli builder, keyword optimizasyonu ve şablonlar.',
+      'Create ATS-friendly resumes with Pathica. Use our AI resume builder, CV maker, and cover letter generator for job-winning applications.',
     type: 'website',
     url: '/',
     images: [{ url: '/logo_pathica.png', alt: 'Pathica logo' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pathica | AI Resume Builder ve CV Oluşturucu',
-    description: 'AI CV oluşturucu, resume builder ve cover letter araçlarıyla hızlı ve ATS odaklı başvurular hazırla.',
+    title: 'Pathica | AI Resume Builder and CV Maker',
+    description: 'Create ATS-friendly resumes with Pathica. Use our AI resume builder, CV maker, and cover letter generator for job-winning applications.',
     images: ['/logo_pathica.png'],
   },
   keywords: [
     'ai resume builder',
     'resume builder',
-    'cv oluşturucu',
-    'online cv oluştur',
-    'ai cv oluşturucu',
+    'cv builder',
+    'cv maker',
+    'online resume maker',
     'cover letter generator',
     'cover letter writing',
-    'ön yazı oluşturucu',
-    'ön yazı nasıl yazılır',
     'ats resume checker',
     'resume keyword optimizer',
     'resume analyzer',
