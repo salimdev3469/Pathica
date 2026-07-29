@@ -8,9 +8,13 @@ export const supabaseAdmin = createClient(
 );
 
 // Helper for client-side usage (to be used later when setting up Auth proper with SSR)
+let client: ReturnType<typeof createSSRBrowserClient> | undefined;
+
 export const createBrowserClient = () => {
-    return createSSRBrowserClient(
+    if (client) return client;
+    client = createSSRBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-url.supabase.co',
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
     );
+    return client;
 };

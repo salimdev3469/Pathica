@@ -81,7 +81,7 @@ export default function RootLayout({
   const initialCookieConsent = cookieStore.get(COOKIE_CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
-    <html lang="en" suppressHydrationWarning className="overflow-x-clip">
+    <html lang="en" suppressHydrationWarning className="overflow-x-clip" translate="no">
       <body className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased transition-colors duration-300 overflow-x-clip`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <CssHealthCheck />
